@@ -1,0 +1,33 @@
+---
+description: قوانین استقرار — build، migrate، seed، Docker
+globs: docker/**,Dockerfile,docker-compose.yml,scripts/**,packages/core/**,package.json
+alwaysApply: false
+---
+
+# استقرار پلتفرم (Pelak)
+
+تنها deploy: `apps/pelak` — جزئیات: `docs/DEPLOYMENT.md`
+
+## جداسازی مراحل
+
+| مرحله | زمان | دستور |
+|-------|------|--------|
+| Build image | CI / docker build | `npm run build -w @nextgen-cms/pelak` |
+| Migrate | هر startup | `npm run db:migrate` |
+| Seed | first-boot | `FIRST_BOOT=1 npm run db:seed` |
+| Backup | قبل migrate prod | `docker/docker-entrypoint.sh` |
+
+**هرگز** migrate/seed در `build`.
+
+## Docker
+
+- `docker/Dockerfile` — multi-stage standalone
+- Entrypoint: `docker/docker-entrypoint.sh`
+- Server: `node apps/pelak/server.js`
+- Volume: `/data` · Health: `GET /api/health`
+
+## توسعه محلی
+
+```bash
+npm run db:setup && npm run dev
+```

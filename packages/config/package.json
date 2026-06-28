@@ -1,0 +1,17 @@
+{
+  "name": "@nextgen-cms/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@nextgen-cms/contract": "*",
+    "@nextgen-cms/core": "*"
+  },
+  "peerDependencies": {
+    "next": ">=16.0.0"
+  }
+}

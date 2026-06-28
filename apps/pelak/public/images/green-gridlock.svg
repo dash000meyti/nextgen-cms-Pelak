@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="توربین‌های بادی در منظره‌ای مه‌آلود">
+  <defs>
+    <linearGradient id="mist" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dfe6e9"/>
+      <stop offset="100%" stop-color="#74b9ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#mist)"/>
+  <rect y="650" width="1600" height="250" fill="#55efc4" opacity="0.35"/>
+  <g fill="#2d3436" opacity="0.75">
+    <rect x="260" y="520" width="12" height="180"/>
+    <line x1="266" y1="520" x2="180" y2="420" stroke="#2d3436" stroke-width="8"/>
+    <line x1="266" y1="520" x2="350" y2="400" stroke="#2d3436" stroke-width="8"/>
+    <line x1="266" y1="520" x2="266" y2="340" stroke="#2d3436" stroke-width="8"/>
+    <rect x="760" y="480" width="14" height="220"/>
+    <line x1="767" y1="480" x2="660" y2="360" stroke="#2d3436" stroke-width="9"/>
+    <line x1="767" y1="480" x2="870" y2="350" stroke="#2d3436" stroke-width="9"/>
+    <line x1="767" y1="480" x2="767" y2="300" stroke="#2d3436" stroke-width="9"/>
+    <rect x="1180" y="540" width="12" height="160"/>
+    <line x1="1186" y1="540" x2="1100" y2="450" stroke="#2d3436" stroke-width="8"/>
+    <line x1="1186" y1="540" x2="1270" y2="430" stroke="#2d3436" stroke-width="8"/>
+    <line x1="1186" y1="540" x2="1186" y2="370" stroke="#2d3436" stroke-width="8"/>
+  </g>
+</svg>

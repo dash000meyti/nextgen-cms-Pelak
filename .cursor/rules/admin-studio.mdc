@@ -1,0 +1,46 @@
+---
+description: قوانین Studio CMS
+globs: packages/studio/**,apps/pelak/app/admin/**,apps/pelak/components/admin/**
+alwaysApply: false
+---
+
+# Admin Studio — Nextgen CMS
+
+`packages/studio` = package منطق admin · UI در `apps/pelak/components/admin/`
+
+مرجع: `docs/STUDIO.md` · skills: `hokmran-studio`, `hokmran-rbac`
+
+## مرزها
+
+- **Public:** `@nextgen-cms/site-data` — هرگز mutations
+- **Studio:** `packages/studio/` + `components/admin/` — هرگز `components/home/`
+
+## Mutation pattern
+
+```
+requirePermissionMutation("…") → validate → repository write → invalidate*() → return | redirect
+```
+
+## RBAC
+
+- `settings.*` — تب‌های `/admin/settings/*`
+- `content.*` / `members.*` / `media.*` — بخش هسته
+- `modules.*` — CRUD ماژول (`/admin/issues`, `/admin/videos`)
+- `settings.modules` — فقط toggle فعال/غیرفعال ماژول
+- موضوعات: `/admin/settings/content/topics` — مجوز `settings.content`
+
+## Settings hub
+
+- ۸ تب: `packages/studio/src/admin/settings-tabs.ts`
+- layout: بدون هیچ `settings.*` → `forbidden()`
+
+## Schema-driven
+
+- Field defs: `packages/contract/src/cms-schema/`
+- Validation: `packages/studio/src/cms/validation/`
+- Mutations: `packages/studio/src/cms/mutations/`
+
+## Auth
+
+- `apps/pelak/proxy.ts` — JWT cookie
+- `getMemberSession()` در layout و mutations

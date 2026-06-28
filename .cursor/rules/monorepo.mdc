@@ -1,0 +1,48 @@
+---
+description: Monorepo workspace boundaries and import rules
+globs: apps/**,packages/**
+alwaysApply: false
+---
+
+# Monorepo — Nextgen CMS
+
+مرجع کلی: `AGENTS.md`
+
+## Workspaces
+
+- Root: `nextgen-cms` — `npm workspaces`
+- Deploy app: `@nextgen-cms/pelak` در `apps/pelak` (تنها app)
+- Packages: `@nextgen-cms/contract|core|config|site-data|studio|seed`
+- `packages/studio` package منطق admin است — app حذف‌شدهٔ `apps/studio` نیست
+
+## وابستگی مجاز
+
+```
+contract (leaf)
+core ← contract
+config ← core + contract
+site-data ← core + config + contract
+studio ← core + config + contract
+seed ← core
+apps/pelak ← all
+```
+
+## Import
+
+- کد جدید: `@nextgen-cms/*` — نه `@/lib/*` (shim منسوخ)
+- کامپوننت‌های app: `@/components/*` داخل `apps/pelak`
+
+## Build
+
+```bash
+npm run dev
+npm run build        # بدون migrate/seed
+```
+
+## تغییر schema
+
+1. `packages/core/src/db/schema/`
+2. `npm run db:generate -w @nextgen-cms/core`
+3. commit migration در `packages/core/drizzle/`
+
+جزئیات: `docs/MIGRATION-POLICY.md`

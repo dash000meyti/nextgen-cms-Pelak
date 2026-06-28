@@ -1,0 +1,28 @@
+---
+description: قراردادهای استایل و تم حکمران (Tailwind v4، توکن‌ها، برند قرمز، فونت IRANSans)
+globs: apps/**/app/**/*.css,apps/**/components/**/*.tsx,packages/config/**
+alwaysApply: false
+---
+
+# استایل و تم حکمران
+
+- Tailwind v4. توکن‌های CSS از DB (`theme_tokens`) در runtime inject می‌شوند؛ **fallback** در `app/globals.css` با `@theme inline`.
+- منبع runtime: `ThemeTokensProvider` → `--paper`, `--surface`, `--accent`, ...
+- پیش‌فرض‌های کد: `packages/config/src/theme/defaults.ts` — باید با `globals.css` هم‌خوان بمانند.
+- رنگ‌های برند:
+  - `--accent` = `#8b0016` (روشن) / `#e0455d` (تیره) — قرمز حکمران
+  - سطوح: `--paper`, `--surface`, `--surface-2`
+  - متن: `--ink`, `--ink-muted`, `--ink-faint`
+  - خطوط: `--rule`, `--rule-strong`
+  - نرم: `--accent-soft` (پس‌زمینهٔ ملایم accent)
+  - از کلاس‌های Tailwind `text-accent`, `bg-paper`, `border-rule` و... استفاده کن.
+- لوگو: `public/images/hokmran-logo.svg` — SVG خالص قرمز، در هر دو تم ثابت. هرگز از PNG با `invert` استفاده نکن.
+- فونت:
+  - `font-sans` → IRANSansX Regular (بدنه)
+  - `font-heading` → IRANSansX Black (عناوین h1–h6 خودکار، `leading-1.25`)
+- تم روشن/تیره: کلاس `dark` روی `<html>` توسط `ThemeProvider`. FOUC با اسکریپت inline در `app/layout.tsx`.
+- عرض‌های استاندارد: `max-w-content` (۴۲rem) برای بدنهٔ مقاله، `max-w-wide` (۷۶rem) برای گرید/هدر. همیشه داخل `Container`.
+- بدنهٔ مقاله: کلاس `prose-article` روی wrapper — اندازه/leading پاراگراف‌ها یکدست می‌شود.
+- تصاویر: `rounded` (نه گوشهٔ تیز)، hover `scale-[1.03]` با `duration-500 ease-out`.
+- فاصله‌ها یکدست: `py-10 md:py-14` برای صفحات، `gap-8 sm:gap-10 lg:gap-8` برای گریدها.
+- `@theme` قانون Tailwind v4 است؛ هشدار «Unknown at rule» ادیتور است نه خطای build.

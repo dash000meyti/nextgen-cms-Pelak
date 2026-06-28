@@ -1,0 +1,232 @@
+"use client";
+
+import {
+  createMemberAndRedirect,
+  type MemberFormData,
+  removeMember,
+  saveMember,
+} from "@nextgen-cms/studio/cms/mutations/member";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { ImageField } from "@/components/admin/fields/ImageField";
+import { SlugField } from "@/components/admin/fields/SlugField";
+import { TextareaField } from "@/components/admin/fields/TextareaField";
+import { TextField } from "@/components/admin/fields/TextField";
+import { FormMessage } from "@/components/admin/studio/FormMessage";
+
+type RoleOption = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
+type MemberFormProps = {
+  mode: "create" | "edit";
+  memberId?: number;
+  initial: MemberFormData;
+  roleOptions: RoleOption[];
+  canDelete?: boolean;
+};
+
+export function MemberForm({
+  mode,
+  memberId,
+  initial,
+  roleOptions,
+  canDelete = false,
+}: MemberFormProps) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [form, setForm] = useState(initial);
+
+  function update<K extends keyof MemberFormData>(
+    key: K,
+    value: MemberFormData[K],
+  ) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function handleSave() {
+    setError(null);
+    setSuccess(null);
+    startTransition(async () => {
+      if (mode === "create") {
+        const result = await createMemberAndRedirect(form);
+        if (result && !result.ok) setError(result.error);
+        return;
+      }
+      if (!memberId) return;
+      const result = await saveMember(memberId, form);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setSuccess("ذخیره شد.");
+      router.refresh();
+    });
+  }
+
+  function handleDelete() {
+    if (!memberId) return;
+    if (!window.confirm("این عضو حذف یا غیرفعال شود؟")) return;
+    setError(null);
+    setSuccess(null);
+    startTransition(async () => {
+      const result = await removeMember(memberId);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      router.push("/admin/members");
+      router.refresh();
+    });
+  }
+
+  return (
+    <div className="space-y-8">
+      <FormMessage error={error} success={success} />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <TextField
+          id="name"
+          label="نام"
+          value={form.name}
+          onChange={(name) => update("name", name)}
+          required
+        />
+        <SlugField
+          id="slug"
+          label="نامک"
+          value={form.slug}
+          onChange={(slug) => update("slug", slug)}
+          sourceTitle={mode === "create" ? form.name : undefined}
+          required
+        />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <TextField
+          id="email"
+          label="ایمیل"
+          value={form.email}
+          onChange={(email) => update("email", email)}
+        />
+        <TextField
+          id="password"
+          label={mode === "create" ? "رمز عبور" : "رمز عبور جدید"}
+          value={form.password}
+          onChange={(password) => update("password", password)}
+          type="password"
+          hint={mode === "edit" ? "برای تغییر ندادن، خالی بگذارید." : undefined}
+        />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <TextField
+          id="displayRole"
+          label="سمت"
+          value={form.displayRole}
+          onChange={(displayRole) => update("displayRole", displayRole)}
+        />
+        <div className="space-y-2">
+          <label
+            htmlFor="roleId"
+            className="block text-sm font-medium text-ink"
+          >
+            نقش سیستمی
+          </label>
+          <select
+            id="roleId"
+            value={form.roleId}
+            onChange={(event) =>
+              update("roleId", Number.parseInt(event.target.value, 10))
+            }
+            className="w-full rounded border border-rule bg-paper px-3 py-2 text-sm text-ink"
+          >
+            {roleOptions.map((role) => (
+              <option key={role.id} value={role.id}>
+                {role.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <label className="flex items-center gap-2 text-sm text-ink">
+        <input
+          type="checkbox"
+          checked={form.isActive}
+          onChange={(event) => update("isActive", event.target.checked)}
+          className="rounded border-rule"
+        />
+        حساب فعال
+      </label>
+
+      <TextareaField
+        id="bio"
+        label="بیوگرافی"
+        value={form.bio}
+        onChange={(bio) => update("bio", bio)}
+        rows={5}
+      />
+
+      <ImageField
+        id="avatar"
+        label="تصویر"
+        src={form.avatarSrc}
+        alt={form.avatarAlt}
+        onSrcChange={(avatarSrc) => update("avatarSrc", avatarSrc)}
+        onAltChange={(avatarAlt) => update("avatarAlt", avatarAlt)}
+        required
+      />
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <TextField
+          id="socialTwitter"
+          label="توییتر"
+          value={form.socialTwitter}
+          onChange={(socialTwitter) => update("socialTwitter", socialTwitter)}
+        />
+        <TextField
+          id="socialTelegram"
+          label="تلگرام"
+          value={form.socialTelegram}
+          onChange={(socialTelegram) =>
+            update("socialTelegram", socialTelegram)
+          }
+        />
+        <TextField
+          id="socialInstagram"
+          label="اینستاگرام"
+          value={form.socialInstagram}
+          onChange={(socialInstagram) =>
+            update("socialInstagram", socialInstagram)
+          }
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-3 border-t border-rule pt-6">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={pending}
+          className="rounded bg-accent px-6 py-2 text-sm text-paper hover:bg-accent-hover disabled:opacity-50"
+        >
+          {pending ? "در حال ذخیره…" : mode === "create" ? "ایجاد" : "ذخیره"}
+        </button>
+        {canDelete && memberId ? (
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={pending}
+            className="rounded border border-rule px-6 py-2 text-sm text-ink-muted hover:bg-surface-2 disabled:opacity-50"
+          >
+            حذف
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,20 @@
+{
+  "name": "@nextgen-cms/studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@nextgen-cms/contract": "*",
+    "@nextgen-cms/config": "*",
+    "@nextgen-cms/core": "*",
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.3"
+  },
+  "peerDependencies": {
+    "next": ">=16.0.0"
+  }
+}

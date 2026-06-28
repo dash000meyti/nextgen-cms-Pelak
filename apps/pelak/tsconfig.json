@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./*"],
+      "@nextgen-cms/contract": ["../../packages/contract/src/index.ts"],
+      "@nextgen-cms/contract/*": ["../../packages/contract/src/*"],
+      "@nextgen-cms/core": ["../../packages/core/src/index.ts"],
+      "@nextgen-cms/core/*": ["../../packages/core/src/*"],
+      "@nextgen-cms/config": ["../../packages/config/src/index.ts"],
+      "@nextgen-cms/config/*": ["../../packages/config/src/*"],
+      "@nextgen-cms/site-data": ["../../packages/site-data/src/index.ts"],
+      "@nextgen-cms/site-data/*": ["../../packages/site-data/src/*"],
+      "@nextgen-cms/studio": ["../../packages/studio/src/index.ts"],
+      "@nextgen-cms/studio/*": ["../../packages/studio/src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "proxy.ts"
+  ],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,76 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1782569256407,
+      "tag": "0000_panoramic_scorpion",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1782570000000,
+      "tag": "0001_platform_meta",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1782571000000,
+      "tag": "0002_theme_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1782649015243,
+      "tag": "0003_faithful_carnage",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1782652113854,
+      "tag": "0004_thankful_aaron_stack",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1782655000000,
+      "tag": "0005_backfill_members_from_authors",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1782656000000,
+      "tag": "0006_low_the_hand",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1782657442441,
+      "tag": "0007_mighty_elektra",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1782660000000,
+      "tag": "0008_topics_to_content_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1782661000000,
+      "tag": "0009_module_permissions_backfill",
+      "breakpoints": true
+    }
+  ]
+}

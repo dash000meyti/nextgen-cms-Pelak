@@ -1,0 +1,20 @@
+{
+  "name": "@nextgen-cms/seed",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "db:seed": "tsx src/seed.ts"
+  },
+  "dependencies": {
+    "@nextgen-cms/contract": "*",
+    "@nextgen-cms/core": "*",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.11.1",
+    "drizzle-orm": "^0.45.2",
+    "tsx": "^4.22.4"
+  }
+}

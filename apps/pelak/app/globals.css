@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+/* ===========================================================
+   Hokmran design tokens
+   Light (default) + Dark
+   =========================================================== */
+:root {
+  /* surfaces & text */
+  --paper: #ffffff;
+  --surface: #faf8f6;
+  --surface-2: #f3f0eb;
+  --ink: #14110f;
+  --ink-muted: #5c5752;
+  --ink-faint: #8a847d;
+
+  /* brand */
+  --accent: #8b0016;
+  --accent-hover: #6e0011;
+  --accent-soft: #f4e8ea;
+
+  /* lines */
+  --rule: #e6e2dd;
+  --rule-strong: #d4cec6;
+
+  /* widths */
+  --content-max: 42rem; /* ~672px article body */
+  --wide-max: 76rem; /* ~1216px layout */
+
+  /* radius */
+  --radius: 6px;
+}
+
+:root.dark {
+  --paper: #0e0d0c;
+  --surface: #161412;
+  --surface-2: #1f1c19;
+  --ink: #f4f1ec;
+  --ink-muted: #a39d94;
+  --ink-faint: #6f6a63;
+
+  --accent: #e0455d;
+  --accent-hover: #f0566e;
+  --accent-soft: #2a1518;
+
+  --rule: #2a2723;
+  --rule-strong: #3a362f;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+
+  --font-sans: var(--font-iran-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading:
+    var(--font-iran-sans-black), var(--font-iran-sans), ui-sans-serif, system-ui,
+    sans-serif;
+
+  --max-width-content: var(--content-max);
+  --max-width-wide: var(--wide-max);
+  --radius: var(--radius);
+}
+
+/* ===========================================================
+   Base
+   =========================================================== */
+html {
+  font-size: 100%;
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 93.75%; /* 15px base on small phones */
+  }
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-size: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
+  line-height: 1.75;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--ink);
+}
+
+/* ===========================================================
+   Utilities
+   =========================================================== */
+
+/* Persian numerals helper */
+.fa-num {
+  font-feature-settings: "ss01";
+}
+
+/* Article reading column */
+.prose-article p {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--ink);
+}
+.prose-article p + p {
+  margin-top: 1.25rem;
+}
+
+/* Subtle scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--rule-strong);
+  border-radius: 999px;
+}
+
+/* Hide horizontal scrollbar on nav row while keeping scroll */
+.nav-scroll {
+  scrollbar-width: none;
+}
+.nav-scroll::-webkit-scrollbar {
+  display: none;
+}

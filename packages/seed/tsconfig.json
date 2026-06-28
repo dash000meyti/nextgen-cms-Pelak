@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@nextgen-cms/contract": ["../contract/src/index.ts"],
+      "@nextgen-cms/contract/*": ["../contract/src/*"],
+      "@nextgen-cms/core": ["../core/src/index.ts"],
+      "@nextgen-cms/core/*": ["../core/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

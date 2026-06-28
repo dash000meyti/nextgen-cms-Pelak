@@ -1,0 +1,15 @@
+export const CACHE_TAGS = {
+  siteConfig: "site-config",
+  theme: "theme",
+  articles: "articles",
+  authors: "authors",
+  members: "members",
+  topics: "topics",
+  issues: "issues",
+  videos: "videos",
+  article: (slug: string) => `article:${slug}`,
+  author: (slug: string) => `author:${slug}`,
+  member: (slug: string) => `member:${slug}`,
+  topic: (slug: string) => `topic:${slug}`,
+  issue: (number: number) => `issue:${number}`,
+} as const;

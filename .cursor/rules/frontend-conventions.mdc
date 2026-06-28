@@ -1,0 +1,20 @@
+---
+description: قراردادهای کامپوننت — UI-only
+globs: apps/pelak/components/**/*.tsx,apps/pelak/app/**/*.tsx
+alwaysApply: false
+---
+
+# قراردادهای فرانت‌اند
+
+مرجع ساختار: `docs/UI-BOUNDARY.md` · skill: `hokmran-component`
+
+- کامپوننت‌ها فقط `props` — بدون import DB/fixture
+- داده در **صفحات** از `@nextgen-cms/site-data` — نه در کامپوننت‌ها
+- Server Component پیش‌فرض؛ `"use client"` فقط برای state/event
+- بدون UI library — Tailwind v4 + SVG inline
+- `ui/` primitives · `admin/` استودیو · `home|article/` سایت · `layout/` shell
+- عرض: داخل `Container`
+- RTL: کلاس‌های منطقی (`ps-`/`pe-`)
+- اعداد: `toLocaleString("fa-IR")`
+
+Deploy app: `apps/pelak/components/`

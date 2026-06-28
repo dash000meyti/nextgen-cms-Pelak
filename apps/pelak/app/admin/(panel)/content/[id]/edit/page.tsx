@@ -1,0 +1,69 @@
+import { canDeleteArticle } from "@nextgen-cms/studio/admin/article-access";
+import { requireMember } from "@nextgen-cms/studio/admin/require-member";
+import type { ArticleFormData } from "@nextgen-cms/studio/cms/mutations/article";
+import {
+  findIssuesForPicker,
+  findMembersForArticlePicker,
+  findTopicsForPicker,
+  getArticleForAdmin,
+} from "@nextgen-cms/studio/cms/queries";
+import { notFound } from "next/navigation";
+import { ArticleForm } from "@/components/admin/studio/ArticleForm";
+
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function EditArticlePage({ params }: PageProps) {
+  const { id } = await params;
+  const articleId = Number.parseInt(id, 10);
+  if (Number.isNaN(articleId)) notFound();
+
+  const session = await requireMember();
+  const [article, members, topics, issues] = await Promise.all([
+    getArticleForAdmin(articleId),
+    findMembersForArticlePicker(),
+    findTopicsForPicker(),
+    findIssuesForPicker(),
+  ]);
+
+  if (!article) notFound();
+
+  const initial: ArticleFormData = {
+    slug: article.slug,
+    title: article.title,
+    subtitle: article.subtitle,
+    excerpt: article.excerpt,
+    status: article.status,
+    publishedAt: article.publishedAt,
+    readingMinutes: article.readingMinutes,
+    heroSrc: article.heroSrc,
+    heroAlt: article.heroAlt,
+    heroCaption: article.heroCaption ?? "",
+    heroCredit: article.heroCredit ?? "",
+    issueNumber: article.issueNumber,
+    isFeatured: article.isFeatured,
+    isEditorsPick: article.isEditorsPick,
+    body: article.body,
+    relatedSlugs: article.relatedSlugs,
+    memberIds: article.memberIds,
+    topicIds: article.topicIds,
+  };
+
+  return (
+    <div className="space-y-6">
+      <h1 className="font-heading text-2xl text-ink">ویرایش محتوا</h1>
+      <ArticleForm
+        mode="edit"
+        articleId={articleId}
+        initial={initial}
+        members={members}
+        topics={topics}
+        issues={issues}
+        canDelete={canDeleteArticle(session, {
+          createdByMemberId: article.createdByMemberId,
+        })}
+      />
+    </div>
+  );
+}

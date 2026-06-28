@@ -1,0 +1,18 @@
+services:
+  pelak:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - pelak-data:/data
+    environment:
+      SESSION_SECRET: change-me-to-a-long-random-string
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: changeme123
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    restart: unless-stopped
+
+volumes:
+  pelak-data:

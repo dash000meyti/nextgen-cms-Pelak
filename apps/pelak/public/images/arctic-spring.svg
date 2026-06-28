@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="منظره یخی قطب شمال در طلوع">
+  <defs>
+    <linearGradient id="dawn" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1b2a41"/>
+      <stop offset="45%" stop-color="#6d4b7a"/>
+      <stop offset="100%" stop-color="#f0a36b"/>
+    </linearGradient>
+    <linearGradient id="snow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dbe7ef"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#dawn)"/>
+  <path d="M0 620 L300 420 L620 560 L980 380 L1300 520 L1600 450 L1600 900 L0 900 Z" fill="url(#snow)"/>
+  <ellipse cx="820" cy="760" rx="520" ry="60" fill="#ffffff" opacity="0.25"/>
+</svg>

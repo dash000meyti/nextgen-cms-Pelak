@@ -1,0 +1,12 @@
+---
+description: ساختار آمادهٔ i18n برای افزودن انگلیسی (/en) بعداً
+globs: packages/**,apps/**/app/**
+alwaysApply: false
+---
+
+# آماده‌سازی i18n
+
+- پیش‌فرض: فارسی (RTL) در root.
+- رشته‌های UI از `getSiteConfig()` / `site_settings` در DB می‌آیند.
+- مسیر انگلیسی بعداً با `/en/[...]"` یا `app/[locale]/` اضافه می‌شود؛ فعلاً ساختار flat نگه‌دار تا refactor ساده بماند.
+- تاریخ‌ها و اعداد: فارسی با `toLocaleString("fa-IR")`. برای انگلیسی، locale را از params بخوان.

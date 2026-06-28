@@ -1,0 +1,28 @@
+{
+  "name": "@nextgen-cms/core",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*",
+    "./drizzle/*": "./drizzle/*"
+  },
+  "scripts": {
+    "db:generate": "drizzle-kit generate --config drizzle.config.ts",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:backup": "tsx scripts/backup-db.ts",
+    "db:purge-archived-media": "tsx scripts/purge-archived-media.ts"
+  },
+  "dependencies": {
+    "@nextgen-cms/contract": "*",
+    "better-sqlite3": "^12.11.1",
+    "dayjs": "^1.11.21",
+    "drizzle-orm": "^0.45.2",
+    "jalaliday": "^3.1.1",
+    "tsx": "^4.22.4"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.10"
+  }
+}

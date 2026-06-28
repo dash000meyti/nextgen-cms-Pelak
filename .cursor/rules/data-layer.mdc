@@ -1,0 +1,34 @@
+---
+description: لایهٔ داده — SQLite، Drizzle، repositories، accessorهای public
+globs: packages/core/**,packages/site-data/**,packages/contract/**
+alwaysApply: false
+---
+
+# لایهٔ داده — Nextgen CMS
+
+مرجع: `AGENTS.md` · `docs/ARCHITECTURE.md`
+
+## پشته
+
+- **SQLite** روی volume: `pelak.sqlite` (dev: `./data/`, prod: `/data/`)
+- **Schema:** `packages/core/src/db/schema/`
+- **Migrations:** `packages/core/drizzle/migrations/` — additive-only
+- **Repositories:** `packages/core/src/db/repositories/`
+- **Public accessor:** `packages/site-data/src/get-content.ts`
+- **Types:** `packages/contract/src/types/`
+
+## قوانین
+
+- کامپوننت‌ها DB import نمی‌کنند — صفحات accessor + props
+- Admin از `@nextgen-cms/studio` — نه `get-content`
+- `platform_meta` — `packages/core/src/platform/meta.ts`
+
+## Migration / Seed
+
+```bash
+npm run db:generate
+npm run db:migrate
+npm run db:setup    # migrate + first-boot seed
+```
+
+Fixtures: `packages/seed/src/` — جزئیات: `docs/MIGRATION-POLICY.md`

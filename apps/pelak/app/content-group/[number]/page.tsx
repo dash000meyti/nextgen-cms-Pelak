@@ -3,6 +3,7 @@ import { requireFeatureModule } from "@nextgen-cms/site-data/require-feature-mod
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { contentGroupCoverFrameClass } from "@/components/content-group/content-group-cover-aspect";
 import { ArticleListItem } from "@/components/article/ArticleListItem";
 import { SectionTitle } from "@/components/article/SectionHeader";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
@@ -41,7 +42,9 @@ export default async function ContentGroupPage({
       />
 
       <div className="mt-6 grid gap-6 border-b border-rule pb-10 sm:grid-cols-[200px_1fr] sm:gap-10 md:grid-cols-[260px_1fr] md:gap-14">
-        <div className="relative aspect-3/4 w-full max-w-[200px] overflow-hidden rounded bg-rule sm:max-w-none">
+        <div
+          className={`${contentGroupCoverFrameClass} w-full max-w-[200px] sm:max-w-none`}
+        >
           <Image
             src={group.cover.src}
             alt={group.cover.alt}

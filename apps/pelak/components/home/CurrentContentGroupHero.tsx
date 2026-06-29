@@ -2,6 +2,7 @@ import type { ArticlePreview } from "@nextgen-cms/contract/types/article";
 import type { ContentGroup } from "@nextgen-cms/contract/types/content-group";
 import Image from "next/image";
 import Link from "next/link";
+import { contentGroupCoverFrameClass } from "@/components/content-group/content-group-cover-aspect";
 import { ArticleListItem } from "@/components/article/ArticleListItem";
 import { SectionTitle } from "@/components/article/SectionHeader";
 import { Container } from "@/components/layout/Container";
@@ -23,7 +24,9 @@ export function CurrentContentGroupHero({
       <div className="grid gap-8 md:grid-cols-[280px_1fr] md:gap-14">
         <div className="space-y-4">
           <Link href={`/content-group/${group.number}`} className="block">
-            <div className="relative mx-auto aspect-3/4 w-full max-w-[220px] overflow-hidden rounded bg-rule sm:max-w-[260px] md:max-w-none">
+            <div
+              className={`${contentGroupCoverFrameClass} mx-auto w-full max-w-[220px] sm:max-w-[260px] md:max-w-none`}
+            >
               <Image
                 src={group.cover.src}
                 alt={group.cover.alt}

@@ -1,6 +1,7 @@
 import type { ContentGroupSummary } from "@nextgen-cms/contract/types/content-group";
 import Image from "next/image";
 import Link from "next/link";
+import { contentGroupCoverFrameClass } from "@/components/content-group/content-group-cover-aspect";
 
 type ContentGroupCardProps = {
   group: ContentGroupSummary;
@@ -12,7 +13,7 @@ export function ContentGroupCard({ group }: ContentGroupCardProps) {
       href={`/content-group/${group.number}`}
       className="group block space-y-4"
     >
-      <div className="relative aspect-3/4 w-full overflow-hidden rounded bg-rule">
+      <div className={`${contentGroupCoverFrameClass} w-full`}>
         <Image
           src={group.cover.src}
           alt={group.cover.alt}

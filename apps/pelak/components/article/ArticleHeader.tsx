@@ -6,6 +6,7 @@ import { ReadingTime } from "@/components/ui/ReadingTime";
 type ArticleHeaderProps = {
   title: string;
   subtitle: string;
+  excerpt?: string;
   authors: Article["authors"];
   publishedAt: string;
   readingMinutes: number;
@@ -14,6 +15,7 @@ type ArticleHeaderProps = {
 export function ArticleHeader({
   title,
   subtitle,
+  excerpt,
   authors,
   publishedAt,
   readingMinutes,
@@ -34,6 +36,12 @@ export function ArticleHeader({
         <span aria-hidden="true">·</span>
         <ReadingTime minutes={readingMinutes} />
       </div>
+
+      {excerpt ? (
+        <p className="text-sm leading-relaxed text-ink-muted sm:text-base md:leading-7">
+          {excerpt}
+        </p>
+      ) : null}
     </header>
   );
 }

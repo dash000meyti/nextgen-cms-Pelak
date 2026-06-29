@@ -1,6 +1,7 @@
 import type { ContentGroup } from "@nextgen-cms/contract/types/content-group";
 import Image from "next/image";
 import Link from "next/link";
+import { contentGroupCoverAspectClass } from "@/components/content-group/content-group-cover-aspect";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 
@@ -12,13 +13,16 @@ export function TopContentGroup({ group }: TopContentGroupProps) {
   return (
     <Container className="flex flex-col items-stretch">
       <div className="w-full flex flex-row items-center justify-between gap-2 py-2">
-        <Link href={`/content-group/${group.number}`}>
+        <Link
+          href={`/content-group/${group.number}`}
+          className={`relative ${contentGroupCoverAspectClass} w-[50px] shrink-0 overflow-hidden rounded-md transition-opacity duration-300 hover:opacity-80`}
+        >
           <Image
             src={group.cover.src}
             alt={group.cover.alt}
-            width={50}
-            height={75}
-            className="rounded-md hover:opacity-80 transition-opacity duration-300"
+            fill
+            className="object-cover"
+            sizes="50px"
             priority
           />
         </Link>

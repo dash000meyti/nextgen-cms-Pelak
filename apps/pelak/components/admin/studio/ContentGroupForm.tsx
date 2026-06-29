@@ -185,6 +185,7 @@ export function ContentGroupForm({
         onSrcChange={(coverSrc) => update("coverSrc", coverSrc)}
         onAltChange={(coverAlt) => update("coverAlt", coverAlt)}
         uploadContext={uploadContext}
+        previewAspectClass="aspect-2/3 w-full max-w-[160px]"
         required
       />
       <button

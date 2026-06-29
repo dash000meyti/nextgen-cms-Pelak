@@ -1,6 +1,7 @@
 import type { ContentGroupSummary } from "@nextgen-cms/contract/types/content-group";
 import Image from "next/image";
 import Link from "next/link";
+import { contentGroupCoverAspectClass } from "@/components/content-group/content-group-cover-aspect";
 import { Button } from "@/components/ui/Button";
 
 type ContentGroupPromoBannerProps = {
@@ -16,7 +17,9 @@ export function ContentGroupPromoBanner({
       className="w-full overflow-hidden rounded border border-rule bg-surface/50"
     >
       <Link href={`/content-group/${group.number}`} className="group block">
-        <div className="relative aspect-3/4 w-full overflow-hidden bg-rule">
+        <div
+          className={`relative ${contentGroupCoverAspectClass} w-full overflow-hidden bg-rule`}
+        >
           <Image
             src={group.cover.src}
             alt={group.cover.alt}

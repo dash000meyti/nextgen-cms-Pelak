@@ -20,6 +20,7 @@ type ImageFieldProps = {
   showCaption?: boolean;
   required?: boolean;
   uploadContext?: MediaUploadContext;
+  previewAspectClass?: string;
 };
 
 export function ImageField({
@@ -36,6 +37,7 @@ export function ImageField({
   showCaption = false,
   required,
   uploadContext,
+  previewAspectClass,
 }: ImageFieldProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -137,7 +139,18 @@ export function ImageField({
         />
       ) : null}
 
-      {src ? (
+      {src ? previewAspectClass ? (
+        <div
+          className={`relative overflow-hidden rounded border border-rule ${previewAspectClass}`}
+        >
+          {/* biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs */}
+          <img
+            src={src}
+            alt={alt || label}
+            className="h-full w-full object-cover"
+          />
+        </div>
+      ) : (
         // biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs
         <img
           src={src}

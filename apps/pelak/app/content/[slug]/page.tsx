@@ -68,6 +68,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             <ArticleHeader
               title={article.title}
               subtitle={article.subtitle}
+              excerpt={article.excerpt}
               authors={article.authors}
               publishedAt={article.publishedAt}
               readingMinutes={article.readingMinutes}

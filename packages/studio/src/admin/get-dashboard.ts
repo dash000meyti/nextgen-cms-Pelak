@@ -6,8 +6,8 @@ import {
 } from "@nextgen-cms/core/db/repositories/articles";
 import {
   countAuthors,
-  countIssues,
-} from "@nextgen-cms/core/db/repositories/issues-authors";
+  countContentGroups,
+} from "@nextgen-cms/core/db/repositories/content-groups-public";
 import { countTopics } from "@nextgen-cms/core/db/repositories/topics";
 import { countVideos } from "@nextgen-cms/core/db/repositories/videos";
 import { requireMember } from "@nextgen-cms/studio/admin/require-member";
@@ -31,7 +31,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     articlesLast30Days,
     totalAuthors,
     totalTopics,
-    totalIssues,
+    totalContentGroups,
     totalVideos,
   ] = await Promise.all([
     countArticlesByStatus(),
@@ -39,7 +39,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     countArticlesSince(30),
     countAuthors(),
     countTopics(),
-    countIssues(),
+    countContentGroups(),
     countVideos(),
   ]);
 
@@ -60,7 +60,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       articlesLast30Days: editAll ? articlesLast30Days : 0,
       totalAuthors,
       totalTopics,
-      totalIssues,
+      totalContentGroups,
       totalVideos,
     },
     recentArticles,

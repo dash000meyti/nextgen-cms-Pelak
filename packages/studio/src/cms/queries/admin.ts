@@ -8,9 +8,9 @@ import {
   resolveMemberNamesByAuthorIds,
 } from "@nextgen-cms/core/db/repositories/articles";
 import {
-  findAllIssuesAdmin,
-  findIssueById,
-} from "@nextgen-cms/core/db/repositories/issues-admin";
+  findAllContentGroupsAdmin,
+  findContentGroupById,
+} from "@nextgen-cms/core/db/repositories/content-groups-admin";
 import { findMembersForArticleAttribution } from "@nextgen-cms/core/db/repositories/members";
 import {
   findAllMembersAdmin,
@@ -25,7 +25,7 @@ import {
   findAllVideosAdmin,
   findVideoById,
 } from "@nextgen-cms/core/db/repositories/videos-admin";
-import { issues, topics } from "@nextgen-cms/core/db/schema";
+import { contentGroups, topics } from "@nextgen-cms/core/db/schema";
 import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
 import { canAccessMembersList } from "@nextgen-cms/studio/admin/member-access";
 import { requireMember } from "@nextgen-cms/studio/admin/require-member";
@@ -72,7 +72,7 @@ export async function getArticleForAdmin(id: number) {
       heroAlt: row.heroAlt,
       heroCaption: row.heroCaption,
       heroCredit: row.heroCredit,
-      issueNumber: row.issueNumber,
+      contentGroupNumber: row.contentGroupNumber,
       isFeatured: row.isFeatured,
       isEditorsPick: row.isEditorsPick,
       body: row.body,
@@ -186,15 +186,15 @@ export async function getTopicForAdmin(id: number) {
   });
 }
 
-export async function listIssuesAdmin() {
+export async function listContentGroupsAdmin() {
   return withMemberAccess(async (memberId) => {
-    return findAllIssuesAdmin(access(memberId));
+    return findAllContentGroupsAdmin(access(memberId));
   });
 }
 
-export async function getIssueForAdmin(id: number) {
+export async function getContentGroupForAdmin(id: number) {
   return withMemberAccess(async (memberId) => {
-    return findIssueById(id, access(memberId));
+    return findContentGroupById(id, access(memberId));
   });
 }
 
@@ -251,18 +251,21 @@ export async function findTopicsForPicker(): Promise<PickerOption[]> {
   }));
 }
 
-export async function findIssuesForPicker(): Promise<PickerOption[]> {
+export async function findContentGroupsForPicker(): Promise<PickerOption[]> {
   const session = await requireMember();
   const allowed =
-    session.permissions.includes("modules.issues.view") ||
+    session.permissions.includes("modules.contentGroup.view") ||
     session.permissions.includes("content.create");
   if (!allowed) {
-    await requirePermission("modules.issues.view");
+    await requirePermission("modules.contentGroup.view");
   }
-  const rows = await db.select().from(issues).orderBy(issues.number);
+  const rows = await db
+    .select()
+    .from(contentGroups)
+    .orderBy(contentGroups.number);
   return rows.map((row) => ({
     id: row.id,
-    label: `شمارهٔ ${row.number.toLocaleString("fa-IR")} — ${row.label}`,
+    label: `گروه محتوا ${row.number.toLocaleString("fa-IR")} — ${row.label}`,
     number: row.number,
   }));
 }

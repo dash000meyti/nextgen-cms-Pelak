@@ -4,7 +4,7 @@ export * from "./article-authors";
 export * from "./article-topics";
 export * from "./articles";
 export * from "./authors";
-export * from "./issues";
+export * from "./content-groups";
 export * from "./media-assets";
 export * from "./member-sessions";
 export * from "./members";

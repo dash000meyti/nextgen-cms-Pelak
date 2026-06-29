@@ -35,7 +35,7 @@
 
 | مسیر | نقش |
 |------|-----|
-| `/admin/issues` | CRUD شماره‌ها — `modules.issues.*` |
+| `/admin/content-group` | CRUD گروه‌های محتوا — `modules.contentGroup.*` |
 | `/admin/videos` | CRUD ویدیوها — `modules.video.*` |
 
 ## لایهٔ CMS (monorepo)
@@ -66,26 +66,26 @@ packages/core/src/db/repositories/ — نوشتن DB
 |------|------|
 | هسته | `content.publish`, `members.edit`, `media.upload` |
 | تنظیمات | `settings.content`, `settings.modules`, … |
-| ماژول | `modules.issues.view`, `modules.video.create`, `modules.newsletter.manage` |
+| ماژول | `modules.contentGroup.view`, `modules.video.create`, `modules.newsletter.manage` |
 
 ### مجوزهای ماژول
 
 | ماژول | مجوزها | مسیر ادمین |
 |-------|--------|------------|
-| شماره‌ها (`issues`) | `view`, `create`, `edit`, `delete` | `/admin/issues` |
+| گروه‌های محتوا (`contentGroup`) | `view`, `create`, `edit`, `delete` | `/admin/content-group` |
 | ویدیو (`video`) | `view`, `create`, `edit`, `delete` | `/admin/videos` |
 | خبرنامه (`newsletter`) | `manage` | فقط تنظیمات (فعال/غیرفعال در `settings.modules`) |
 
 | عمل | مجوز | UI |
 |-----|------|-----|
 | toggle فعال/غیرفعال ماژول | `settings.modules` | `/admin/settings/modules` |
-| CRUD محتوای ماژول | `modules.*` | `/admin/issues`, `/admin/videos` |
+| CRUD محتوای ماژول | `modules.*` | `/admin/content-group`, `/admin/videos` |
 | مدیریت خبرنامه | `modules.newsletter.manage` | تنظیمات ماژول |
 
 ## ماژول‌ها
 
 `ModuleSettings` در `site_settings.module_settings`:
-- `issues`: فعال/غیرفعال + دوره (`yearly|seasonal|monthly|weekly`)
+- `contentGroup`: فعال/غیرفعال + دوره (`yearly|seasonal|monthly|weekly`)
 - `video`: فعال + عنوان صفحه + تعداد در صفحه
 - `newsletter`: فعال/غیرفعال
 

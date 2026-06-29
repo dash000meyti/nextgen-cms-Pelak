@@ -1,15 +1,15 @@
 import { db } from "@nextgen-cms/core/db";
 import { mapAuthorRow } from "@nextgen-cms/core/db/mappers/author";
 import {
-  mapIssueRow,
-  mapIssueSummaryRow,
-} from "@nextgen-cms/core/db/mappers/issue";
-import { findArticlesByIssueNumber } from "@nextgen-cms/core/db/repositories/articles";
+  mapContentGroupRow,
+  mapContentGroupSummaryRow,
+} from "@nextgen-cms/core/db/mappers/content-group";
+import { findArticlesByContentGroupNumber } from "@nextgen-cms/core/db/repositories/articles";
 import {
   articleAuthors,
   articles,
   authors,
-  issues,
+  contentGroups,
 } from "@nextgen-cms/core/db/schema";
 import { and, asc, count, desc, eq } from "drizzle-orm";
 
@@ -63,8 +63,11 @@ export async function countAuthors() {
   return rows[0]?.total ?? 0;
 }
 
-export async function findAllIssueSummaries() {
-  const rows = await db.select().from(issues).orderBy(desc(issues.number));
+export async function findAllContentGroupSummaries() {
+  const rows = await db
+    .select()
+    .from(contentGroups)
+    .orderBy(desc(contentGroups.number));
   const summaries = await Promise.all(
     rows.map(async (row) => {
       const articleRows = await db
@@ -72,55 +75,55 @@ export async function findAllIssueSummaries() {
         .from(articles)
         .where(
           and(
-            eq(articles.issueNumber, row.number),
+            eq(articles.contentGroupNumber, row.number),
             eq(articles.status, "published"),
           ),
         );
-      return mapIssueSummaryRow(row, articleRows[0]?.total ?? 0);
+      return mapContentGroupSummaryRow(row, articleRows[0]?.total ?? 0);
     }),
   );
   return summaries;
 }
 
-export async function findAllIssueNumbers() {
+export async function findAllContentGroupNumbers() {
   const rows = await db
-    .select({ number: issues.number })
-    .from(issues)
-    .orderBy(desc(issues.number));
+    .select({ number: contentGroups.number })
+    .from(contentGroups)
+    .orderBy(desc(contentGroups.number));
   return rows.map((row) => row.number);
 }
 
-export async function findIssueByNumber(number: number) {
+export async function findContentGroupByNumber(number: number) {
   const rows = await db
     .select()
-    .from(issues)
-    .where(eq(issues.number, number))
+    .from(contentGroups)
+    .where(eq(contentGroups.number, number))
     .limit(1);
 
   const row = rows[0];
   if (!row) return undefined;
 
-  const issueArticles = await findArticlesByIssueNumber(number);
-  return mapIssueRow(row, issueArticles);
+  const groupArticles = await findArticlesByContentGroupNumber(number);
+  return mapContentGroupRow(row, groupArticles);
 }
 
-export async function findCurrentIssue() {
+export async function findCurrentContentGroup() {
   const rows = await db
     .select()
-    .from(issues)
-    .orderBy(desc(issues.number))
+    .from(contentGroups)
+    .orderBy(desc(contentGroups.number))
     .limit(1);
 
   const row = rows[0];
   if (!row) {
-    throw new Error("No issues found in database");
+    throw new Error("No content groups found in database");
   }
 
-  const issueArticles = await findArticlesByIssueNumber(row.number);
-  return mapIssueRow(row, issueArticles);
+  const groupArticles = await findArticlesByContentGroupNumber(row.number);
+  return mapContentGroupRow(row, groupArticles);
 }
 
-export async function countIssues() {
-  const rows = await db.select({ total: count() }).from(issues);
+export async function countContentGroups() {
+  const rows = await db.select({ total: count() }).from(contentGroups);
   return rows[0]?.total ?? 0;
 }

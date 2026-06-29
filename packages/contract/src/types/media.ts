@@ -22,6 +22,7 @@ export type MediaAsset = {
 
 export type MediaUploadContext = {
   contentId?: number;
+  contentGroupId?: number;
   memberId?: number;
   folder?: string;
 };

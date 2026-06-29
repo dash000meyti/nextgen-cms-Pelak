@@ -3,7 +3,7 @@ import type { FeatureModules } from "@nextgen-cms/contract/types/theme";
 
 function disabledHrefs(modules: FeatureModules): Set<string> {
   const hrefs = new Set<string>();
-  if (!modules.issues) hrefs.add("/issues");
+  if (!modules.contentGroup) hrefs.add("/content-group");
   if (!modules.video) hrefs.add("/video");
   if (!modules.newsletter) {
     hrefs.add("/newsletter");

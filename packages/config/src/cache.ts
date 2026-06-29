@@ -61,13 +61,13 @@ export function invalidateTopic(slug: string) {
   updateTag(CACHE_TAGS.topic(slug));
 }
 
-export function invalidateIssues() {
-  updateTag(CACHE_TAGS.issues);
+export function invalidateContentGroups() {
+  updateTag(CACHE_TAGS.contentGroups);
 }
 
-export function invalidateIssue(number: number) {
-  updateTag(CACHE_TAGS.issues);
-  updateTag(CACHE_TAGS.issue(number));
+export function invalidateContentGroup(number: number) {
+  updateTag(CACHE_TAGS.contentGroups);
+  updateTag(CACHE_TAGS.contentGroup(number));
 }
 
 export function invalidateVideos() {

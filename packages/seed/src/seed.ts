@@ -19,7 +19,7 @@ import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { articles as mockArticles } from "./fixtures/articles";
 import { authors as mockAuthors } from "./fixtures/authors";
-import { issues as mockIssues } from "./fixtures/issues";
+import { contentGroups as mockContentGroups } from "./fixtures/content-groups";
 import { defaultRolePermissions, systemRoles } from "./fixtures/rbac";
 import { siteConfig as mockSiteConfig } from "./fixtures/site-config";
 import {
@@ -77,7 +77,7 @@ if (force) {
     "article_authors",
     "articles",
     "videos",
-    "issues",
+    "content_groups",
     "topics",
     "authors",
     "site_settings",
@@ -199,16 +199,16 @@ for (const topic of mockTopics) {
   topicIdBySlug.set(topic.slug, result[0].id);
 }
 
-for (const issue of mockIssues) {
-  db.insert(schema.issues)
+for (const group of mockContentGroups) {
+  db.insert(schema.contentGroups)
     .values({
-      number: issue.number,
-      season: issue.season,
-      year: issue.year,
-      label: issue.label,
-      coverSrc: issue.cover.src,
-      coverAlt: issue.cover.alt,
-      publishedAt: issue.publishedAt,
+      number: group.number,
+      season: group.season,
+      year: group.year,
+      label: group.label,
+      coverSrc: group.cover.src,
+      coverAlt: group.cover.alt,
+      publishedAt: group.publishedAt,
     })
     .run();
 }
@@ -234,7 +234,7 @@ for (const article of mockArticles) {
       heroAlt: article.heroImage.alt,
       heroCaption: article.heroImage.caption ?? null,
       heroCredit: article.heroImage.credit ?? null,
-      issueNumber: article.issueNumber ?? null,
+      contentGroupNumber: article.contentGroupNumber ?? null,
       isFeatured: article.isFeatured ?? false,
       isEditorsPick: article.isEditorsPick ?? false,
       body: article.body,

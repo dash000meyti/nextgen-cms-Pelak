@@ -25,7 +25,7 @@ export default async function AdminPanelLayout({
     role: session.role,
     permissions: session.permissions,
     enabledModules: {
-      issues: moduleSettings.issues.enabled,
+      contentGroup: moduleSettings.contentGroup.enabled,
       video: moduleSettings.video.enabled,
     },
   };

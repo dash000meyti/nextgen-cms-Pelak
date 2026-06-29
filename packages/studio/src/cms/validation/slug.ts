@@ -3,6 +3,7 @@ const RESERVED_SLUGS = new Set([
   "api",
   "articles",
   "authors",
+  "content-group",
   "issues",
   "topics",
   "video",

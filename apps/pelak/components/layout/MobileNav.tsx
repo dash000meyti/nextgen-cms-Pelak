@@ -7,10 +7,13 @@ import { createPortal } from "react-dom";
 
 type MobileNavProps = {
   navSections: NavSection[];
-  currentIssueLabel: string;
+  currentContentGroupLabel: string;
 };
 
-export function MobileNav({ navSections, currentIssueLabel }: MobileNavProps) {
+export function MobileNav({
+  navSections,
+  currentContentGroupLabel,
+}: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -92,11 +95,11 @@ export function MobileNav({ navSections, currentIssueLabel }: MobileNavProps) {
 
                   <div className="mt-4 border-t border-rule px-3 pt-4">
                     <Link
-                      href="/issues"
+                      href="/content-group"
                       onClick={() => setOpen(false)}
                       className="block rounded-md bg-accent-soft px-3 py-2.5 text-sm text-accent transition-colors hover:bg-accent hover:text-paper"
                     >
-                      {currentIssueLabel}
+                      {currentContentGroupLabel}
                     </Link>
                   </div>
                 </nav>

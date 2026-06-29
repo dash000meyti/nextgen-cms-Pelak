@@ -9,6 +9,10 @@ import { TextField } from "@/components/admin/fields/TextField";
 
 type EditorBlock = ArticleBlock & { _key: string };
 
+function stableBlockKey(block: ArticleBlock, index: number): string {
+  return `block-${index}-${block.type}`;
+}
+
 function newKey() {
   return crypto.randomUUID();
 }
@@ -31,7 +35,10 @@ function createBlock(type: ArticleBlock["type"]): EditorBlock {
 }
 
 function toEditorBlocks(blocks: ArticleBlock[]): EditorBlock[] {
-  return blocks.map((block) => ({ ...block, _key: newKey() }));
+  return blocks.map((block, index) => ({
+    ...block,
+    _key: stableBlockKey(block, index),
+  }));
 }
 
 function fromEditorBlocks(blocks: EditorBlock[]): ArticleBlock[] {

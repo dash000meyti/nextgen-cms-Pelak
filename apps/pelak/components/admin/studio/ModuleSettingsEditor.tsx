@@ -1,8 +1,8 @@
 "use client";
 
-import { ISSUE_PERIOD_LABELS } from "@nextgen-cms/contract/cms-schema/issue";
+import { CONTENT_GROUP_PERIOD_LABELS } from "@nextgen-cms/contract/cms-schema/content-group";
 import type {
-  IssuePeriod,
+  ContentGroupPeriod,
   ModuleSettings,
 } from "@nextgen-cms/contract/types/modules";
 import { saveModuleSettings } from "@nextgen-cms/studio/cms/mutations/settings";
@@ -15,7 +15,7 @@ type ModuleSettingsEditorProps = {
   value: ModuleSettings;
 };
 
-const PERIOD_OPTIONS: IssuePeriod[] = [
+const PERIOD_OPTIONS: ContentGroupPeriod[] = [
   "yearly",
   "seasonal",
   "monthly",
@@ -51,28 +51,31 @@ export function ModuleSettingsEditor({ value }: ModuleSettingsEditorProps) {
         <label className="flex items-center gap-3 text-sm text-ink">
           <input
             type="checkbox"
-            checked={modules.issues.enabled}
+            checked={modules.contentGroup.enabled}
             onChange={(e) =>
               setModules({
                 ...modules,
-                issues: { ...modules.issues, enabled: e.target.checked },
+                contentGroup: {
+                  ...modules.contentGroup,
+                  enabled: e.target.checked,
+                },
               })
             }
             className="accent-accent"
           />
-          <span className="font-medium">شماره‌ها</span>
+          <span className="font-medium">گروه‌های محتوا</span>
         </label>
-        {modules.issues.enabled ? (
+        {modules.contentGroup.enabled ? (
           <label className="block space-y-1.5 text-sm">
             <span className="text-ink-muted">دوره انتشار</span>
             <select
-              value={modules.issues.period}
+              value={modules.contentGroup.period}
               onChange={(e) =>
                 setModules({
                   ...modules,
-                  issues: {
-                    ...modules.issues,
-                    period: e.target.value as IssuePeriod,
+                  contentGroup: {
+                    ...modules.contentGroup,
+                    period: e.target.value as ContentGroupPeriod,
                   },
                 })
               }
@@ -80,7 +83,7 @@ export function ModuleSettingsEditor({ value }: ModuleSettingsEditorProps) {
             >
               {PERIOD_OPTIONS.map((period) => (
                 <option key={period} value={period}>
-                  {ISSUE_PERIOD_LABELS[period]}
+                  {CONTENT_GROUP_PERIOD_LABELS[period]}
                 </option>
               ))}
             </select>

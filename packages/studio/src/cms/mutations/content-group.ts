@@ -1,14 +1,18 @@
 "use server";
 
-import { invalidateIssue, invalidateIssues } from "@nextgen-cms/config/cache";
+import {
+  invalidateContentGroup,
+  invalidateContentGroups,
+} from "@nextgen-cms/config/cache";
 import { PermissionDeniedError } from "@nextgen-cms/core/db/access/permission-denied-error";
 import {
-  findIssueById,
-  type IssueWriteInput,
-  insertIssue,
-  issueNumberExistsAdmin,
-  updateIssue,
-} from "@nextgen-cms/core/db/repositories/issues-admin";
+  type ContentGroupWriteInput,
+  contentGroupNumberExistsAdmin,
+  findContentGroupById,
+  insertContentGroup,
+  updateContentGroup,
+} from "@nextgen-cms/core/db/repositories/content-groups-admin";
+import { promoteContentGroupCoverSrc } from "@nextgen-cms/core/media/promote-content-group-cover";
 import { parseJalaliInput } from "@nextgen-cms/core/platform/datetime";
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";
@@ -20,7 +24,7 @@ import {
 } from "@nextgen-cms/studio/cms/validation";
 import { redirect } from "next/navigation";
 
-export type IssueFormData = {
+export type ContentGroupFormData = {
   number: number;
   season: string;
   year: number;
@@ -41,7 +45,7 @@ function handleMutationError(error: unknown): MutationResult {
   throw error;
 }
 
-function parseFormData(data: IssueFormData): IssueWriteInput {
+function parseFormData(data: ContentGroupFormData): ContentGroupWriteInput {
   let publishedAt = data.publishedAt.trim();
   try {
     publishedAt = parseJalaliInput(publishedAt);
@@ -60,22 +64,32 @@ function parseFormData(data: IssueFormData): IssueWriteInput {
   };
 }
 
-async function validate(input: IssueWriteInput, excludeId?: number) {
-  if (!input.number || input.number < 1) return "شمارهٔ شماره نامعتبر است.";
+async function validate(input: ContentGroupWriteInput, excludeId?: number) {
+  if (!input.number || input.number < 1) {
+    return "شماره گروه محتوا نامعتبر است.";
+  }
   const labelError = validateRequired(input.label, "برچسب");
   if (labelError) return labelError;
   const coverError = validateImageMeta(input.coverSrc, input.coverAlt, "جلد");
   if (coverError) return coverError;
-  const exists = await issueNumberExistsAdmin(input.number, excludeId);
+  const exists = await contentGroupNumberExistsAdmin(input.number, excludeId);
   if (exists) return "این شماره قبلاً استفاده شده است.";
   return undefined;
 }
 
-export async function createIssue(
-  data: IssueFormData,
+async function resolveContentGroupCoverSrc(
+  contentGroupId: number,
+  coverSrc: string,
+): Promise<string> {
+  if (!coverSrc.trim()) return coverSrc;
+  return promoteContentGroupCoverSrc(contentGroupId, coverSrc);
+}
+
+export async function createContentGroup(
+  data: ContentGroupFormData,
 ): Promise<MutationResult> {
   const sessionOrDenied = await requirePermissionMutation(
-    "modules.issues.create",
+    "modules.contentGroup.create",
   );
   if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
   const session = sessionOrDenied as Awaited<ReturnType<typeof requireMember>>;
@@ -85,45 +99,62 @@ export async function createIssue(
   if (error) return { ok: false, error };
 
   try {
-    const id = await insertIssue(input, access(session.memberId));
-    invalidateIssues();
-    invalidateIssue(input.number);
+    const id = await insertContentGroup(input, access(session.memberId));
+    const coverSrc = await resolveContentGroupCoverSrc(id, input.coverSrc);
+    if (coverSrc !== input.coverSrc) {
+      await updateContentGroup(
+        id,
+        { ...input, coverSrc },
+        access(session.memberId),
+      );
+    }
+    invalidateContentGroups();
+    invalidateContentGroup(input.number);
     return { ok: true, id };
   } catch (error) {
     return handleMutationError(error);
   }
 }
 
-export async function saveIssue(
+export async function saveContentGroup(
   id: number,
-  data: IssueFormData,
+  data: ContentGroupFormData,
 ): Promise<MutationResult> {
   const sessionOrDenied = await requirePermissionMutation(
-    "modules.issues.edit",
+    "modules.contentGroup.edit",
   );
   if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
   const session = sessionOrDenied as Awaited<ReturnType<typeof requireMember>>;
 
-  const existing = await findIssueById(id, access(session.memberId));
-  if (!existing) return { ok: false, error: "شماره یافت نشد." };
+  const existing = await findContentGroupById(id, access(session.memberId));
+  if (!existing) return { ok: false, error: "گروه محتوا یافت نشد." };
 
   const input = parseFormData(data);
   const error = await validate(input, id);
   if (error) return { ok: false, error };
 
   try {
-    await updateIssue(id, input, access(session.memberId));
-    invalidateIssues();
-    invalidateIssue(input.number);
-    if (existing.number !== input.number) invalidateIssue(existing.number);
+    const coverSrc = await resolveContentGroupCoverSrc(id, input.coverSrc);
+    await updateContentGroup(
+      id,
+      { ...input, coverSrc },
+      access(session.memberId),
+    );
+    invalidateContentGroups();
+    invalidateContentGroup(input.number);
+    if (existing.number !== input.number) {
+      invalidateContentGroup(existing.number);
+    }
     return { ok: true, id };
   } catch (error) {
     return handleMutationError(error);
   }
 }
 
-export async function createIssueAndRedirect(data: IssueFormData) {
-  const result = await createIssue(data);
+export async function createContentGroupAndRedirect(
+  data: ContentGroupFormData,
+) {
+  const result = await createContentGroup(data);
   if (!result.ok) return result;
-  redirect(`/admin/issues/${result.id}/edit`);
+  redirect(`/admin/content-group/${result.id}/edit`);
 }

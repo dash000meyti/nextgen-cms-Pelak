@@ -1,6 +1,6 @@
 import type { ArticlePreview, ImageMeta } from "../types/article";
 
-export type IssueSummary = {
+export type ContentGroupSummary = {
   number: number;
   season: string;
   year: number;
@@ -10,6 +10,6 @@ export type IssueSummary = {
   articleCount: number;
 };
 
-export type Issue = IssueSummary & {
+export type ContentGroup = ContentGroupSummary & {
   articles: ArticlePreview[];
 };

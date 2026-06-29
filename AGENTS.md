@@ -15,7 +15,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 | پلاک | Pelak | `apps/pelak` |
 | استودیو | Studio | `packages/studio` + `/admin` |
 | بخش هسته | Core Section | content, members, media, settings |
-| ماژول | Feature Module | issues, video, newsletter |
+| ماژول | Feature Module | contentGroup, video, newsletter |
 | قرارداد | Contract | `packages/contract` |
 | هسته | Core | `packages/core` |
 | دادهٔ سایت | Site Data | `packages/site-data` |

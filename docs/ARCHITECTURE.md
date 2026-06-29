@@ -30,7 +30,7 @@ flowchart LR
     S[settings]
   end
   subgraph modules [ماژول — Feature Module]
-    I[issues]
+    CG[contentGroup]
     V[video]
     N[newsletter]
   end
@@ -45,7 +45,7 @@ flowchart LR
 |------|----------|------------|------------|
 | هسته | محتوا، اعضا، مدیا | `content.*`, `members.*`, `media.*` | `/admin/content`, `/admin/members`, `/admin/media` |
 | تنظیمات | تنظیمات | `settings.*` | `/admin/settings/*` |
-| ماژول | شماره، ویدیو، خبرنامه | `modules.*` | `/admin/issues`, `/admin/videos` |
+| ماژول | گروه محتوا، ویدیو، خبرنامه | `modules.*` | `/admin/content-group`, `/admin/videos` |
 
 فعال/غیرفعال ماژول: `settings.modules` (toggle) — CRUD محتوای ماژول: `modules.*`. جزئیات: `docs/STUDIO.md`.
 

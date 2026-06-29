@@ -15,13 +15,13 @@ npm run format   # biome format --write
 
 ## مسیرها
 
-- `/` — صفحهٔ اصلی (شمارهٔ جاری، مقالات اصلی، پرخواننده‌ترین‌ها، موضوعات، انتخاب سردبیر، ویدیوها، خبرنامه)
+- `/` — صفحهٔ اصلی (گروه محتوای جاری، مقالات اصلی، پرخواننده‌ترین‌ها، موضوعات، انتخاب سردبیر، ویدیوها، خبرنامه)
 - `/articles` — فهرست مقالات با فیلتر موضوع
 - `/articles/[slug]` — صفحهٔ خواندن مقاله
 - `/topics/[slug]` — مقالات هر موضوع
 - `/authors/[slug]` — صفحهٔ نویسنده
-- `/issues` — آرشیو هفته‌نامه
-- `/issues/[number]` — جزئیات هر شماره
+- `/content-group` — آرشیو هفته‌نامه
+- `/content-group/[number]` — جزئیات هر گروه محتوا
 - `/video` — ویدیوها
 - `/about` — درباره ما
 - `/contact` — تماس با ما
@@ -30,8 +30,8 @@ npm run format   # biome format --write
 
 ```
 app/            مسیرها (Server Components پیش‌فرض)
-components/      layout, article, home, issue, video, contact, ui, theme
-lib/types/       قرارداد داده (article, issue, site)
+components/      layout, article, home, content-group, video, contact, ui, theme
+lib/types/       قرارداد داده (article, content-group, site)
 lib/data/        ماک + accessorها (get-content.ts تنها منبع)
 public/images/   placeholderهای SVG
 scripts/         generate-placeholders.mjs

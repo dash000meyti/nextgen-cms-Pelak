@@ -17,6 +17,7 @@ import {
 } from "@nextgen-cms/studio/cms/mutations/article";
 import type { PickerOption } from "@nextgen-cms/studio/cms/queries";
 import { useRouter } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useState, useTransition } from "react";
 import { BlockEditor } from "@/components/admin/fields/BlockEditor";
 import { ImageField } from "@/components/admin/fields/ImageField";
@@ -26,6 +27,7 @@ import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { PublishBar } from "@/components/admin/studio/PublishBar";
+import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type ArticleFormProps = {
   mode: "create" | "edit";
@@ -33,7 +35,7 @@ type ArticleFormProps = {
   initial: ArticleFormData;
   members: PickerOption[];
   topics: PickerOption[];
-  issues: PickerOption[];
+  contentGroups: PickerOption[];
   canDelete?: boolean;
 };
 
@@ -43,7 +45,7 @@ export function ArticleForm({
   initial,
   members,
   topics,
-  issues,
+  contentGroups,
   canDelete = false,
 }: ArticleFormProps) {
   const router = useRouter();
@@ -66,10 +68,19 @@ export function ArticleForm({
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  async function handleSave() {
+  function runMutation(task: () => Promise<void>) {
+    startTransition(() => {
+      void task().catch((error: unknown) => {
+        if (isRedirectError(error)) throw error;
+        setError(formatServerActionError(error));
+      });
+    });
+  }
+
+  function handleSave() {
     setError(null);
     setSuccess(null);
-    startTransition(async () => {
+    runMutation(async () => {
       if (mode === "create") {
         const result = await createArticleAndRedirect(form);
         if (result && !result.ok) setError(result.error);
@@ -90,7 +101,7 @@ export function ArticleForm({
     if (!articleId) return;
     if (!window.confirm("این محتوا حذف شود؟")) return;
     setError(null);
-    startTransition(async () => {
+    runMutation(async () => {
       const result = await removeArticleAndRedirect(articleId);
       if (result && !result.ok) setError(result.error);
     });
@@ -99,7 +110,7 @@ export function ArticleForm({
   function handlePublish() {
     if (!articleId) return;
     setError(null);
-    startTransition(async () => {
+    runMutation(async () => {
       const result = await publishArticle(articleId);
       if (!result.ok) {
         setError(result.error);
@@ -117,7 +128,7 @@ export function ArticleForm({
   function handleUnpublish() {
     if (!articleId) return;
     setError(null);
-    startTransition(async () => {
+    runMutation(async () => {
       const result = await unpublishArticle(articleId);
       if (!result.ok) {
         setError(result.error);
@@ -240,18 +251,18 @@ export function ArticleForm({
       </div>
 
       <ReferencePicker
-        label="شماره"
-        options={issues}
+        label="گروه محتوا"
+        options={contentGroups}
         selectedIds={
-          form.issueNumber != null
-            ? issues
-                .filter((item) => item.number === form.issueNumber)
+          form.contentGroupNumber != null
+            ? contentGroups
+                .filter((item) => item.number === form.contentGroupNumber)
                 .map((item) => item.id)
             : []
         }
         onChange={(ids) => {
-          const issue = issues.find((item) => item.id === ids[0]);
-          update("issueNumber", issue?.number ?? null);
+          const group = contentGroups.find((item) => item.id === ids[0]);
+          update("contentGroupNumber", group?.number ?? null);
         }}
       />
 

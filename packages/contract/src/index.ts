@@ -5,7 +5,7 @@ export * from "./media/no-op-processor";
 export * from "./permissions";
 export * from "./roles";
 export * from "./types/article";
-export * from "./types/issue";
+export * from "./types/content-group";
 export * from "./types/media";
 export * from "./types/member";
 export * from "./types/site";

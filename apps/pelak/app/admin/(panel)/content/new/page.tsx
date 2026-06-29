@@ -1,7 +1,7 @@
 import { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import type { ArticleFormData } from "@nextgen-cms/studio/cms/mutations/article";
 import {
-  findIssuesForPicker,
+  findContentGroupsForPicker,
   findMembersForArticlePicker,
   findTopicsForPicker,
 } from "@nextgen-cms/studio/cms/queries";
@@ -9,10 +9,10 @@ import { ArticleForm } from "@/components/admin/studio/ArticleForm";
 
 export default async function NewArticlePage() {
   const session = await requireMember();
-  const [members, topics, issues] = await Promise.all([
+  const [members, topics, contentGroups] = await Promise.all([
     findMembersForArticlePicker(),
     findTopicsForPicker(),
-    findIssuesForPicker(),
+    findContentGroupsForPicker(),
   ]);
 
   const initial: ArticleFormData = {
@@ -27,7 +27,7 @@ export default async function NewArticlePage() {
     heroAlt: "",
     heroCaption: "",
     heroCredit: "",
-    issueNumber: null,
+    contentGroupNumber: null,
     isFeatured: false,
     isEditorsPick: false,
     body: [{ type: "paragraph", content: "" }],
@@ -44,7 +44,7 @@ export default async function NewArticlePage() {
         initial={initial}
         members={members}
         topics={topics}
-        issues={issues}
+        contentGroups={contentGroups}
       />
     </div>
   );

@@ -1,19 +1,19 @@
 import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
-import { listIssuesAdmin } from "@nextgen-cms/studio/cms/queries";
+import { listContentGroupsAdmin } from "@nextgen-cms/studio/cms/queries";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
 
-export default async function AdminIssuesPage() {
-  await requirePermission("modules.issues.view");
-  const issues = await listIssuesAdmin();
+export default async function AdminContentGroupsPage() {
+  await requirePermission("modules.contentGroup.view");
+  const groups = await listContentGroupsAdmin();
 
   return (
     <DocumentList
-      title="شماره‌ها"
-      newHref="/admin/issues/new"
-      newLabel="شمارهٔ جدید"
-      rows={issues}
+      title="گروه‌های محتوا"
+      newHref="/admin/content-group/new"
+      newLabel="گروه محتوای جدید"
+      rows={groups}
       rowKey={(row) => row.id}
-      editHref={(row) => `/admin/issues/${row.id}/edit`}
+      editHref={(row) => `/admin/content-group/${row.id}/edit`}
       columns={[
         {
           key: "number",

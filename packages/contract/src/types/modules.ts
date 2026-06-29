@@ -1,7 +1,7 @@
-export type IssuePeriod = "yearly" | "seasonal" | "monthly" | "weekly";
+export type ContentGroupPeriod = "yearly" | "seasonal" | "monthly" | "weekly";
 
 export type ModuleSettings = {
-  issues: { enabled: boolean; period: IssuePeriod };
+  contentGroup: { enabled: boolean; period: ContentGroupPeriod };
   video: { enabled: boolean; pageTitle: string; itemsPerPage: number };
   newsletter: { enabled: boolean };
 };
@@ -28,9 +28,9 @@ export type ContentSettings = {
   showAuthorOnCards: boolean;
 };
 
-/** @deprecated Use ModuleSettings.issues.enabled etc. */
+/** @deprecated Use ModuleSettings.contentGroup.enabled etc. */
 export type FeatureModules = {
-  issues: boolean;
+  contentGroup: boolean;
   video: boolean;
   newsletter: boolean;
 };

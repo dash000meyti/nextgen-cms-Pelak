@@ -51,7 +51,9 @@ function mapPreviewFields(row: ArticleWithRelations): ArticlePreview {
     topics: mapTopics(row.topics),
     readingMinutes: row.readingMinutes,
     heroImage: mapHero(row),
-    ...(row.issueNumber != null ? { issueNumber: row.issueNumber } : {}),
+    ...(row.contentGroupNumber != null
+      ? { contentGroupNumber: row.contentGroupNumber }
+      : {}),
     ...(row.isFeatured ? { isFeatured: true } : {}),
     ...(row.isEditorsPick ? { isEditorsPick: true } : {}),
   };

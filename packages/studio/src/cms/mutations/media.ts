@@ -19,6 +19,7 @@ import {
 } from "@nextgen-cms/core/db/repositories/media-assets";
 import { getExtensionForMimeType } from "@nextgen-cms/core/media/constants";
 import { resolveUploadFolder } from "@nextgen-cms/core/media/folders";
+import { contentGroupPath } from "@nextgen-cms/core/media/path-policy";
 import { getMediaProcessor } from "@nextgen-cms/core/media/processor";
 import {
   countMediaReferences,
@@ -32,7 +33,10 @@ import {
   removeMediaFile,
   saveMediaFile,
 } from "@nextgen-cms/core/media/storage";
-import { canEditArticle } from "@nextgen-cms/studio/admin/article-access";
+import {
+  canEditArticle,
+  hasPermission,
+} from "@nextgen-cms/studio/admin/article-access";
 import {
   assertMediaFolderAccess,
   canDeleteAsset,
@@ -48,6 +52,7 @@ function parseUploadContext(
   context?: MediaUploadContext,
 ): MediaUploadContext {
   const contentIdRaw = formData.get("contentId");
+  const contentGroupIdRaw = formData.get("contentGroupId");
   const folderRaw = formData.get("folder");
   const memberIdRaw = formData.get("memberId");
 
@@ -56,6 +61,11 @@ function parseUploadContext(
       context?.contentId ??
       (typeof contentIdRaw === "string" && contentIdRaw
         ? Number.parseInt(contentIdRaw, 10)
+        : undefined),
+    contentGroupId:
+      context?.contentGroupId ??
+      (typeof contentGroupIdRaw === "string" && contentGroupIdRaw
+        ? Number.parseInt(contentGroupIdRaw, 10)
         : undefined),
     memberId:
       context?.memberId ??
@@ -96,6 +106,19 @@ async function validateUploadAccess(
       return { ok: false, error: "محتوا یافت نشد." };
     }
     if (!canEditArticle(session, article)) {
+      return { ok: false, error: PERMISSION_DENIED };
+    }
+  }
+
+  if (uploadContext.contentGroupId != null) {
+    const expectedFolder = contentGroupPath(uploadContext.contentGroupId);
+    if (folderPath !== expectedFolder) {
+      return { ok: false, error: PERMISSION_DENIED };
+    }
+    if (
+      !hasPermission(session, "modules.contentGroup.create") &&
+      !hasPermission(session, "modules.contentGroup.edit")
+    ) {
       return { ok: false, error: PERMISSION_DENIED };
     }
   }
@@ -144,7 +167,10 @@ export async function uploadMedia(
 
   const uploadContext = parseUploadContext(formData, {
     ...context,
-    memberId: context?.memberId ?? session.memberId,
+    memberId:
+      context?.contentGroupId != null || context?.contentId != null
+        ? context.memberId
+        : (context?.memberId ?? session.memberId),
   });
   const folderPath = resolveUploadFolder(uploadContext);
 

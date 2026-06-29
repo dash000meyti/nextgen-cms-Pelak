@@ -10,7 +10,7 @@ export type AdminMemberContextValue = {
   role: Role;
   permissions: Permission[];
   enabledModules: {
-    issues: boolean;
+    contentGroup: boolean;
     video: boolean;
   };
 };

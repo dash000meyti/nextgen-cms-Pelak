@@ -1,6 +1,6 @@
 export { articleSchema } from "./article";
 export { authorSchema } from "./author";
-export { issueSchema } from "./issue";
+export { contentGroupSchema } from "./content-group";
 export { memberSchema } from "./member";
 export {
   modulesSettingsSchema,

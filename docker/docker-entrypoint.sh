@@ -15,6 +15,7 @@ fi
 
 echo "Running migrations..."
 su-exec nextjs:nodejs node ./node_modules/tsx/dist/cli.mjs packages/core/scripts/migrate.ts
+su-exec nextjs:nodejs node ./node_modules/tsx/dist/cli.mjs packages/core/scripts/migrate-content-group-uploads.ts
 
 if su-exec nextjs:nodejs node ./node_modules/tsx/dist/cli.mjs packages/core/scripts/is-first-boot.ts; then
   export FIRST_BOOT=1

@@ -1,6 +1,6 @@
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const issues = sqliteTable("issues", {
+export const contentGroups = sqliteTable("content_groups", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   number: integer("number").notNull().unique(),
   season: text("season").notNull(),
@@ -11,5 +11,5 @@ export const issues = sqliteTable("issues", {
   publishedAt: text("published_at").notNull(),
 });
 
-export type IssueRow = typeof issues.$inferSelect;
-export type IssueInsert = typeof issues.$inferInsert;
+export type ContentGroupRow = typeof contentGroups.$inferSelect;
+export type ContentGroupInsert = typeof contentGroups.$inferInsert;

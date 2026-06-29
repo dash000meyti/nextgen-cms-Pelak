@@ -10,7 +10,7 @@ apps/pelak/components/
   admin/      استودیو — studio/, fields/, media/
   home/       بخش‌های صفحهٔ اصلی
   article/    کارت/لیست/هدر مقاله
-  issue/      شماره‌ها (ماژول)
+  content-group/      گروه‌های محتوا (ماژول)
   layout/     shell — Container, SiteHeader, Breadcrumbs
   theme/      ThemeProvider, tokens runtime
   contact/    فرم تماس

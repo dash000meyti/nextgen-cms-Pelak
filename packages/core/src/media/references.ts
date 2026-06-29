@@ -2,7 +2,7 @@ import { db } from "@nextgen-cms/core/db";
 import {
   articles,
   authors,
-  issues,
+  contentGroups,
   members,
   videos,
 } from "@nextgen-cms/core/db/schema";
@@ -31,10 +31,10 @@ export async function countMediaReferences(publicUrl: string): Promise<number> {
     .from(authors)
     .where(eq(authors.avatarSrc, publicUrl));
 
-  const [issueCover] = await db
+  const [contentGroupCover] = await db
     .select({ total: count() })
-    .from(issues)
-    .where(eq(issues.coverSrc, publicUrl));
+    .from(contentGroups)
+    .where(eq(contentGroups.coverSrc, publicUrl));
 
   const [videoThumb] = await db
     .select({ total: count() })
@@ -46,7 +46,7 @@ export async function countMediaReferences(publicUrl: string): Promise<number> {
     (articleBody?.total ?? 0) +
     (memberAvatar?.total ?? 0) +
     (authorAvatar?.total ?? 0) +
-    (issueCover?.total ?? 0) +
+    (contentGroupCover?.total ?? 0) +
     (videoThumb?.total ?? 0)
   );
 }
@@ -85,12 +85,12 @@ export async function mediaReferenceSummary(
     .limit(1);
   if (authorHits.length > 0) refs.push("آواتار نویسنده");
 
-  const issueHits = await db
-    .select({ id: issues.id })
-    .from(issues)
-    .where(eq(issues.coverSrc, publicUrl))
+  const contentGroupHits = await db
+    .select({ id: contentGroups.id })
+    .from(contentGroups)
+    .where(eq(contentGroups.coverSrc, publicUrl))
     .limit(1);
-  if (issueHits.length > 0) refs.push("جلد شماره");
+  if (contentGroupHits.length > 0) refs.push("جلد گروه محتوا");
 
   const videoHits = await db
     .select({ id: videos.id })

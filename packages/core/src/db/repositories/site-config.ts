@@ -59,7 +59,7 @@ export async function findContentSettings() {
 
 export async function updateFeatureModules(modules: FeatureModules) {
   await updateModuleSettings({
-    issues: { enabled: modules.issues, period: "seasonal" },
+    contentGroup: { enabled: modules.contentGroup, period: "seasonal" },
     video: {
       enabled: modules.video,
       pageTitle: "ویدیو",

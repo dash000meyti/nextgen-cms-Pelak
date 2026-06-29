@@ -47,12 +47,38 @@ const routeRedirects = [
     destination: "/admin/settings/content/topics/:path*",
     permanent: true,
   },
+  { source: "/issues", destination: "/content-group", permanent: true },
+  {
+    source: "/issues/:number",
+    destination: "/content-group/:number",
+    permanent: true,
+  },
+  {
+    source: "/admin/issues",
+    destination: "/admin/content-group",
+    permanent: true,
+  },
+  {
+    source: "/admin/issues/:path*",
+    destination: "/admin/content-group/:path*",
+    permanent: true,
+  },
+  {
+    source: "/uploads/issues/:path*",
+    destination: "/uploads/content-group/:path*",
+    permanent: true,
+  },
 ];
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
   output: "standalone",
   serverExternalPackages: ["better-sqlite3"],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "5mb",
+    },
+  },
   transpilePackages: [
     "@nextgen-cms/contract",
     "@nextgen-cms/core",

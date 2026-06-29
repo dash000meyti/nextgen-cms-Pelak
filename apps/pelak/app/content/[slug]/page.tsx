@@ -1,6 +1,6 @@
 import {
   getArticleBySlug,
-  getCurrentIssue,
+  getCurrentContentGroup,
   getRelatedArticles,
   getSiteConfig,
 } from "@nextgen-cms/site-data/get-content";
@@ -10,10 +10,10 @@ import { ArticleBody } from "@/components/article/ArticleBody";
 import { ArticleHeader } from "@/components/article/ArticleHeader";
 import { ArticleHero } from "@/components/article/ArticleHero";
 import { AuthorList } from "@/components/article/AuthorList";
-import { IssuePromoBanner } from "@/components/article/IssuePromoBanner";
+import { ContentGroupPromoBanner } from "@/components/article/ContentGroupPromoBanner";
 import { RelatedArticles } from "@/components/article/RelatedArticles";
 import { TopicTags } from "@/components/article/TopicTags";
-import { TopIssue } from "@/components/home/TopIssue";
+import { TopContentGroup } from "@/components/home/TopContentGroup";
 import { Container } from "@/components/layout/Container";
 import { ShareBar } from "@/components/ui/ShareBar";
 
@@ -52,14 +52,14 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   if (!article) notFound();
 
   const related = await getRelatedArticles(slug, 3);
-  const [currentIssue, siteConfig] = await Promise.all([
-    getCurrentIssue(),
+  const [currentContentGroup, siteConfig] = await Promise.all([
+    getCurrentContentGroup(),
     getSiteConfig(),
   ]);
 
   return (
     <>
-      <TopIssue issue={currentIssue} />
+      <TopContentGroup group={currentContentGroup} />
 
       <Container variant="wide" className="py-6 md:py-12">
         <div className="flex flex-col lg:flex-row gap-6">
@@ -111,7 +111,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
               variant="sidebar"
             />
             <div className="w-full sticky top-[18dvh] z-10">
-              <IssuePromoBanner issue={currentIssue} />
+              <ContentGroupPromoBanner group={currentContentGroup} />
             </div>
           </aside>
         </div>

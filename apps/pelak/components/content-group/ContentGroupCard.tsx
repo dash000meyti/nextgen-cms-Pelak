@@ -1,18 +1,21 @@
-import type { IssueSummary } from "@nextgen-cms/contract/types/issue";
+import type { ContentGroupSummary } from "@nextgen-cms/contract/types/content-group";
 import Image from "next/image";
 import Link from "next/link";
 
-type IssueCardProps = {
-  issue: IssueSummary;
+type ContentGroupCardProps = {
+  group: ContentGroupSummary;
 };
 
-export function IssueCard({ issue }: IssueCardProps) {
+export function ContentGroupCard({ group }: ContentGroupCardProps) {
   return (
-    <Link href={`/issues/${issue.number}`} className="group block space-y-4">
+    <Link
+      href={`/content-group/${group.number}`}
+      className="group block space-y-4"
+    >
       <div className="relative aspect-3/4 w-full overflow-hidden rounded bg-rule">
         <Image
-          src={issue.cover.src}
-          alt={issue.cover.alt}
+          src={group.cover.src}
+          alt={group.cover.alt}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           sizes="(max-width: 768px) 50vw, 25vw"
@@ -20,9 +23,9 @@ export function IssueCard({ issue }: IssueCardProps) {
       </div>
       <div className="space-y-1">
         <p className="font-heading text-base text-ink transition-colors group-hover:text-accent">
-          {issue.label}
+          {group.label}
         </p>
-        <p className="text-xs text-ink-muted">{issue.articleCount} محتوا</p>
+        <p className="text-xs text-ink-muted">{group.articleCount} محتوا</p>
       </div>
     </Link>
   );

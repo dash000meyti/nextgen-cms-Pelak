@@ -10,11 +10,11 @@ export {
   unpublishArticle,
 } from "@nextgen-cms/studio/cms/mutations/article";
 export {
-  createIssue,
-  createIssueAndRedirect,
-  type IssueFormData,
-  saveIssue,
-} from "@nextgen-cms/studio/cms/mutations/issue";
+  type ContentGroupFormData,
+  createContentGroup,
+  createContentGroupAndRedirect,
+  saveContentGroup,
+} from "@nextgen-cms/studio/cms/mutations/content-group";
 export {
   deleteMedia,
   uploadMedia,

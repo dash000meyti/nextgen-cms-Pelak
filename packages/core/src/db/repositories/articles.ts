@@ -194,9 +194,11 @@ export async function findEditorsPicks(limit = 3) {
   return rows.map(mapArticleRowToPreview);
 }
 
-export async function findArticlesByIssueNumber(issueNumber: number) {
+export async function findArticlesByContentGroupNumber(
+  contentGroupNumber: number,
+) {
   const rows = await findPublishedArticles(
-    eq(articles.issueNumber, issueNumber),
+    eq(articles.contentGroupNumber, contentGroupNumber),
   );
   return rows.map(mapArticleRowToPreview);
 }
@@ -257,7 +259,7 @@ export type ArticleWriteInput = {
   heroAlt: string;
   heroCaption: string | null;
   heroCredit: string | null;
-  issueNumber: number | null;
+  contentGroupNumber: number | null;
   isFeatured: boolean;
   isEditorsPick: boolean;
   body: (typeof articles.$inferSelect)["body"];
@@ -380,7 +382,7 @@ function articleRowFromInput(input: ArticleWriteInput, updatedAt: string) {
     heroAlt: input.heroAlt,
     heroCaption: input.heroCaption,
     heroCredit: input.heroCredit,
-    issueNumber: input.issueNumber,
+    contentGroupNumber: input.contentGroupNumber,
     isFeatured: input.isFeatured,
     isEditorsPick: input.isEditorsPick,
     body: input.body,

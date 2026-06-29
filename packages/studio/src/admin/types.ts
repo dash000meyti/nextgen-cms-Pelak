@@ -7,7 +7,7 @@ export type AdminDashboardStats = {
   articlesLast30Days: number;
   totalAuthors: number;
   totalTopics: number;
-  totalIssues: number;
+  totalContentGroups: number;
   totalVideos: number;
 };
 

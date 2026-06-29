@@ -2,7 +2,7 @@ import { canDeleteArticle } from "@nextgen-cms/studio/admin/article-access";
 import { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import type { ArticleFormData } from "@nextgen-cms/studio/cms/mutations/article";
 import {
-  findIssuesForPicker,
+  findContentGroupsForPicker,
   findMembersForArticlePicker,
   findTopicsForPicker,
   getArticleForAdmin,
@@ -20,11 +20,11 @@ export default async function EditArticlePage({ params }: PageProps) {
   if (Number.isNaN(articleId)) notFound();
 
   const session = await requireMember();
-  const [article, members, topics, issues] = await Promise.all([
+  const [article, members, topics, contentGroups] = await Promise.all([
     getArticleForAdmin(articleId),
     findMembersForArticlePicker(),
     findTopicsForPicker(),
-    findIssuesForPicker(),
+    findContentGroupsForPicker(),
   ]);
 
   if (!article) notFound();
@@ -41,7 +41,7 @@ export default async function EditArticlePage({ params }: PageProps) {
     heroAlt: article.heroAlt,
     heroCaption: article.heroCaption ?? "",
     heroCredit: article.heroCredit ?? "",
-    issueNumber: article.issueNumber,
+    contentGroupNumber: article.contentGroupNumber,
     isFeatured: article.isFeatured,
     isEditorsPick: article.isEditorsPick,
     body: article.body,
@@ -59,7 +59,7 @@ export default async function EditArticlePage({ params }: PageProps) {
         initial={initial}
         members={members}
         topics={topics}
-        issues={issues}
+        contentGroups={contentGroups}
         canDelete={canDeleteArticle(session, {
           createdByMemberId: article.createdByMemberId,
         })}

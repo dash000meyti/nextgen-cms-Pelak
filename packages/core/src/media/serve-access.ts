@@ -1,6 +1,7 @@
 import type { ArticleStatus } from "@nextgen-cms/contract/article-status";
 import {
   isArchivedMediaPath,
+  isContentGroupMediaPath,
   isDraftMediaPath,
   isSharedMediaPath,
   parseContentIdFromPath,
@@ -13,6 +14,9 @@ export type UploadServeDecision =
 
 export function classifyUploadPath(relativePath: string): UploadServeDecision {
   if (isSharedMediaPath(relativePath)) {
+    return { access: "public" };
+  }
+  if (isContentGroupMediaPath(relativePath)) {
     return { access: "public" };
   }
   if (isDraftMediaPath(relativePath)) {

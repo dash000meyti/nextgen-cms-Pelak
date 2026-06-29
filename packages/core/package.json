@@ -1,6 +1,6 @@
 {
   "name": "@nextgen-cms/core",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "exports": {
@@ -12,7 +12,10 @@
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:backup": "tsx scripts/backup-db.ts",
-    "db:purge-archived-media": "tsx scripts/purge-archived-media.ts"
+    "db:purge-archived-media": "tsx scripts/purge-archived-media.ts",
+    "db:promote-content-group-covers": "tsx scripts/promote-content-group-covers.ts",
+    "db:promote-article-media": "tsx scripts/promote-article-media.ts",
+    "db:migrate-content-group-uploads": "tsx scripts/migrate-content-group-uploads.ts"
   },
   "dependencies": {
     "@nextgen-cms/contract": "*",

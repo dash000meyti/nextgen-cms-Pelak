@@ -3,7 +3,7 @@ import { db } from "@nextgen-cms/core/db";
 import {
   articles,
   authors,
-  issues,
+  contentGroups,
   members,
   topics,
   videos,
@@ -81,17 +81,17 @@ export async function slugExists(
   }
 }
 
-export async function issueNumberExists(
+export async function contentGroupNumberExists(
   number: number,
   excludeId?: number,
 ): Promise<boolean> {
   const where =
     excludeId != null
-      ? and(eq(issues.number, number), ne(issues.id, excludeId))
-      : eq(issues.number, number);
+      ? and(eq(contentGroups.number, number), ne(contentGroups.id, excludeId))
+      : eq(contentGroups.number, number);
   const rows = await db
-    .select({ id: issues.id })
-    .from(issues)
+    .select({ id: contentGroups.id })
+    .from(contentGroups)
     .where(where)
     .limit(1);
   return rows.length > 0;

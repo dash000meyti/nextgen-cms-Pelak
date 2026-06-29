@@ -1,13 +1,13 @@
 import type {
-  CurrentIssueInfo,
+  CurrentContentGroupInfo,
   SiteConfig,
 } from "@nextgen-cms/contract/types/site";
 
-export const currentIssue: CurrentIssueInfo = {
+export const currentContentGroup: CurrentContentGroupInfo = {
   number: 24,
   season: "بهار",
   year: 1405,
-  label: "شماره ۲۴ — بهار ۱۴۰۵",
+  label: "گروه محتوا ۲۴ — بهار ۱۴۰۵",
 };
 
 export const siteConfig: SiteConfig = {
@@ -41,7 +41,7 @@ export const siteConfig: SiteConfig = {
         { href: "/topics/amniyat", label: "امنیت" },
       ],
     },
-    { id: "issues", label: "هفته‌نامه", href: "/issues" },
+    { id: "contentGroup", label: "گروه‌های محتوا", href: "/content-group" },
     { id: "video", label: "ویدیوها", href: "/video" },
     { id: "about", label: "درباره ما", href: "/about" },
     { id: "contact", label: "تماس با ما", href: "/contact" },
@@ -54,7 +54,7 @@ export const siteConfig: SiteConfig = {
       title: "درباره",
       links: [
         { href: "/about", label: "درباره ما" },
-        { href: "/issues", label: "هفته‌نامه" },
+        { href: "/content-group", label: "گروه‌های محتوا" },
         { href: "/video", label: "ویدیوها" },
         { href: "/contact", label: "تماس با ما" },
       ],

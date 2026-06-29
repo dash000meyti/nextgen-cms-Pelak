@@ -25,7 +25,7 @@ Admin: `/admin/login` — credentials از seed یا `.env.local`
 └── استودیو (/admin) — mutations در packages/studio، UI در components/admin/
 
 بخش هسته: محتوا · اعضا · مدیا · تنظیمات
-ماژول: شماره‌ها · ویدیو · خبرنامه
+ماژول: گروه‌های محتوا · ویدیو · خبرنامه
 
 داده public ← packages/site-data
 داده admin  ← packages/studio

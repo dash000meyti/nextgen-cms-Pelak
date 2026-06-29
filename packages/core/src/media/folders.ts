@@ -6,6 +6,10 @@ export function resolveUploadFolder(context: MediaUploadContext = {}): string {
     return normalizeFolderPath(`content/${context.contentId}`);
   }
 
+  if (context.contentGroupId != null) {
+    return normalizeFolderPath(`content-group/${context.contentGroupId}`);
+  }
+
   if (context.memberId != null) {
     return normalizeFolderPath(`content/draft/${context.memberId}`);
   }

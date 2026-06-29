@@ -3,7 +3,7 @@
 import type { FeatureModules } from "@nextgen-cms/contract/types/theme";
 
 const MODULE_LABELS: Record<keyof FeatureModules, string> = {
-  issues: "شماره‌ها",
+  contentGroup: "گروه‌های محتوا",
   video: "ویدیو",
   newsletter: "خبرنامه",
 };

@@ -25,7 +25,7 @@ requirePermissionMutation("…") → validate → repository write → invalidat
 
 - `settings.*` — تب‌های `/admin/settings/*`
 - `content.*` / `members.*` / `media.*` — بخش هسته
-- `modules.*` — CRUD ماژول (`/admin/issues`, `/admin/videos`)
+- `modules.*` — CRUD ماژول (`/admin/content-group`, `/admin/videos`)
 - `settings.modules` — فقط toggle فعال/غیرفعال ماژول
 - موضوعات: `/admin/settings/content/topics` — مجوز `settings.content`
 

@@ -1,4 +1,4 @@
-import type { IssuePeriod } from "@nextgen-cms/contract/types/modules";
+import type { ContentGroupPeriod } from "@nextgen-cms/contract/types/modules";
 import type { DocumentField } from "./types";
 
 const BASE_FIELDS: DocumentField[] = [
@@ -20,7 +20,7 @@ const BASE_FIELDS: DocumentField[] = [
   },
 ];
 
-const PERIOD_FIELDS: Record<IssuePeriod, DocumentField[]> = {
+const PERIOD_FIELDS: Record<ContentGroupPeriod, DocumentField[]> = {
   yearly: [
     {
       key: "year",
@@ -101,7 +101,9 @@ const PERIOD_FIELDS: Record<IssuePeriod, DocumentField[]> = {
   ],
 };
 
-export function getIssueFieldDefs(period: IssuePeriod): DocumentField[] {
+export function getContentGroupFieldDefs(
+  period: ContentGroupPeriod,
+): DocumentField[] {
   return [
     ...BASE_FIELDS.slice(0, 1),
     ...PERIOD_FIELDS[period],
@@ -109,20 +111,20 @@ export function getIssueFieldDefs(period: IssuePeriod): DocumentField[] {
   ];
 }
 
-export const ISSUE_PERIOD_LABELS: Record<IssuePeriod, string> = {
+export const CONTENT_GROUP_PERIOD_LABELS: Record<ContentGroupPeriod, string> = {
   yearly: "سالنامه",
   seasonal: "فصلنامه",
   monthly: "ماهنامه",
   weekly: "هفته‌نامه",
 };
 
-export const issueSchema = {
-  type: "issue",
-  label: "شماره",
-  labelPlural: "شماره‌ها",
-  fields: getIssueFieldDefs("seasonal"),
+export const contentGroupSchema = {
+  type: "contentGroup",
+  label: "گروه محتوا",
+  labelPlural: "گروه‌های محتوا",
+  fields: getContentGroupFieldDefs("seasonal"),
 } satisfies {
-  type: "issue";
+  type: "contentGroup";
   label: string;
   labelPlural: string;
   fields: DocumentField[];

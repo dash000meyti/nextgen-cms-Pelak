@@ -19,10 +19,10 @@ const NAV_ITEMS = [
 
 const MODULE_NAV_ITEMS = [
   {
-    href: "/admin/issues",
-    label: "شماره‌ها",
-    permission: "modules.issues.view" as Permission,
-    module: "issues" as const,
+    href: "/admin/content-group",
+    label: "گروه‌های محتوا",
+    permission: "modules.contentGroup.view" as Permission,
+    module: "contentGroup" as const,
   },
   {
     href: "/admin/videos",
@@ -49,7 +49,7 @@ function canSeeNavItem(
 
 function canSeeModuleNavItem(
   permissions: Permission[],
-  enabledModules: { issues: boolean; video: boolean },
+  enabledModules: { contentGroup: boolean; video: boolean },
   item: (typeof MODULE_NAV_ITEMS)[number],
 ) {
   if (!enabledModules[item.module]) return false;

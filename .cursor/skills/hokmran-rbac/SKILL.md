@@ -21,7 +21,7 @@ description: راهنمای RBAC، نقش‌ها و مجوزها در پلتفر
 |------|------|
 | هسته | `content.publish`, `members.edit`, `media.upload` |
 | تنظیمات | `settings.content`, `settings.modules`, … |
-| **ماژول** | `modules.issues.view`, `modules.video.create`, `modules.newsletter.manage` |
+| **ماژول** | `modules.contentGroup.view`, `modules.video.create`, `modules.newsletter.manage` |
 
 ## مجوزهای settings
 
@@ -39,18 +39,18 @@ settings.members   settings.media    settings.modules
 
 | ماژول | actions | مسیر ادمین |
 |-------|---------|------------|
-| `issues` | `view`, `create`, `edit`, `delete` | `/admin/issues` |
+| `contentGroup` | `view`, `create`, `edit`, `delete` | `/admin/content-group` |
 | `video` | `view`, `create`, `edit`, `delete` | `/admin/videos` |
 | `newsletter` | `manage` | UI/settings فقط |
 
 - فعال/غیرفعال کردن ماژول در سایت: `settings.modules`
 - CRUD محتوای ماژول: `modules.*` (نه `settings.content`)
-- sidebar: لینک issues/videos فقط با `modules.*.view` + `module_settings.enabled`
+- sidebar: لینک contentGroup/videos فقط با `modules.*.view` + `module_settings.enabled`
 
 ## نقش‌های سیستمی
 
 - `super_admin` — همه مجوزها
-- `editor_in_chief` — محتوا + members.create + media + settings.content/modules/personal + modules.issues/video + newsletter.manage
+- `editor_in_chief` — محتوا + members.create + media + settings.content/modules/personal + modules.contentGroup/video + newsletter.manage
 - `writer` — content.create/edit_own + media.upload/delete_own + settings.personal
 
 ## نقش سفارشی
@@ -64,21 +64,21 @@ settings.members   settings.media    settings.modules
 ## الگوی mutation
 
 ```typescript
-const sessionOrDenied = await requirePermissionMutation("modules.issues.create");
+const sessionOrDenied = await requirePermissionMutation("modules.contentGroup.create");
 if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
 ```
 
 ## الگوی صفحه
 
 ```typescript
-await requirePermission("modules.issues.view");
+await requirePermission("modules.contentGroup.view");
 ```
 
 ## UI
 
 - `AdminMemberProvider` + `useAdminMember().permissions` + `enabledModules`
 - `SettingsNav` — تب‌ها از `packages/studio/src/admin/settings-tabs.ts`
-- Sidebar: لینک اعضا با `members.*`؛ issues/videos با `modules.*.view` + enabled؛ تنظیمات همیشه visible ولی layout بدون مجوز `forbidden()`
+- Sidebar: لینک اعضا با `members.*`؛ contentGroup/videos با `modules.*.view` + enabled؛ تنظیمات همیشه visible ولی layout بدون مجوز `forbidden()`
 - `RolesSettingsPanel` — گروه checkbox «ماژول‌ها» با label فارسی
 
 ## Media settings vs media.*

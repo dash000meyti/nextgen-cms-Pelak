@@ -8,7 +8,7 @@ export const permissionResources = [
 
 export type PermissionResource = (typeof permissionResources)[number];
 
-export const moduleIds = ["issues", "video", "newsletter"] as const;
+export const moduleIds = ["contentGroup", "video", "newsletter"] as const;
 
 export type ModuleId = (typeof moduleIds)[number];
 
@@ -18,8 +18,8 @@ export type ModuleCrudAction = (typeof moduleCrudActions)[number];
 
 export const modulePermissionGroups = [
   {
-    id: "issues" as const,
-    label: "شماره‌ها",
+    id: "contentGroup" as const,
+    label: "گروه‌های محتوا",
     actions: [...moduleCrudActions],
   },
   {
@@ -78,7 +78,7 @@ export const permissionValues = buildPermissionValues();
 
 /** Module permissions granted when a role had legacy `settings.content` access */
 export const settingsContentModuleBackfillPermissions = modulePermissionGroups
-  .filter((group) => group.id === "issues" || group.id === "video")
+  .filter((group) => group.id === "contentGroup" || group.id === "video")
   .flatMap((group) =>
     group.actions.map(
       (action) => `modules.${group.id}.${action}` as Permission,

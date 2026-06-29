@@ -17,7 +17,7 @@ Hokmran theme colors and layout tokens live in SQLite, not on disk. At request t
 
 | Key | Default | Effect |
 |-----|---------|--------|
-| `issues` | `true` | Show `/issues` in nav/footer |
+| `contentGroup` | `true` | Show `/content-group` in nav/footer |
 | `video` | `true` | Show `/video` in nav/footer |
 | `newsletter` | `false` | Reserved for future UI |
 

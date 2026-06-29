@@ -1,16 +1,16 @@
 export {
   findAuthorsForPicker,
-  findIssuesForPicker,
+  findContentGroupsForPicker,
   findMembersForArticlePicker,
   findTopicsForPicker,
   getArticleForAdmin,
-  getIssueForAdmin,
+  getContentGroupForAdmin,
   getMemberForAdmin,
   getTopicForAdmin,
   getVideoForAdmin,
   listAllRolesForPicker,
   listArticlesAdmin,
-  listIssuesAdmin,
+  listContentGroupsAdmin,
   listMembersAdmin,
   listRolesAdmin,
   listSystemRoles,
@@ -27,6 +27,6 @@ export {
 export { getCurrentMemberProfile } from "@nextgen-cms/studio/cms/queries/member";
 export {
   assertUniqueSlug,
-  issueNumberExists,
+  contentGroupNumberExists,
   slugExists,
 } from "@nextgen-cms/studio/cms/queries/slug";

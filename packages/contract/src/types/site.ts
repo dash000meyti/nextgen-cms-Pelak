@@ -49,7 +49,7 @@ export type SiteConfig = {
   contactEmail: string;
 };
 
-export type CurrentIssueInfo = {
+export type CurrentContentGroupInfo = {
   number: number;
   season: string;
   year: number;

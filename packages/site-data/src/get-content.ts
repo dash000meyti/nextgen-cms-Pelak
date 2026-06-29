@@ -6,24 +6,24 @@ import type {
   Author,
   Topic,
 } from "@nextgen-cms/contract/types/article";
-import type { Issue } from "@nextgen-cms/contract/types/issue";
+import type { ContentGroup } from "@nextgen-cms/contract/types/content-group";
 import {
   findAllArticlePreviews,
   findAllArticleSlugs,
   findArticleBySlug,
   findArticlesByAuthorSlug,
-  findArticlesByIssueNumber,
+  findArticlesByContentGroupNumber,
   findArticlesBySlugs,
   findArticlesByTopicSlug,
   findEditorsPicks,
   findFeaturedArticles,
 } from "@nextgen-cms/core/db/repositories/articles";
 import {
-  findAllIssueNumbers,
-  findAllIssueSummaries,
-  findCurrentIssue,
-  findIssueByNumber,
-} from "@nextgen-cms/core/db/repositories/issues-authors";
+  findAllContentGroupNumbers,
+  findAllContentGroupSummaries,
+  findContentGroupByNumber,
+  findCurrentContentGroup,
+} from "@nextgen-cms/core/db/repositories/content-groups-public";
 import {
   findAllPublicMemberSlugs,
   findAllPublicMembers,
@@ -143,11 +143,11 @@ export async function getEditorsPicks(limit = 3): Promise<ArticlePreview[]> {
 }
 
 export async function getLeadEssays(limit = 3): Promise<ArticlePreview[]> {
-  const issue = await getCurrentIssue();
+  const group = await getCurrentContentGroup();
   const essays = await platformCache(
-    ["articles-by-issue", String(issue.number)],
-    [CACHE_TAGS.articles, CACHE_TAGS.issue(issue.number)],
-    () => findArticlesByIssueNumber(issue.number),
+    ["articles-by-content-group", String(group.number)],
+    [CACHE_TAGS.articles, CACHE_TAGS.contentGroup(group.number)],
+    () => findArticlesByContentGroupNumber(group.number),
   )();
   return essays.slice(0, limit);
 }
@@ -189,34 +189,34 @@ export async function getMostRead(limit = 10): Promise<ArticlePreview[]> {
   )();
 }
 
-/* ---------- Issues ---------- */
+/* ---------- Content groups ---------- */
 
-export const getIssues = platformCache(
-  ["issues-all"],
-  [CACHE_TAGS.issues],
-  findAllIssueSummaries,
+export const getContentGroups = platformCache(
+  ["content-groups-all"],
+  [CACHE_TAGS.contentGroups],
+  findAllContentGroupSummaries,
 );
 
-export const getAllIssueNumbers = platformCache(
-  ["issue-numbers"],
-  [CACHE_TAGS.issues],
-  findAllIssueNumbers,
+export const getAllContentGroupNumbers = platformCache(
+  ["content-group-numbers"],
+  [CACHE_TAGS.contentGroups],
+  findAllContentGroupNumbers,
 );
 
-export async function getIssueByNumber(
+export async function getContentGroupByNumber(
   number: number,
-): Promise<Issue | undefined> {
+): Promise<ContentGroup | undefined> {
   return platformCache(
-    ["issue", String(number)],
-    [CACHE_TAGS.issues, CACHE_TAGS.issue(number)],
-    () => findIssueByNumber(number),
+    ["content-group", String(number)],
+    [CACHE_TAGS.contentGroups, CACHE_TAGS.contentGroup(number)],
+    () => findContentGroupByNumber(number),
   )();
 }
 
-export const getCurrentIssue = platformCache(
-  ["current-issue"],
-  [CACHE_TAGS.issues],
-  findCurrentIssue,
+export const getCurrentContentGroup = platformCache(
+  ["current-content-group"],
+  [CACHE_TAGS.contentGroups],
+  findCurrentContentGroup,
 );
 
 /* ---------- Members (public profiles) ---------- */

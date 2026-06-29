@@ -1,13 +1,14 @@
 "use client";
 
-import { getIssueFieldDefs } from "@nextgen-cms/contract/cms-schema/issue";
+import { getContentGroupFieldDefs } from "@nextgen-cms/contract/cms-schema/content-group";
 import type { DocumentField } from "@nextgen-cms/contract/cms-schema/types";
-import type { IssuePeriod } from "@nextgen-cms/contract/types/modules";
+import type { ContentGroupPeriod } from "@nextgen-cms/contract/types/modules";
+import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import {
-  createIssueAndRedirect,
-  type IssueFormData,
-  saveIssue,
-} from "@nextgen-cms/studio/cms/mutations/issue";
+  type ContentGroupFormData,
+  createContentGroupAndRedirect,
+  saveContentGroup,
+} from "@nextgen-cms/studio/cms/mutations/content-group";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { ImageField } from "@/components/admin/fields/ImageField";
@@ -15,19 +16,19 @@ import { JalaliDateField } from "@/components/admin/fields/JalaliDateField";
 import { TextField } from "@/components/admin/fields/TextField";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
 
-type IssueFormProps = {
+type ContentGroupFormProps = {
   mode: "create" | "edit";
-  issueId?: number;
-  initial: IssueFormData;
-  issuePeriod: IssuePeriod;
+  contentGroupId?: number;
+  initial: ContentGroupFormData;
+  contentGroupPeriod: ContentGroupPeriod;
 };
 
 function renderPeriodField(
   field: DocumentField,
-  form: IssueFormData,
-  update: <K extends keyof IssueFormData>(
+  form: ContentGroupFormData,
+  update: <K extends keyof ContentGroupFormData>(
     key: K,
-    value: IssueFormData[K],
+    value: ContentGroupFormData[K],
   ) => void,
 ) {
   if (field.key === "year") {
@@ -94,25 +95,29 @@ function renderPeriodField(
   );
 }
 
-export function IssueForm({
+export function ContentGroupForm({
   mode,
-  issueId,
+  contentGroupId,
   initial,
-  issuePeriod,
-}: IssueFormProps) {
+  contentGroupPeriod,
+}: ContentGroupFormProps) {
   const router = useRouter();
+  const session = useAdminMember();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [form, setForm] = useState(initial);
+  const uploadContext = contentGroupId
+    ? { contentGroupId }
+    : { memberId: session.memberId };
   const periodFields = useMemo(
-    () => getIssueFieldDefs(issuePeriod),
-    [issuePeriod],
+    () => getContentGroupFieldDefs(contentGroupPeriod),
+    [contentGroupPeriod],
   );
 
-  function update<K extends keyof IssueFormData>(
+  function update<K extends keyof ContentGroupFormData>(
     key: K,
-    value: IssueFormData[K],
+    value: ContentGroupFormData[K],
   ) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
@@ -122,12 +127,12 @@ export function IssueForm({
     setSuccess(null);
     startTransition(async () => {
       if (mode === "create") {
-        const result = await createIssueAndRedirect(form);
+        const result = await createContentGroupAndRedirect(form);
         if (result && !result.ok) setError(result.error);
         return;
       }
-      if (!issueId) return;
-      const result = await saveIssue(issueId, form);
+      if (!contentGroupId) return;
+      const result = await saveContentGroup(contentGroupId, form);
       if (!result.ok) {
         setError(result.error);
         return;
@@ -179,6 +184,7 @@ export function IssueForm({
         alt={form.coverAlt}
         onSrcChange={(coverSrc) => update("coverSrc", coverSrc)}
         onAltChange={(coverAlt) => update("coverAlt", coverAlt)}
+        uploadContext={uploadContext}
         required
       />
       <button

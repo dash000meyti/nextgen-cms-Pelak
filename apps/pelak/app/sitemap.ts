@@ -1,7 +1,7 @@
 import {
   getAllArticleSlugs,
   getAllAuthorSlugs,
-  getAllIssueNumbers,
+  getAllContentGroupNumbers,
   getAllTopicSlugs,
 } from "@nextgen-cms/site-data/get-content";
 import type { MetadataRoute } from "next";
@@ -11,18 +11,18 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hokmran.example";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [articleSlugs, authorSlugs, topicSlugs, issueNumbers] =
+  const [articleSlugs, authorSlugs, topicSlugs, contentGroupNumbers] =
     await Promise.all([
       getAllArticleSlugs(),
       getAllAuthorSlugs(),
       getAllTopicSlugs(),
-      getAllIssueNumbers(),
+      getAllContentGroupNumbers(),
     ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     "",
     "/content",
-    "/issues",
+    "/content-group",
     "/video",
     "/about",
     "/contact",
@@ -50,8 +50,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  const issueRoutes = issueNumbers.map((number: number) => ({
-    url: `${baseUrl}/issues/${number}`,
+  const contentGroupRoutes = contentGroupNumbers.map((number: number) => ({
+    url: `${baseUrl}/content-group/${number}`,
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
@@ -61,6 +61,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...articleRoutes,
     ...authorRoutes,
     ...topicRoutes,
-    ...issueRoutes,
+    ...contentGroupRoutes,
   ];
 }

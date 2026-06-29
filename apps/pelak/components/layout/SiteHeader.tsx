@@ -10,13 +10,13 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 type SiteHeaderProps = {
   siteConfig: SiteConfig;
   searchArticles: ArticlePreview[];
-  currentIssueLabel: string;
+  currentContentGroupLabel: string;
 };
 
 export function SiteHeader({
   siteConfig,
   searchArticles,
-  currentIssueLabel,
+  currentContentGroupLabel,
 }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-rule bg-paper/80 backdrop-blur-sm supports-backdrop-filter:bg-paper/75">
@@ -25,7 +25,7 @@ export function SiteHeader({
           <div className="lg:hidden">
             <MobileNav
               navSections={siteConfig.navSections}
-              currentIssueLabel={currentIssueLabel}
+              currentContentGroupLabel={currentContentGroupLabel}
             />
           </div>
           <nav aria-label="ناوبری اصلی" className="hidden lg:block">

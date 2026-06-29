@@ -24,3 +24,21 @@ export function resolveUploadPublicPath(
 export function resolveLegacyUploadPublicPath(filename: string): string {
   return `/uploads/${filename}`;
 }
+
+export function parseUploadPublicUrl(
+  publicUrl: string,
+): { folderPath: string; filename: string } | null {
+  const trimmed = publicUrl.trim();
+  if (!trimmed.startsWith("/uploads/")) return null;
+
+  const relative = trimmed.slice("/uploads/".length);
+  const slash = relative.lastIndexOf("/");
+  if (slash === -1) {
+    return { folderPath: "", filename: relative };
+  }
+
+  return {
+    folderPath: normalizeFolderPath(relative.slice(0, slash)),
+    filename: relative.slice(slash + 1),
+  };
+}

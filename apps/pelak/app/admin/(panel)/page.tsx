@@ -33,7 +33,7 @@ export default async function AdminDashboardPage() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2">
-        <AdminStatCard label="شماره‌ها" value={stats.totalIssues} />
+        <AdminStatCard label="گروه‌های محتوا" value={stats.totalContentGroups} />
         <AdminStatCard label="ویدیوها" value={stats.totalVideos} />
       </section>
 

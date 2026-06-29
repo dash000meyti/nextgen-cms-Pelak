@@ -16,6 +16,7 @@ import {
 } from "@nextgen-cms/core/db/repositories/articles";
 import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
 import { archiveMediaForContent } from "@nextgen-cms/core/media/archive";
+import { promoteArticleMedia } from "@nextgen-cms/core/media/promote-article-media";
 import {
   canDeleteArticle,
   canEditArticle,
@@ -49,7 +50,7 @@ export type ArticleFormData = {
   heroAlt: string;
   heroCaption: string;
   heroCredit: string;
-  issueNumber: number | null;
+  contentGroupNumber: number | null;
   isFeatured: boolean;
   isEditorsPick: boolean;
   body: ArticleBlock[];
@@ -85,7 +86,7 @@ function parseFormData(data: ArticleFormData): ArticleWriteInput {
     heroAlt: data.heroAlt.trim(),
     heroCaption: data.heroCaption.trim() || null,
     heroCredit: data.heroCredit.trim() || null,
-    issueNumber: data.issueNumber,
+    contentGroupNumber: data.contentGroupNumber,
     isFeatured: data.isFeatured,
     isEditorsPick: data.isEditorsPick,
     body: parseArticleBlocks(data.body),
@@ -184,6 +185,16 @@ export async function createArticle(
     const id = await insertArticle(input, access(session.memberId), {
       createdByMemberId: session.memberId,
     });
+
+    const promoted = await promoteArticleMedia(id, input.heroSrc, input.body);
+    if (promoted.changed) {
+      await updateArticle(
+        id,
+        { ...input, heroSrc: promoted.heroSrc, body: promoted.body },
+        access(session.memberId),
+      );
+    }
+
     await invalidateAfterSave(input.slug);
     return { ok: true, id };
   } catch (error) {
@@ -218,7 +229,14 @@ export async function saveArticle(
   if (error) return { ok: false, error };
 
   try {
-    await updateArticle(id, input, access(session.memberId));
+    const promoted = await promoteArticleMedia(id, input.heroSrc, input.body);
+    await updateArticle(
+      id,
+      promoted.changed
+        ? { ...input, heroSrc: promoted.heroSrc, body: promoted.body }
+        : input,
+      access(session.memberId),
+    );
     await invalidateAfterSave(input.slug, existing.slug);
     return { ok: true, id };
   } catch (error) {
@@ -239,6 +257,11 @@ export async function publishArticle(id: number): Promise<MutationResult> {
 
   try {
     const memberIds = await existingMemberIds(existing);
+    const promoted = await promoteArticleMedia(
+      id,
+      existing.heroSrc,
+      existing.body,
+    );
     await updateArticle(
       id,
       {
@@ -249,14 +272,14 @@ export async function publishArticle(id: number): Promise<MutationResult> {
         status: "published",
         publishedAt,
         readingMinutes: existing.readingMinutes,
-        heroSrc: existing.heroSrc,
+        heroSrc: promoted.heroSrc,
         heroAlt: existing.heroAlt,
         heroCaption: existing.heroCaption,
         heroCredit: existing.heroCredit,
-        issueNumber: existing.issueNumber,
+        contentGroupNumber: existing.contentGroupNumber,
         isFeatured: existing.isFeatured,
         isEditorsPick: existing.isEditorsPick,
-        body: existing.body,
+        body: promoted.body,
         relatedSlugs: existing.relatedSlugs,
         memberIds,
         topicIds: existing.topics.map((topic) => topic.id),
@@ -296,7 +319,7 @@ export async function unpublishArticle(id: number): Promise<MutationResult> {
         heroAlt: existing.heroAlt,
         heroCaption: existing.heroCaption,
         heroCredit: existing.heroCredit,
-        issueNumber: existing.issueNumber,
+        contentGroupNumber: existing.contentGroupNumber,
         isFeatured: existing.isFeatured,
         isEditorsPick: existing.isEditorsPick,
         body: existing.body,

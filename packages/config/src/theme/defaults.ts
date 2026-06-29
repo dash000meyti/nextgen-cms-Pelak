@@ -46,13 +46,13 @@ export const DEFAULT_THEME_PALETTE_DARK: ThemePalette = {
 };
 
 export const DEFAULT_FEATURE_MODULES: LegacyFeatureModules = {
-  issues: true,
+  contentGroup: true,
   video: true,
   newsletter: false,
 };
 
 export const DEFAULT_MODULE_SETTINGS: ModuleSettings = {
-  issues: { enabled: true, period: "seasonal" },
+  contentGroup: { enabled: true, period: "seasonal" },
   video: { enabled: true, pageTitle: "ویدیو", itemsPerPage: 12 },
   newsletter: { enabled: false },
 };
@@ -80,15 +80,18 @@ export function featureModulesToModuleSettings(
   legacy: LegacyFeatureModules | ModuleSettings,
 ): ModuleSettings {
   if (
-    "issues" in legacy &&
-    typeof legacy.issues === "object" &&
-    legacy.issues !== null
+    "contentGroup" in legacy &&
+    typeof legacy.contentGroup === "object" &&
+    legacy.contentGroup !== null
   ) {
     return legacy;
   }
-  const flags = legacy as LegacyFeatureModules;
+  const flags = legacy as LegacyFeatureModules & { issues?: boolean };
   return {
-    issues: { enabled: flags.issues, period: "seasonal" },
+    contentGroup: {
+      enabled: flags.contentGroup ?? flags.issues ?? false,
+      period: "seasonal",
+    },
     video: {
       enabled: flags.video,
       pageTitle: DEFAULT_MODULE_SETTINGS.video.pageTitle,
@@ -102,7 +105,7 @@ export function moduleSettingsToFeatureModules(
   settings: ModuleSettings,
 ): LegacyFeatureModules {
   return {
-    issues: settings.issues.enabled,
+    contentGroup: settings.contentGroup.enabled,
     video: settings.video.enabled,
     newsletter: settings.newsletter.enabled,
   };

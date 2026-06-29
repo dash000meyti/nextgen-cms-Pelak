@@ -38,9 +38,9 @@ export const exampleSchema = {
 | `select` | dropdown |
 | `json` | JSON خام |
 
-## Issue schema پویا
+## Content group schema پویا
 
-`getIssueFieldDefs(period)` در `packages/contract/src/cms-schema/issue.ts` — فیلدها بر اساس `yearly|seasonal|monthly|weekly`.
+`getContentGroupFieldDefs(period)` در `packages/contract/src/cms-schema/content-group.ts` — فیلدها بر اساس `yearly|seasonal|monthly|weekly`.
 
 ## Settings schemas
 

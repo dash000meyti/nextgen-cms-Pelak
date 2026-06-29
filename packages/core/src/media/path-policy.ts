@@ -41,3 +41,12 @@ export function writerDraftPath(memberId: number): string {
 export function contentPath(contentId: number): string {
   return normalizeFolderPath(`content/${contentId}`);
 }
+
+export function contentGroupPath(contentGroupId: number): string {
+  return normalizeFolderPath(`content-group/${contentGroupId}`);
+}
+
+export function isContentGroupMediaPath(relativePath: string): boolean {
+  const normalized = relativePath.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+  return /^content-group\/\d+/.test(normalized);
+}

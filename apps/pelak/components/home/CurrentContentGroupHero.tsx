@@ -1,5 +1,5 @@
 import type { ArticlePreview } from "@nextgen-cms/contract/types/article";
-import type { Issue } from "@nextgen-cms/contract/types/issue";
+import type { ContentGroup } from "@nextgen-cms/contract/types/content-group";
 import Image from "next/image";
 import Link from "next/link";
 import { ArticleListItem } from "@/components/article/ArticleListItem";
@@ -7,24 +7,26 @@ import { SectionTitle } from "@/components/article/SectionHeader";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 
-type CurrentIssueHeroProps = {
-  issue: Issue;
+type CurrentContentGroupHeroProps = {
+  group: ContentGroup;
   featured: ArticlePreview[];
 };
 
-export function CurrentIssueHero({ issue, featured }: CurrentIssueHeroProps) {
+export function CurrentContentGroupHero({
+  group,
+  featured,
+}: CurrentContentGroupHeroProps) {
   const lead = featured[0];
 
   return (
     <Container className="py-8 md:py-14">
       <div className="grid gap-8 md:grid-cols-[280px_1fr] md:gap-14">
-        {/* Issue cover */}
         <div className="space-y-4">
-          <Link href={`/issues/${issue.number}`} className="block">
+          <Link href={`/content-group/${group.number}`} className="block">
             <div className="relative mx-auto aspect-3/4 w-full max-w-[220px] overflow-hidden rounded bg-rule sm:max-w-[260px] md:max-w-none">
               <Image
-                src={issue.cover.src}
-                alt={issue.cover.alt}
+                src={group.cover.src}
+                alt={group.cover.alt}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 220px, 280px"
@@ -34,22 +36,21 @@ export function CurrentIssueHero({ issue, featured }: CurrentIssueHeroProps) {
           </Link>
           <div className="space-y-2 text-center md:text-start">
             <p className="font-heading text-base text-ink md:text-lg">
-              {issue.label}
+              {group.label}
             </p>
             <p className="text-sm text-ink-muted">
-              {issue.articleCount} محتوا در این شماره
+              {group.articleCount} محتوا در این گروه
             </p>
             <div className="md:text-start">
-              <Button href={`/issues/${issue.number}`} variant="outline">
-                مشاهده شماره
+              <Button href={`/content-group/${group.number}`} variant="outline">
+                مشاهده گروه محتوا
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Lead + list */}
         <div className="space-y-6">
-          <SectionTitle title="شمارهٔ جدید" />
+          <SectionTitle title="جدیدترین گروه محتوا" />
           {lead ? (
             <article className="group space-y-3 border-b border-rule pb-8 sm:space-y-4">
               <Link href={`/content/${lead.slug}`}>

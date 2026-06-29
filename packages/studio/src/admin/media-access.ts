@@ -4,12 +4,24 @@ import type { MemberSession } from "@nextgen-cms/contract/types/member";
 import { PERMISSION_DENIED } from "@nextgen-cms/core/db/access/permission-messages";
 import {
   contentPath,
+  isContentGroupMediaPath,
   writerDraftPath,
 } from "@nextgen-cms/core/media/path-policy";
 import { hasPermission } from "@nextgen-cms/studio/admin/article-access";
 
 export function hasFullMediaAccess(session: MemberSession): boolean {
   return hasPermission(session, "media.manage_all");
+}
+
+function canAccessContentGroupFolder(
+  session: MemberSession,
+  folder: string,
+): boolean {
+  if (!isContentGroupMediaPath(folder)) return false;
+  return (
+    hasPermission(session, "modules.contentGroup.create") ||
+    hasPermission(session, "modules.contentGroup.edit")
+  );
 }
 
 export function canReadFolder(
@@ -30,6 +42,10 @@ export function canReadFolder(
     if (normalized === ownedPath || normalized.startsWith(ownedPath)) {
       return true;
     }
+  }
+
+  if (canAccessContentGroupFolder(session, normalized)) {
+    return true;
   }
 
   return false;
@@ -67,12 +83,23 @@ export function getVirtualRootFolders(
   ownedContentIds: number[],
 ): string[] {
   if (hasFullMediaAccess(session)) {
-    return [normalizeFolderPath("shared"), normalizeFolderPath("content")];
+    return [
+      normalizeFolderPath("shared"),
+      normalizeFolderPath("content"),
+      normalizeFolderPath("content-group"),
+    ];
   }
-  return [
+  const roots = [
     writerDraftPath(session.memberId),
     ...ownedContentIds.map((id) => contentPath(id)),
   ];
+  if (
+    hasPermission(session, "modules.contentGroup.create") ||
+    hasPermission(session, "modules.contentGroup.edit")
+  ) {
+    roots.push(normalizeFolderPath("content-group"));
+  }
+  return roots;
 }
 
 export type MediaFolderAccessMode = "read" | "write";

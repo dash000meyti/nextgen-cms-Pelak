@@ -10,6 +10,7 @@ import {
   listMediaAssets,
 } from "@nextgen-cms/core/db/repositories/media-assets";
 import {
+  contentGroupPath,
   contentPath,
   writerDraftPath,
 } from "@nextgen-cms/core/media/path-policy";
@@ -27,6 +28,7 @@ import { requireMember } from "@nextgen-cms/studio/admin/require-member";
 export type ListMediaOptions = {
   folder?: string;
   contentId?: number;
+  contentGroupId?: number;
 };
 
 export type MediaBrowseContext = {
@@ -64,6 +66,13 @@ export async function listMedia(
     const access = assertMediaFolderAccess(session, folder, ownedContentIds);
     if (!access.ok) return [];
     return listMediaAssets({ contentId: options.contentId });
+  }
+
+  if (options.contentGroupId != null) {
+    const folder = contentGroupPath(options.contentGroupId);
+    const access = assertMediaFolderAccess(session, folder, ownedContentIds);
+    if (!access.ok) return [];
+    return listMediaAssets({ folderPath: folder });
   }
 
   const folderPath = options.folder
@@ -113,6 +122,10 @@ export async function listMediaForPicker(
 
   if (context.contentId != null) {
     return listMedia({ contentId: context.contentId });
+  }
+
+  if (context.contentGroupId != null) {
+    return listMedia({ contentGroupId: context.contentGroupId });
   }
 
   const memberId = context.memberId ?? session.memberId;

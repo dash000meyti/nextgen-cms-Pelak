@@ -71,6 +71,13 @@
       "when": 1782661000000,
       "tag": "0009_module_permissions_backfill",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1782662000000,
+      "tag": "0010_rename_issues_to_content_groups",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,6 @@
 import {
   getArticlesByTopic,
-  getCurrentIssue,
+  getCurrentContentGroup,
   getEditorsPicks,
   getFeatureModules,
   getLeadEssays,
@@ -8,12 +8,12 @@ import {
   getTopics,
   getVideos,
 } from "@nextgen-cms/site-data/get-content";
-import { CurrentIssueHero } from "@/components/home/CurrentIssueHero";
+import { CurrentContentGroupHero } from "@/components/home/CurrentContentGroupHero";
 import { EditorsPick } from "@/components/home/EditorsPick";
 import { LeadEssays } from "@/components/home/LeadEssays";
 import { MostReadList } from "@/components/home/MostReadList";
 import { NewsletterCta } from "@/components/home/NewsletterCta";
-import { TopIssue } from "@/components/home/TopIssue";
+import { TopContentGroup } from "@/components/home/TopContentGroup";
 import { TopicColumns } from "@/components/home/TopicColumns";
 import { VideoSection } from "@/components/home/VideoSection";
 import { Container } from "@/components/layout/Container";
@@ -27,8 +27,10 @@ export default async function HomePage() {
     getTopics(),
   ]);
 
-  const issue = featureModules.issues ? await getCurrentIssue() : null;
-  const leadEssays = featureModules.issues ? await getLeadEssays(3) : [];
+  const group = featureModules.contentGroup
+    ? await getCurrentContentGroup()
+    : null;
+  const leadEssays = featureModules.contentGroup ? await getLeadEssays(3) : [];
   const videos = featureModules.video ? await getVideos() : [];
 
   const topicColumns = await Promise.all(
@@ -40,10 +42,10 @@ export default async function HomePage() {
 
   return (
     <>
-      {issue ? (
+      {group ? (
         <>
-          <TopIssue issue={issue} />
-          <CurrentIssueHero issue={issue} featured={leadEssays} />
+          <TopContentGroup group={group} />
+          <CurrentContentGroupHero group={group} featured={leadEssays} />
         </>
       ) : null}
 

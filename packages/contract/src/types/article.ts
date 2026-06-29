@@ -41,7 +41,7 @@ export type ArticlePreview = {
   topics: Topic[];
   readingMinutes: number;
   heroImage: ImageMeta;
-  issueNumber?: number;
+  contentGroupNumber?: number;
   isFeatured?: boolean;
   isEditorsPick?: boolean;
 };

@@ -2,7 +2,7 @@ import { THEME_STORAGE_KEY } from "@nextgen-cms/config/theme/constants";
 import { applyFeatureModules } from "@nextgen-cms/site-data/apply-feature-modules";
 import {
   getArticles,
-  getCurrentIssue,
+  getCurrentContentGroup,
   getFeatureModules,
   getSiteConfig,
   getThemeTokens,
@@ -43,7 +43,9 @@ export default async function RootLayout({
       getArticles(),
     ]);
 
-  const currentIssue = featureModules.issues ? await getCurrentIssue() : null;
+  const currentContentGroup = featureModules.contentGroup
+    ? await getCurrentContentGroup()
+    : null;
   const siteConfig = applyFeatureModules(rawSiteConfig, featureModules);
 
   return (
@@ -65,7 +67,7 @@ export default async function RootLayout({
             <SiteHeader
               siteConfig={siteConfig}
               searchArticles={searchArticles}
-              currentIssueLabel={currentIssue?.label ?? ""}
+              currentContentGroupLabel={currentContentGroup?.label ?? ""}
             />
             <main className="flex-1">{children}</main>
             <SiteFooter siteConfig={siteConfig} />

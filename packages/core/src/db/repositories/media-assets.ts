@@ -6,7 +6,8 @@ import {
   mediaAssets,
 } from "@nextgen-cms/core/db/schema";
 import { resolveUploadPublicPath } from "@nextgen-cms/core/media/urls";
-import { and, desc, eq, isNull, like, lt, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, like, lt, or, sql } from "drizzle-orm";
+import { normalizeFolderPath } from "@nextgen-cms/contract/media/folder-path";
 
 export type ListMediaAssetsOptions = {
   folderPath?: string;
@@ -81,6 +82,35 @@ export async function listMediaAssets(
     .from(mediaAssets)
     .where(conditions.length > 0 ? and(...conditions) : undefined)
     .orderBy(desc(mediaAssets.createdAt));
+
+  return rows.map(mapRowToMediaAsset);
+}
+
+export async function listMediaAssetsInFolder(
+  folderPath: string,
+): Promise<MediaAsset[]> {
+  return listMediaAssets({
+    folderPath: normalizeFolderPath(folderPath),
+    includeDeleted: true,
+  });
+}
+
+export async function listMediaAssetsInFolderTree(
+  prefix: string,
+): Promise<MediaAsset[]> {
+  const normalized = prefix.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+  if (!normalized) return [];
+
+  const exactPath = `${normalized}/`;
+  const rows = await db
+    .select()
+    .from(mediaAssets)
+    .where(
+      or(
+        eq(mediaAssets.folderPath, exactPath),
+        like(mediaAssets.folderPath, `${normalized}/%`),
+      ),
+    );
 
   return rows.map(mapRowToMediaAsset);
 }

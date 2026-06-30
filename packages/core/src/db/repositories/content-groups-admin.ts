@@ -3,6 +3,8 @@ import { assertMemberPermission } from "@nextgen-cms/core/db/access/assert-permi
 import { PermissionDeniedError } from "@nextgen-cms/core/db/access/permission-denied-error";
 import type { AdminAccess } from "@nextgen-cms/core/db/access/types";
 import { contentGroups } from "@nextgen-cms/core/db/schema";
+import { contentGroupPath } from "@nextgen-cms/core/media/path-policy";
+import { purgeMediaFolder } from "@nextgen-cms/core/media/purge-folder";
 import { and, eq, ne } from "drizzle-orm";
 
 export type ContentGroupWriteInput = {
@@ -117,5 +119,6 @@ export async function deleteContentGroup(id: number, access: AdminAccess) {
     .limit(1);
   if (!existing[0]) throw new PermissionDeniedError();
 
+  await purgeMediaFolder(contentGroupPath(id));
   await db.delete(contentGroups).where(eq(contentGroups.id, id));
 }

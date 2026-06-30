@@ -17,7 +17,7 @@ import {
   updateArticle,
 } from "@nextgen-cms/core/db/repositories/articles";
 import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
-import { archiveMediaForContent } from "@nextgen-cms/core/media/archive";
+import { purgeMediaForContent } from "@nextgen-cms/core/media/purge-folder";
 import { promoteArticleMedia } from "@nextgen-cms/core/media/promote-article-media";
 import {
   canDeleteArticle,
@@ -379,7 +379,7 @@ export async function removeArticle(id: number): Promise<MutationResult> {
   if (!canDeleteArticle(session, existing)) return permissionDeniedResult();
 
   try {
-    await archiveMediaForContent(id);
+    await purgeMediaForContent(id);
     await deleteArticle(id, access(session.memberId));
     await invalidateAfterSave(existing.slug, {
       contentGroupNumber: existing.contentGroupNumber,

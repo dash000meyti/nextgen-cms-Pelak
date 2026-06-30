@@ -1,5 +1,6 @@
 "use client";
 
+import { getFolderBrowseLabel } from "@nextgen-cms/contract/media/folder-display";
 import type { MediaAsset } from "@nextgen-cms/contract/types/media";
 import {
   deleteMedia,
@@ -14,7 +15,8 @@ import { MediaSettingsTab } from "@/components/admin/media/MediaSettingsTab";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
 
 type MediaLibraryProps = {
-  folder: string;
+  browseFolder: string;
+  uploadFolder: string;
   assets: MediaAsset[];
   subfolders: string[];
   canUpload: boolean;
@@ -24,7 +26,8 @@ type MediaLibraryProps = {
 type TabId = "files" | "settings";
 
 export function MediaLibrary({
-  folder,
+  browseFolder,
+  uploadFolder,
   assets,
   subfolders,
   canUpload,
@@ -45,7 +48,7 @@ export function MediaLibrary({
     startTransition(async () => {
       const formData = new FormData();
       formData.set("file", file);
-      const result = await uploadMedia(formData, { folder });
+      const result = await uploadMedia(formData, { folder: uploadFolder });
       if (!result.ok) {
         setError(result.error);
         return;
@@ -133,7 +136,7 @@ export function MediaLibrary({
         <MediaSettingsTab />
       ) : (
         <div className="space-y-6">
-          <FolderBreadcrumb folder={folder} />
+          <FolderBreadcrumb folder={browseFolder} />
 
           {subfolders.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -143,7 +146,7 @@ export function MediaLibrary({
                   href={`/admin/media?folder=${encodeURIComponent(subfolder)}`}
                   className="rounded border border-rule bg-surface-2 px-3 py-2 text-sm text-ink hover:border-accent"
                 >
-                  {subfolder}
+                  {getFolderBrowseLabel(browseFolder, subfolder)}
                 </Link>
               ))}
             </div>

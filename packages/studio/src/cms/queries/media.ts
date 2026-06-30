@@ -9,9 +9,18 @@ import {
   listFolderPaths,
   listMediaAssets,
 } from "@nextgen-cms/core/db/repositories/media-assets";
+import { mergeChildFolders } from "@nextgen-cms/core/media/folder-browse";
+import {
+  findAllArticleIds,
+  findAllContentGroupIds,
+  findAllMemberIds,
+  findAllVideoIds,
+  findArticleIdsByIds,
+} from "@nextgen-cms/core/media/media-folder-entities";
 import {
   contentGroupPath,
   contentPath,
+  memberAvatarPath,
   videoPath,
   writerDraftPath,
 } from "@nextgen-cms/core/media/path-policy";
@@ -100,6 +109,49 @@ export async function getMediaByFolder(
   return listMedia({ folder: folderPath });
 }
 
+async function resolveEntityChildFolders(
+  parentPrefix: string,
+  session: MemberSession,
+  ownedContentIds: number[],
+): Promise<string[]> {
+  const parent = parentPrefix.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+
+  if (parent === "shared") {
+    return [
+      normalizeFolderPath("shared/site"),
+      normalizeFolderPath("shared/members"),
+    ];
+  }
+
+  if (parent === "shared/members") {
+    const memberIds = await findAllMemberIds();
+    return memberIds.map((id) => memberAvatarPath(id));
+  }
+
+  if (parent === "content") {
+    const articleIds = hasFullMediaAccess(session)
+      ? await findAllArticleIds()
+      : await findArticleIdsByIds(ownedContentIds);
+    return articleIds.map((id) => contentPath(id));
+  }
+
+  if (parent === "content-group") {
+    const groupIds = await findAllContentGroupIds();
+    return groupIds.map((id) => contentGroupPath(id));
+  }
+
+  if (parent === "videos") {
+    const videoIds = await findAllVideoIds();
+    return videoIds.map((id) => videoPath(id));
+  }
+
+  if (parent.startsWith("content/draft/")) {
+    return [];
+  }
+
+  return [];
+}
+
 export async function getMediaFolders(
   parentFolder?: string,
 ): Promise<string[]> {
@@ -118,8 +170,12 @@ export async function getMediaFolders(
   );
   if (!access.ok) return [];
 
-  const folders = await listFolderPaths(prefix);
-  return folders.filter((folder) =>
+  const [dbFolders, entityFolders] = await Promise.all([
+    listFolderPaths(prefix),
+    resolveEntityChildFolders(prefix, session, ownedContentIds),
+  ]);
+
+  return mergeChildFolders(dbFolders, entityFolders).filter((folder) =>
     canReadFolder(session, folder, ownedContentIds),
   );
 }

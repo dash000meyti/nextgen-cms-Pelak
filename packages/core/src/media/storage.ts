@@ -1,5 +1,7 @@
-import { mkdir, rename, unlink, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { mkdir, rename, rm, unlink, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { normalizeFolderPath } from "@nextgen-cms/contract/media/folder-path";
+import { resolveUploadsDir } from "../platform/paths";
 import { resolveMediaStoragePath } from "./urls";
 
 export async function ensureFolderDir(
@@ -44,4 +46,19 @@ export async function moveMediaFile(
   const toPath = resolveMediaStoragePath(toFolder, filename);
   await mkdir(dirname(toPath), { recursive: true });
   await rename(fromPath, toPath);
+}
+
+export async function removeMediaFolderDir(folderPath: string): Promise<void> {
+  const folder = normalizeFolderPath(folderPath).replace(/\/$/, "");
+  if (!folder) return;
+
+  const dir = join(resolveUploadsDir(), folder);
+  try {
+    await rm(dir, { recursive: true, force: true });
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+      return;
+    }
+    throw error;
+  }
 }

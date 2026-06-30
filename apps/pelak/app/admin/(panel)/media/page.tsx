@@ -1,5 +1,6 @@
 import { normalizeFolderPath } from "@nextgen-cms/contract/media/folder-path";
 import {
+  canBrowseMediaRoot,
   canDeleteAsset,
   canReadFolder,
 } from "@nextgen-cms/studio/admin/media-access";
@@ -25,25 +26,31 @@ export default async function AdminMediaPage({
 
   const browseContext = await getMediaBrowseContext(session);
   const params = await searchParams;
-  const requestedFolder = params.folder
-    ? normalizeFolderPath(params.folder)
-    : browseContext.defaultFolder;
 
-  const folder = canReadFolder(
-    session,
-    requestedFolder,
-    browseContext.ownedContentIds,
-  )
-    ? requestedFolder
-    : browseContext.defaultFolder;
-
-  if (params.folder && folder !== requestedFolder) {
-    redirect(`/admin/media?folder=${encodeURIComponent(folder)}`);
+  let browseFolder = "";
+  if (params.folder !== undefined) {
+    const requestedFolder = normalizeFolderPath(params.folder);
+    if (
+      !canReadFolder(
+        session,
+        requestedFolder,
+        browseContext.ownedContentIds,
+      )
+    ) {
+      redirect("/admin/media");
+    }
+    browseFolder = requestedFolder;
+  } else if (!canBrowseMediaRoot(session)) {
+    redirect(
+      `/admin/media?folder=${encodeURIComponent(browseContext.defaultFolder)}`,
+    );
   }
 
+  const uploadFolder = browseFolder || browseContext.defaultFolder;
+
   const [assets, subfolders] = await Promise.all([
-    listMedia({ folder }),
-    getMediaFolders(folder.replace(/\/$/, "")),
+    browseFolder ? listMedia({ folder: browseFolder }) : Promise.resolve([]),
+    getMediaFolders(browseFolder ? browseFolder.replace(/\/$/, "") : undefined),
   ]);
 
   const deletableIds = assets
@@ -54,13 +61,14 @@ export default async function AdminMediaPage({
 
   const canUpload = canUploadToFolder(
     session,
-    folder,
+    uploadFolder,
     browseContext.ownedContentIds,
   );
 
   return (
     <MediaLibrary
-      folder={folder}
+      browseFolder={browseFolder}
+      uploadFolder={uploadFolder}
       assets={assets}
       subfolders={subfolders}
       canUpload={canUpload}

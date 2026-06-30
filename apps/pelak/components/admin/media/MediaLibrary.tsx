@@ -13,6 +13,7 @@ import { FolderBreadcrumb } from "@/components/admin/media/FolderBreadcrumb";
 import { MediaGrid } from "@/components/admin/media/MediaGrid";
 import { MediaSettingsTab } from "@/components/admin/media/MediaSettingsTab";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
 
 type MediaLibraryProps = {
   browseFolder: string;
@@ -41,6 +42,7 @@ export function MediaLibrary({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const deletableSet = new Set(deletableIds);
+  const { confirm, dialog } = useConfirmDialog();
 
   function handleUpload(file: File) {
     setError(null);
@@ -58,8 +60,13 @@ export function MediaLibrary({
     });
   }
 
-  function handleDelete(asset: MediaAsset) {
-    if (!window.confirm(`«${asset.originalName}» حذف شود؟`)) return;
+  async function handleDelete(asset: MediaAsset) {
+    const confirmed = await confirm({
+      title: "حذف فایل",
+      message: `«${asset.originalName}» حذف شود؟`,
+      confirmLabel: "حذف",
+    });
+    if (!confirmed) return;
 
     setError(null);
     setSuccess(null);
@@ -78,6 +85,7 @@ export function MediaLibrary({
 
   return (
     <div className="space-y-6">
+      {dialog}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-heading text-2xl text-ink">مدیا</h1>
         {tab === "files" && canUpload ? (

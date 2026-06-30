@@ -19,6 +19,7 @@ import { useEffect, useState, useTransition } from "react";
 import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
 
 const PERMISSION_LABELS: Record<string, string> = {
   create: "ایجاد",
@@ -80,6 +81,7 @@ export function RolesSettingsPanel({
   );
   const [form, setForm] = useState<RoleFormData>(EMPTY_FORM);
   const [isSystem, setIsSystem] = useState(false);
+  const { confirm, dialog } = useConfirmDialog();
 
   useEffect(() => {
     if (activeId === "new") {
@@ -134,8 +136,14 @@ export function RolesSettingsPanel({
     });
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (typeof activeId !== "number" || isSystem) return;
+    const confirmed = await confirm({
+      title: "حذف نقش",
+      message: "این نقش حذف شود؟",
+      confirmLabel: "حذف",
+    });
+    if (!confirmed) return;
     setError(null);
     startTransition(async () => {
       const result = await removeRole(activeId);
@@ -150,6 +158,7 @@ export function RolesSettingsPanel({
 
   return (
     <div className="grid gap-8 lg:grid-cols-[14rem_1fr]">
+      {dialog}
       <div className="space-y-2">
         {roles.map((role) => (
           <button

@@ -13,6 +13,7 @@ import { SlugField } from "@/components/admin/fields/SlugField";
 import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
 
 type RoleOption = {
   id: number;
@@ -40,6 +41,7 @@ export function MemberForm({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [form, setForm] = useState(initial);
+  const { confirm, dialog } = useConfirmDialog();
 
   function update<K extends keyof MemberFormData>(
     key: K,
@@ -68,9 +70,14 @@ export function MemberForm({
     });
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!memberId) return;
-    if (!window.confirm("این عضو حذف یا غیرفعال شود؟")) return;
+    const confirmed = await confirm({
+      title: "حذف عضو",
+      message: "این عضو حذف یا غیرفعال شود؟",
+      confirmLabel: "حذف",
+    });
+    if (!confirmed) return;
     setError(null);
     setSuccess(null);
     startTransition(async () => {
@@ -86,6 +93,7 @@ export function MemberForm({
 
   return (
     <div className="space-y-8">
+      {dialog}
       <FormMessage error={error} success={success} />
 
       <div className="grid gap-6 lg:grid-cols-2">

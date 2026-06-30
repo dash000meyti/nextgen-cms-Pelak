@@ -28,6 +28,7 @@ import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { PublishBar } from "@/components/admin/studio/PublishBar";
+import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
 import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type ArticleFormProps = {
@@ -51,6 +52,7 @@ export function ArticleForm({
 }: ArticleFormProps) {
   const router = useRouter();
   const session = useAdminMember();
+  const { confirm, dialog } = useConfirmDialog();
   const canPublish = canPublishContent(session);
   const membersReadOnly = !hasPermission(session, "content.edit_all");
   const [pending, startTransition] = useTransition();
@@ -104,9 +106,14 @@ export function ArticleForm({
     });
   }
 
-  function handleArchive() {
+  async function handleArchive() {
     if (!articleId) return;
-    if (!window.confirm("این محتوا به بایگانی ارسال شود؟")) return;
+    const confirmed = await confirm({
+      title: "ارسال به بایگانی",
+      message: "این محتوا به بایگانی ارسال شود؟",
+      confirmLabel: "بایگانی",
+    });
+    if (!confirmed) return;
     setError(null);
     runMutation(async () => {
       const result = await archiveArticleAndRedirect(articleId);
@@ -114,9 +121,14 @@ export function ArticleForm({
     });
   }
 
-  function handlePermanentDelete() {
+  async function handlePermanentDelete() {
     if (!articleId) return;
-    if (!window.confirm("این محتوا برای همیشه حذف شود؟")) return;
+    const confirmed = await confirm({
+      title: "حذف دائمی",
+      message: "این محتوا برای همیشه حذف شود؟",
+      confirmLabel: "حذف",
+    });
+    if (!confirmed) return;
     setError(null);
     runMutation(async () => {
       const result = await removeArticleAndRedirect(articleId);
@@ -124,8 +136,14 @@ export function ArticleForm({
     });
   }
 
-  function handlePublish() {
+  async function handlePublish() {
     if (!articleId) return;
+    const confirmed = await confirm({
+      title: "انتشار",
+      message: "این محتوا منتشر شود؟",
+      confirmLabel: "انتشار",
+    });
+    if (!confirmed) return;
     setError(null);
     runMutation(async () => {
       const result = await publishArticle(articleId);
@@ -142,8 +160,14 @@ export function ArticleForm({
     });
   }
 
-  function handleUnpublish() {
+  async function handleUnpublish() {
     if (!articleId) return;
+    const confirmed = await confirm({
+      title: "لغو انتشار",
+      message: "انتشار این محتوا لغو شود؟",
+      confirmLabel: "لغو انتشار",
+    });
+    if (!confirmed) return;
     setError(null);
     runMutation(async () => {
       const result = await unpublishArticle(articleId);
@@ -159,10 +183,16 @@ export function ArticleForm({
 
   return (
     <div className="space-y-8">
+      {dialog}
       {mode === "edit" && articleId ? (
         <PublishBar
           status={form.status}
           canPublish={canPublish}
+          viewHref={
+            form.status === "published"
+              ? `/content/${form.slug}`
+              : `/admin/content/${articleId}/preview`
+          }
           onPublish={handlePublish}
           onUnpublish={handleUnpublish}
           publishing={pending}

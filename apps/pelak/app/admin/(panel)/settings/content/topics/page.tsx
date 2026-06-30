@@ -2,7 +2,7 @@ import { requirePermission } from "@nextgen-cms/studio/admin/require-permission"
 import { listTopicsAdmin } from "@nextgen-cms/studio/cms/queries";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { DocumentList } from "@/components/admin/studio/DocumentList";
+import { TopicsAdminList } from "@/components/admin/studio/lists/TopicsAdminList";
 
 export const metadata: Metadata = {
   title: "موضوعات — تنظیمات محتوا",
@@ -24,33 +24,7 @@ export default async function ContentTopicsPage() {
           بازگشت به تنظیمات محتوا
         </Link>
       </div>
-      <DocumentList
-        title=""
-        newHref="/admin/settings/content/topics/new"
-        newLabel="موضوع جدید"
-        rows={topics}
-        rowKey={(row) => row.id}
-        editHref={(row) => `/admin/settings/content/topics/${row.id}/edit`}
-        columns={[
-          {
-            key: "name",
-            header: "نام",
-            render: (row) => (
-              <div>
-                <p className="font-medium">{row.name}</p>
-                <p className="text-xs text-ink-faint" dir="ltr">
-                  {row.slug}
-                </p>
-              </div>
-            ),
-          },
-          {
-            key: "description",
-            header: "توضیحات",
-            render: (row) => row.description || "—",
-          },
-        ]}
-      />
+      <TopicsAdminList topics={topics} />
     </div>
   );
 }

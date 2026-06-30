@@ -1,10 +1,22 @@
+"use client";
+
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { type ReactNode, useMemo, useState } from "react";
+import {
+  type DocumentListSort,
+  filterRows,
+  nextSortState,
+  type SortDirection,
+  sortRows,
+} from "./document-list-utils";
 
 export type DocumentListColumn<T> = {
   key: string;
   header: string;
   render: (row: T) => ReactNode;
+  sortable?: boolean;
+  sortValue?: (row: T) => string | number | Date | null | undefined;
+  searchText?: (row: T) => string;
   className?: string;
   headerClassName?: string;
   cellClassName?: string;
@@ -22,7 +34,41 @@ type DocumentListProps<T> = {
   renderActions?: (row: T) => ReactNode;
   emptyMessage?: string;
   toolbar?: ReactNode;
+  searchPlaceholder?: string;
+  defaultSort?: DocumentListSort | null;
 };
+
+function SortIndicator({
+  active,
+  direction,
+}: {
+  active: boolean;
+  direction: SortDirection;
+}) {
+  return (
+    <span
+      className={`ms-1 inline-flex flex-col leading-none ${active ? "text-accent" : "text-ink-faint"}`}
+      aria-hidden
+    >
+      <svg
+        viewBox="0 0 8 5"
+        className={`size-2 ${active && direction === "asc" ? "opacity-100" : "opacity-40"}`}
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d="M4 0 7.5 5H.5z" />
+      </svg>
+      <svg
+        viewBox="0 0 8 5"
+        className={`-mt-px size-2 ${active && direction === "desc" ? "opacity-100" : "opacity-40"}`}
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d="M4 5 .5 0h7z" />
+      </svg>
+    </span>
+  );
+}
 
 export function DocumentList<T>({
   title,
@@ -36,12 +82,38 @@ export function DocumentList<T>({
   renderActions,
   emptyMessage = "موردی یافت نشد.",
   toolbar,
+  searchPlaceholder = "جستجو…",
+  defaultSort,
 }: DocumentListProps<T>) {
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<DocumentListSort | null>(
+    defaultSort ?? null,
+  );
+
+  const visibleRows = useMemo(() => {
+    const filtered = filterRows(rows, query, columns);
+    return sortRows(filtered, sort, columns);
+  }, [rows, query, sort, columns]);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-heading text-2xl text-ink">{title}</h1>
-        <div className="flex items-center gap-3">
+        {title ? (
+          <h1 className="font-heading text-2xl text-ink">{title}</h1>
+        ) : (
+          <div />
+        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="relative">
+            <span className="sr-only">{searchPlaceholder}</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={searchPlaceholder}
+              className="w-48 rounded border border-rule bg-paper px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none sm:w-56"
+            />
+          </label>
           {toolbar}
           {newHref ? (
             <Link
@@ -58,19 +130,44 @@ export function DocumentList<T>({
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-rule bg-surface-2 text-ink-muted">
-              {columns.map((column) => (
-                <th
-                  key={column.key}
-                  className={`px-4 py-3 text-start font-medium ${column.className ?? ""} ${column.headerClassName ?? ""}`}
-                >
-                  {column.header}
-                </th>
-              ))}
+              {columns.map((column) => {
+                const isSortable = Boolean(column.sortable && column.sortValue);
+                const isActive = sort?.key === column.key;
+
+                return (
+                  <th
+                    key={column.key}
+                    className={`px-4 py-3 text-start font-medium ${column.className ?? ""} ${column.headerClassName ?? ""}`}
+                  >
+                    {isSortable ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSort((current) =>
+                            nextSortState(current, column.key),
+                          )
+                        }
+                        className="inline-flex items-center hover:text-ink"
+                      >
+                        {column.header}
+                        <SortIndicator
+                          active={isActive}
+                          direction={
+                            isActive ? (sort?.direction ?? "asc") : "asc"
+                          }
+                        />
+                      </button>
+                    ) : (
+                      column.header
+                    )}
+                  </th>
+                );
+              })}
               <th className="px-4 py-3 text-start font-medium">عملیات</th>
             </tr>
           </thead>
           <tbody>
-            {rows.length === 0 ? (
+            {visibleRows.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length + 1}
@@ -80,7 +177,7 @@ export function DocumentList<T>({
                 </td>
               </tr>
             ) : (
-              rows.map((row) => {
+              visibleRows.map((row) => {
                 const viewUrl = viewHref?.(row);
                 return (
                   <tr

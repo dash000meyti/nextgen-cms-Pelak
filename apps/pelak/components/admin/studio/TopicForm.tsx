@@ -12,6 +12,7 @@ import { SlugField } from "@/components/admin/fields/SlugField";
 import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
 
 type TopicFormProps = {
   mode: "create" | "edit";
@@ -25,6 +26,7 @@ export function TopicForm({ mode, topicId, initial }: TopicFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [form, setForm] = useState(initial);
+  const { confirm, dialog } = useConfirmDialog();
 
   function update<K extends keyof TopicFormData>(
     key: K,
@@ -53,8 +55,28 @@ export function TopicForm({ mode, topicId, initial }: TopicFormProps) {
     });
   }
 
+  async function handleDelete() {
+    if (!topicId) return;
+    const confirmed = await confirm({
+      title: "حذف موضوع",
+      message: "این موضوع حذف شود؟",
+      confirmLabel: "حذف",
+    });
+    if (!confirmed) return;
+    startTransition(async () => {
+      const result = await deleteTopic(topicId);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      router.push("/admin/settings/content/topics");
+      router.refresh();
+    });
+  }
+
   return (
     <div className="space-y-8">
+      {dialog}
       <FormMessage error={error} success={success} />
       <div className="grid gap-6 lg:grid-cols-2">
         <TextField
@@ -91,18 +113,7 @@ export function TopicForm({ mode, topicId, initial }: TopicFormProps) {
       {mode === "edit" && topicId ? (
         <button
           type="button"
-          onClick={() => {
-            if (!topicId || !confirm("این موضوع حذف شود؟")) return;
-            startTransition(async () => {
-              const result = await deleteTopic(topicId);
-              if (!result.ok) {
-                setError(result.error);
-                return;
-              }
-              router.push("/admin/settings/content/topics");
-              router.refresh();
-            });
-          }}
+          onClick={handleDelete}
           disabled={pending}
           className="ms-3 rounded border border-rule px-6 py-2 text-sm text-ink-muted hover:border-accent hover:text-accent disabled:opacity-50"
         >

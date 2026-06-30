@@ -3,6 +3,7 @@
 import { restoreArticleFromArchiveAndRedirect } from "@nextgen-cms/studio/cms/mutations/article";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useState, useTransition } from "react";
+import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
 import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type RestoreArticleButtonProps = {
@@ -12,9 +13,16 @@ type RestoreArticleButtonProps = {
 export function RestoreArticleButton({ articleId }: RestoreArticleButtonProps) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const { confirm, dialog } = useConfirmDialog();
 
-  function handleRestore() {
-    if (!window.confirm("این محتوا از بایگانی بازیابی شود؟")) return;
+  async function handleRestore() {
+    const confirmed = await confirm({
+      title: "بازیابی از بایگانی",
+      message: "این محتوا از بایگانی بازیابی شود؟",
+      confirmLabel: "بازیابی",
+      variant: "default",
+    });
+    if (!confirmed) return;
     setError(null);
     startTransition(() => {
       void (async () => {
@@ -29,6 +37,7 @@ export function RestoreArticleButton({ articleId }: RestoreArticleButtonProps) {
 
   return (
     <span className="inline-flex flex-col items-start gap-1">
+      {dialog}
       <button
         type="button"
         onClick={handleRestore}

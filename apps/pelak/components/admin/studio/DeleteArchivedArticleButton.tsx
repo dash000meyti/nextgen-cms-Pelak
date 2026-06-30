@@ -3,6 +3,7 @@
 import { removeArticleAndRedirect } from "@nextgen-cms/studio/cms/mutations/article";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useState, useTransition } from "react";
+import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
 import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type DeleteArchivedArticleButtonProps = {
@@ -14,9 +15,15 @@ export function DeleteArchivedArticleButton({
 }: DeleteArchivedArticleButtonProps) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const { confirm, dialog } = useConfirmDialog();
 
-  function handleDelete() {
-    if (!window.confirm("این محتوا برای همیشه حذف شود؟")) return;
+  async function handleDelete() {
+    const confirmed = await confirm({
+      title: "حذف دائمی",
+      message: "این محتوا برای همیشه حذف شود؟",
+      confirmLabel: "حذف",
+    });
+    if (!confirmed) return;
     setError(null);
     startTransition(() => {
       void (async () => {
@@ -31,6 +38,7 @@ export function DeleteArchivedArticleButton({
 
   return (
     <span className="inline-flex flex-col items-start gap-1">
+      {dialog}
       <button
         type="button"
         onClick={handleDelete}

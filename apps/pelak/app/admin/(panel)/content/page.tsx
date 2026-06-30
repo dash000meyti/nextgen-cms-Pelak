@@ -29,6 +29,11 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
       rows={articles}
       rowKey={(row) => row.id}
       editHref={(row) => `/admin/content/${row.id}/edit`}
+      viewHref={(row) =>
+        row.status === "published"
+          ? `/content/${row.slug}`
+          : `/admin/content/${row.id}/preview`
+      }
       toolbar={
         <div className="flex flex-wrap gap-2">
           {STATUS_OPTIONS.map((option) => (

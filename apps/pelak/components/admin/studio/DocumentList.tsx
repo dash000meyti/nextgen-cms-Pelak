@@ -18,6 +18,7 @@ type DocumentListProps<T> = {
   rows: T[];
   rowKey: (row: T) => string | number;
   editHref?: (row: T) => string;
+  viewHref?: (row: T) => string | undefined;
   emptyMessage?: string;
   toolbar?: ReactNode;
 };
@@ -30,6 +31,7 @@ export function DocumentList<T>({
   rows,
   rowKey,
   editHref,
+  viewHref,
   emptyMessage = "موردی یافت نشد.",
   toolbar,
 }: DocumentListProps<T>) {
@@ -76,7 +78,9 @@ export function DocumentList<T>({
                 </td>
               </tr>
             ) : (
-              rows.map((row) => (
+              rows.map((row) => {
+                const viewUrl = viewHref?.(row);
+                return (
                 <tr
                   key={rowKey(row)}
                   className="border-b border-rule last:border-0"
@@ -90,19 +94,34 @@ export function DocumentList<T>({
                     </td>
                   ))}
                   <td className="px-4 py-3">
-                    {editHref ? (
-                      <Link
-                        href={editHref(row)}
-                        className="text-accent hover:underline"
-                      >
-                        ویرایش
-                      </Link>
+                    {editHref || viewHref ? (
+                      <div className="flex items-center gap-3">
+                        {viewUrl ? (
+                          <Link
+                            href={viewUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-accent hover:underline"
+                          >
+                            مشاهده
+                          </Link>
+                        ) : null}
+                        {editHref ? (
+                          <Link
+                            href={editHref(row)}
+                            className="text-accent hover:underline"
+                          >
+                            ویرایش
+                          </Link>
+                        ) : null}
+                      </div>
                     ) : (
                       <span className="text-ink-faint">—</span>
                     )}
                   </td>
                 </tr>
-              ))
+                );
+              })
             )}
           </tbody>
         </table>

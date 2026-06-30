@@ -18,6 +18,9 @@ type ArticleCardProps = {
     | "minimal";
   priority?: boolean;
   sectionTitle?: string;
+  secondaryArticles?: ArticlePreview[];
+  imageFirst?: boolean;
+  authorTone?: "muted" | "ink";
 };
 
 function CardMeta({ article }: { article: ArticlePreview }) {
@@ -41,6 +44,9 @@ export function ArticleCard({
   variant = "default",
   priority = false,
   sectionTitle,
+  secondaryArticles,
+  imageFirst = true,
+  authorTone = "muted",
 }: ArticleCardProps) {
   if (variant === "minimal") {
     return (
@@ -57,10 +63,10 @@ export function ArticleCard({
 
   if (variant === "compact") {
     return (
-      <article className="group flex gap-3">
+      <article className="group flex flex-1 gap-3 border-b border-rule py-4 sm:gap-5 last:border-b-0">
         <Link
           href={`/content/${article.slug}`}
-          className="relative block size-14 shrink-0 overflow-hidden rounded bg-rule"
+          className="relative block size-14 shrink-0 self-center overflow-hidden rounded bg-rule"
         >
           <Image
             src={article.heroImage.src}
@@ -70,12 +76,16 @@ export function ArticleCard({
             sizes="56px"
           />
         </Link>
-        <div className="flex flex-1 flex-col gap-1.5">
-          <CardMeta article={article} />
-          <Link href={`/content/${article.slug}`}>
+        <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5">
+          <Link href={`/content/${article.slug}`} className="space-y-1">
             <h3 className="font-heading text-sm leading-normal text-ink transition-colors group-hover:text-accent">
               {article.title}
             </h3>
+            {article.subtitle ? (
+              <p className="line-clamp-2 text-xs leading-relaxed text-ink-muted">
+                {article.subtitle}
+              </p>
+            ) : null}
           </Link>
         </div>
       </article>
@@ -84,21 +94,20 @@ export function ArticleCard({
 
   if (variant === "featuredRow") {
     return (
-      <article className="group grid grid-cols-[1fr_2fr] gap-3 sm:gap-5">
+      <article className="group grid grid-cols-[auto_1fr] gap-5 py-7">
         <Link
           href={`/content/${article.slug}`}
-          className="relative block aspect-square overflow-hidden rounded bg-rule"
+          className="relative block size-16 shrink-0 self-center overflow-hidden rounded bg-rule sm:size-20"
         >
           <Image
             src={article.heroImage.src}
             alt={article.heroImage.alt}
             fill
             className={imgClass}
-            sizes="(max-width: 768px) 33vw, 16vw"
+            sizes="80px"
           />
         </Link>
         <div className="flex flex-col justify-center gap-2">
-          <CardMeta article={article} />
           <Link href={`/content/${article.slug}`} className="space-y-2">
             <h3 className="text-card-title-sm transition-colors group-hover:text-accent">
               {article.title}
@@ -107,47 +116,74 @@ export function ArticleCard({
               {article.subtitle}
             </p>
           </Link>
-          <AuthorChipList authors={article.authors} className="text-sm" />
+          <AuthorChipList authors={article.authors} tone={authorTone} />
         </div>
       </article>
     );
   }
 
   if (variant === "featuredLead") {
-    return (
-      <article className="group grid gap-6 md:grid-cols-2 md:gap-10">
-        <Link
-          href={`/content/${article.slug}`}
-          className="relative block aspect-square w-full overflow-hidden rounded bg-rule"
-        >
-          <Image
-            src={article.heroImage.src}
-            alt={article.heroImage.alt}
-            fill
-            className={imgClass}
-            sizes="(max-width: 768px) 100vw, 50vw"
-            priority={priority}
-          />
-        </Link>
+    const imageLink = (
+      <Link
+        href={`/content/${article.slug}`}
+        className="group relative block aspect-square w-full self-center overflow-hidden rounded bg-rule md:col-span-5"
+      >
+        <Image
+          src={article.heroImage.src}
+          alt={article.heroImage.alt}
+          fill
+          className={imgClass}
+          sizes="(max-width: 768px) 100vw, 42vw"
+          priority={priority}
+        />
+      </Link>
+    );
 
-        <div className="flex flex-col justify-center gap-4">
-          {sectionTitle ? (
-            <SectionTitle title={sectionTitle} bordered />
-          ) : null}
-          <CardMeta article={article} />
-          <Link href={`/content/${article.slug}`} className="space-y-3">
-            <h2 className="text-card-title transition-colors group-hover:text-accent">
-              {article.title}
-            </h2>
-            <p className="text-base leading-relaxed text-ink-muted">
-              {article.subtitle}
-            </p>
-          </Link>
-          <p className="line-clamp-3 text-sm leading-7 text-ink-muted">
-            {article.excerpt}
+    const contentBlock = (
+      <div className="flex flex-col justify-center gap-2 md:col-span-7">
+        {sectionTitle ? (
+          <SectionTitle title={sectionTitle} bordered />
+        ) : null}
+        <Link href={`/content/${article.slug}`} className="group space-y-3 pt-6">
+          <h2 className="mb-0 pb-3 text-card-title transition-colors group-hover:text-accent">
+            {article.title}
+          </h2>
+          <p className="text-base leading-relaxed text-ink-muted">
+            {article.subtitle}
           </p>
-          <AuthorChipList authors={article.authors} className="text-sm" />
-        </div>
+        </Link>
+        <p className="line-clamp-3 text-sm leading-7 text-ink-muted">
+          {article.excerpt}
+        </p>
+        <AuthorChipList authors={article.authors} tone={authorTone} />
+        {secondaryArticles && secondaryArticles.length > 0 ? (
+          <div className="mt-6 border-t border-rule [&>article:first-child]:border-b [&>article:first-child]:border-rule">
+            {secondaryArticles.map((secondary) => (
+              <ArticleCard
+                key={secondary.slug}
+                article={secondary}
+                variant="featuredRow"
+                authorTone={authorTone}
+              />
+            ))}
+          </div>
+        ) : null}
+      </div>
+    );
+
+    return (
+      <article className="grid gap-6 md:grid-cols-12 md:gap-20">
+        {imageFirst ? (
+          <>
+            {imageLink}
+            {contentBlock}
+          </>
+        ) : (
+          <>
+            {contentBlock}
+            {imageLink}
+          </>
+        )}
       </article>
     );
   }
@@ -182,7 +218,7 @@ export function ArticleCard({
           <p className="line-clamp-3 text-sm leading-7 text-ink-muted">
             {article.excerpt}
           </p>
-          <AuthorChipList authors={article.authors} className="text-sm" />
+          <AuthorChipList authors={article.authors} tone={authorTone} />
         </div>
       </article>
     );
@@ -214,7 +250,7 @@ export function ArticleCard({
             {article.subtitle}
           </p>
         </Link>
-        <AuthorChipList authors={article.authors} className="text-sm" />
+        <AuthorChipList authors={article.authors} tone={authorTone} />
       </div>
     </article>
   );

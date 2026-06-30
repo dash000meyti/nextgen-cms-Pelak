@@ -34,22 +34,31 @@ export function SectionTitle({
   title,
   action,
   bordered,
+  titleClassName = "",
+  titleWeight = "heading",
 }: {
   title: string;
   action?: React.ReactNode;
   bordered?: boolean;
+  titleClassName?: string;
+  titleWeight?: "heading" | "normal";
 }) {
+  const titleTypography =
+    titleWeight === "heading"
+      ? "text-block-title"
+      : "m-0 font-sans text-lg leading-relaxed font-normal text-accent";
+
+  const TitleTag = titleWeight === "heading" ? "h2" : "p";
+
   return (
     <div
       className={`flex items-center justify-between pb-3${bordered ? " border-b border-rule" : ""}`}
     >
-      <h2 className="text-block-title flex items-center gap-2.5">
-        <span
-          className="inline-block h-4 w-1 rounded-full bg-accent"
-          aria-hidden="true"
-        />
+      <TitleTag
+        className={`${titleTypography} flex items-center gap-2.5 ${titleClassName}`.trim()}
+      >
         {title}
-      </h2>
+      </TitleTag>
       {action ? <div className="shrink-0">{action}</div> : null}
     </div>
   );

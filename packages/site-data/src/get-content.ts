@@ -293,6 +293,24 @@ export async function getTopicBySlug(slug: string): Promise<Topic | undefined> {
   )();
 }
 
+export type TopicWithArticles = {
+  topic: Topic;
+  articles: ArticlePreview[];
+};
+
+export async function getTopicsWithArticles(
+  limitPerTopic = 7,
+): Promise<TopicWithArticles[]> {
+  const allTopics = await getTopics();
+  const sections = await Promise.all(
+    allTopics.map(async (topic) => ({
+      topic,
+      articles: (await getArticlesByTopic(topic.slug)).slice(0, limitPerTopic),
+    })),
+  );
+  return sections.filter((section) => section.articles.length > 0);
+}
+
 /* ---------- Videos ---------- */
 
 export const getVideos = platformCache(

@@ -13,6 +13,7 @@ export function SiteFooter({ siteConfig }: SiteFooterProps) {
 
   return (
     <footer className="mt-auto border-t border-rule bg-surface">
+      <div className="h-0.25 bg-accent max-w-6xl mx-auto -mt-0.25" />
       <Container className="py-10 md:py-16">
         <div className="grid gap-10 md:grid-cols-[1fr_2fr] md:gap-12">
           <div className="space-y-5">

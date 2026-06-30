@@ -153,7 +153,7 @@ a:hover {
   }
 
   .text-block-title {
-    @apply font-heading text-base leading-normal text-ink md:text-lg;
+    @apply font-heading text-base leading-normal text-accent md:text-lg;
   }
 
   .text-card-title {

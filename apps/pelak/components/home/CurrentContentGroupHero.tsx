@@ -18,54 +18,57 @@ export function CurrentContentGroupHero({
   featured,
 }: CurrentContentGroupHeroProps) {
   return (
-    <Container className="py-8">
-      <div className="grid gap-8 md:grid-cols-[1fr_280px] md:gap-14">
-        <div>
-          <SectionTitle
-            title="جدیدترین گروه محتوا"
-            action={
-              <Button href={`/content-group/${group.number}`} variant="outline">
-                مشاهده گروه محتوا
-              </Button>
-            }
-            bordered={true}
-          />
-          <ul>
-            {featured.slice(0, 3).map((article, index) => (
-              <ArticleListItem
-                key={article.slug}
-                article={article}
-                priority={index === 0}
-              />
-            ))}
-          </ul>
-        </div>
-
-        <div className="self-center">
-          <div className="flex items-center justify-between px-2 gap-2 text-base md:text-lg">
-            <p className="min-w-0 font-heading leading-none text-ink">
-              {group.label}
-            </p>
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-t-full bg-surface-2 text-[0.55em] leading-none text-ink-muted tabular-nums">
-              {group.articleCount.toLocaleString("fa-IR")}
-            </span>
+    <section className="bg-surface">
+      <Container className="py-[100px]">
+        <div className="grid gap-8 md:grid-cols-[1fr_280px] md:gap-20">
+          <div>
+            <SectionTitle
+              title={group.label}
+              action={
+                <Button href={`/content-group/${group.number}`} variant="outline">
+                  مشاهده گروه محتوا
+                </Button>
+              }
+              bordered={true}
+            />
+            <ul>
+              {featured.slice(0, 3).map((article, index) => (
+                <ArticleListItem
+                  key={article.slug}
+                  article={article}
+                  priority={index === 0}
+                  authorTone="ink"
+                />
+              ))}
+            </ul>
           </div>
-          <Link href={`/content-group/${group.number}`} className="block">
-            <div
-              className={`${contentGroupCoverFrameClass} mx-auto w-full max-w-[220px] sm:max-w-[260px] md:max-w-none`}
-            >
-              <Image
-                src={group.cover.src}
-                alt={group.cover.alt}
-                fill
-                className="object-cover border border-rule"
-                sizes="(max-width: 768px) 220px, 280px"
-                priority
-              />
+
+          <div className="self-center">
+            <div className="flex items-center justify-between px-2 gap-2 text-base md:text-lg">
+              <p className="min-w-0 font-sans leading-none text-ink-muted">
+                تعداد محتوا در این شماره :
+              </p>
+              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-t-full bg-surface-2 text-[0.55em] leading-none text-ink-muted tabular-nums">
+                {group.articleCount.toLocaleString("fa-IR")}
+              </span>
             </div>
-          </Link>
+            <Link href={`/content-group/${group.number}`} className="block">
+              <div
+                className={`${contentGroupCoverFrameClass} mx-auto w-full max-w-[220px] sm:max-w-[260px] md:max-w-none`}
+              >
+                <Image
+                  src={group.cover.src}
+                  alt={group.cover.alt}
+                  fill
+                  className="object-cover border border-rule"
+                  sizes="(max-width: 768px) 220px, 280px"
+                  priority
+                />
+              </div>
+            </Link>
+          </div>
         </div>
-      </div>
-    </Container>
+      </Container>
+    </section>
   );
 }

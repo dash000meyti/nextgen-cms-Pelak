@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <Container
       variant="narrow"
-      className="flex min-h-[60vh] flex-col items-center justify-center py-20 text-center"
+      className="flex min-h-[60vh] flex-col items-center justify-center py-25 text-center"
     >
       <p className="font-heading text-6xl text-accent md:text-8xl">۴۰۴</p>
       <h1 className="text-page-title mt-4">صفحه یافت نشد</h1>

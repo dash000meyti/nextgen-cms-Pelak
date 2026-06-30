@@ -6,6 +6,7 @@ type ArticleListItemProps = {
   article: ArticlePreview;
   rank?: number;
   priority?: boolean;
+  authorTone?: "muted" | "ink";
 };
 
 const imgClass =
@@ -15,6 +16,7 @@ export function ArticleListItem({
   article,
   rank,
   priority = false,
+  authorTone = "muted",
 }: ArticleListItemProps) {
   return (
     <li className="group flex items-center gap-3 border-b border-rule py-4 sm:gap-5">
@@ -37,7 +39,11 @@ export function ArticleListItem({
             {article.subtitle}
           </p>
         ) : null}
-        <p className="text-xs text-ink-faint">
+        <p
+          className={
+            authorTone === "ink" ? "text-sm text-ink" : "text-xs text-ink-faint"
+          }
+        >
           {article.authors.map((author) => author.name).join(" و ")}
         </p>
       </div>

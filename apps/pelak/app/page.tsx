@@ -4,12 +4,14 @@ import {
   getFeaturedArticles,
   getFeatureModules,
   getLeadEssays,
+  getTopicsWithArticles,
   getVideos,
 } from "@nextgen-cms/site-data/get-content";
 import { CurrentContentGroupHero } from "@/components/home/CurrentContentGroupHero";
 import { EditorsPick } from "@/components/home/EditorsPick";
 import { FeaturedContent } from "@/components/home/FeaturedContent";
 import { NewsletterCta } from "@/components/home/NewsletterCta";
+import { TopicsWithContent } from "@/components/home/TopicsWithContent";
 import { TopContentGroup } from "@/components/home/TopContentGroup";
 import { VideoSection } from "@/components/home/VideoSection";
 
@@ -26,6 +28,7 @@ export default async function HomePage() {
     : null;
   const leadEssays = featureModules.contentGroup ? await getLeadEssays(3) : [];
   const videos = featureModules.video ? await getVideos() : [];
+  const topicSections = await getTopicsWithArticles(7);
 
   return (
     <>
@@ -43,7 +46,9 @@ export default async function HomePage() {
         <VideoSection videos={videos} />
       ) : null}
 
-      {featureModules.newsletter ? <NewsletterCta /> : null}
+      <TopicsWithContent sections={topicSections} />
+
+      <NewsletterCta />
     </>
   );
 }

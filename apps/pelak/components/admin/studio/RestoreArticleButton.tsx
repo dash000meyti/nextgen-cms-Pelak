@@ -4,6 +4,7 @@ import { restoreArticleFromArchiveAndRedirect } from "@nextgen-cms/studio/cms/mu
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useState, useTransition } from "react";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { TableActionButton } from "@/components/admin/studio/TableActionButton";
 import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type RestoreArticleButtonProps = {
@@ -38,14 +39,12 @@ export function RestoreArticleButton({ articleId }: RestoreArticleButtonProps) {
   return (
     <span className="inline-flex flex-col items-start gap-1">
       {dialog}
-      <button
-        type="button"
+      <TableActionButton
+        label="بازیابی از بایگانی"
+        icon="restore"
         onClick={handleRestore}
         disabled={pending}
-        className="text-accent hover:underline disabled:opacity-50"
-      >
-        {pending ? "در حال بازیابی…" : "بازیابی از بایگانی"}
-      </button>
+      />
       {error ? <span className="text-xs text-accent">{error}</span> : null}
     </span>
   );

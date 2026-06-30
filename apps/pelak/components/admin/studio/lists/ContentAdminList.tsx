@@ -8,6 +8,7 @@ import { DocumentListThumbnail } from "@/components/admin/studio/DocumentListThu
 import { idColumn } from "@/components/admin/studio/document-list-columns";
 import { RestoreArticleButton } from "@/components/admin/studio/RestoreArticleButton";
 import { StatusBadge } from "@/components/admin/studio/StatusBadge";
+import { TableActionLink } from "@/components/admin/studio/TableActionButton";
 
 export type ContentAdminListRow = {
   id: number;
@@ -56,14 +57,13 @@ export function ContentAdminList({ articles, status }: ContentAdminListProps) {
         isArchivedTab
           ? (row) => (
               <>
-                <Link
+                <TableActionLink
                   href={`/admin/content/${row.id}/preview`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  مشاهده
-                </Link>
+                  label="مشاهده"
+                  icon="view"
+                />
                 <RestoreArticleButton articleId={row.id} />
                 <DeleteArchivedArticleButton articleId={row.id} />
               </>

@@ -4,6 +4,7 @@ import { removeArticleAndRedirect } from "@nextgen-cms/studio/cms/mutations/arti
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useState, useTransition } from "react";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { TableActionButton } from "@/components/admin/studio/TableActionButton";
 import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type DeleteArchivedArticleButtonProps = {
@@ -39,14 +40,12 @@ export function DeleteArchivedArticleButton({
   return (
     <span className="inline-flex flex-col items-start gap-1">
       {dialog}
-      <button
-        type="button"
+      <TableActionButton
+        label="حذف دائمی"
+        icon="delete"
         onClick={handleDelete}
         disabled={pending}
-        className="text-ink-muted hover:text-accent disabled:opacity-50"
-      >
-        {pending ? "در حال حذف…" : "حذف دائمی"}
-      </button>
+      />
       {error ? <span className="text-xs text-accent">{error}</span> : null}
     </span>
   );

@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { type ReactNode, useMemo, useState } from "react";
 import {
+  TableActionLink,
+  TableHeaderIcon,
+} from "./TableActionButton";
+import {
   type DocumentListSort,
   filterRows,
   nextSortState,
@@ -12,7 +16,7 @@ import {
 
 export type DocumentListColumn<T> = {
   key: string;
-  header: string;
+  header: ReactNode;
   render: (row: T) => ReactNode;
   sortable?: boolean;
   sortValue?: (row: T) => string | number | Date | null | undefined;
@@ -163,7 +167,9 @@ export function DocumentList<T>({
                   </th>
                 );
               })}
-              <th className="px-4 py-3 text-start font-medium">عملیات</th>
+              <th className="px-4 py-3 text-start font-medium">
+                <TableHeaderIcon name="actions" label="عملیات" />
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -194,28 +200,26 @@ export function DocumentList<T>({
                     ))}
                     <td className="px-4 py-3">
                       {renderActions ? (
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5">
                           {renderActions(row)}
                         </div>
                       ) : editHref || viewHref ? (
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5">
                           {viewUrl ? (
-                            <Link
+                            <TableActionLink
                               href={viewUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-accent hover:underline"
-                            >
-                              مشاهده
-                            </Link>
+                              label="مشاهده"
+                              icon="view"
+                            />
                           ) : null}
                           {editHref ? (
-                            <Link
+                            <TableActionLink
                               href={editHref(row)}
-                              className="text-accent hover:underline"
-                            >
-                              ویرایش
-                            </Link>
+                              label="ویرایش"
+                              icon="edit"
+                            />
                           ) : null}
                         </div>
                       ) : (

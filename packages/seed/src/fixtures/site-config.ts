@@ -27,9 +27,8 @@ export const siteConfig: SiteConfig = {
   },
 
   navSections: [
-    { id: "home", label: "خانه", href: "/" },
     {
-      id: "news",
+      id: "content",
       label: "محتوا",
       href: "/content",
       children: [
@@ -41,10 +40,8 @@ export const siteConfig: SiteConfig = {
         { href: "/topics/amniyat", label: "امنیت" },
       ],
     },
-    { id: "contentGroup", label: "گروه‌های محتوا", href: "/content-group" },
+    { id: "contentGroup", label: "هفته‌نامه", href: "/content-group" },
     { id: "video", label: "ویدیوها", href: "/video" },
-    { id: "about", label: "درباره ما", href: "/about" },
-    { id: "contact", label: "تماس با ما", href: "/contact" },
   ],
 
   utilityLinks: [{ href: "/about", label: "ورود | عضویت" }],

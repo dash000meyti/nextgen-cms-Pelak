@@ -24,7 +24,7 @@ export function PublishBar({
         <span className="text-sm text-ink-muted">وضعیت:</span>
         <StatusBadge status={status} />
       </div>
-      {canPublish ? (
+      {canPublish && status !== "archived" ? (
         <div className="flex gap-2">
           {status === "published" ? (
             <button

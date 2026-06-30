@@ -9,6 +9,7 @@ import {
 } from "@nextgen-cms/studio/admin/article-access";
 import {
   type ArticleFormData,
+  archiveArticleAndRedirect,
   createArticleAndRedirect,
   publishArticle,
   removeArticleAndRedirect,
@@ -16,8 +17,8 @@ import {
   unpublishArticle,
 } from "@nextgen-cms/studio/cms/mutations/article";
 import type { PickerOption } from "@nextgen-cms/studio/cms/queries";
-import { useRouter } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { BlockEditor } from "@/components/admin/fields/BlockEditor";
 import { ImageField } from "@/components/admin/fields/ImageField";
@@ -58,7 +59,13 @@ export function ArticleForm({
   const [form, setForm] = useState(initial);
 
   const uploadContext = articleId
-    ? { contentId: articleId }
+    ? {
+        contentId: articleId,
+        mediaHome:
+          form.status === "archived"
+            ? ("archived" as const)
+            : ("active" as const),
+      }
     : { memberId: session.memberId };
 
   function update<K extends keyof ArticleFormData>(
@@ -97,9 +104,19 @@ export function ArticleForm({
     });
   }
 
-  function handleDelete() {
+  function handleArchive() {
     if (!articleId) return;
-    if (!window.confirm("این محتوا حذف شود؟")) return;
+    if (!window.confirm("این محتوا به بایگانی ارسال شود؟")) return;
+    setError(null);
+    runMutation(async () => {
+      const result = await archiveArticleAndRedirect(articleId);
+      if (result && !result.ok) setError(result.error);
+    });
+  }
+
+  function handlePermanentDelete() {
+    if (!articleId) return;
+    if (!window.confirm("این محتوا برای همیشه حذف شود؟")) return;
     setError(null);
     runMutation(async () => {
       const result = await removeArticleAndRedirect(articleId);
@@ -299,14 +316,25 @@ export function ArticleForm({
           {pending ? "در حال ذخیره…" : mode === "create" ? "ایجاد" : "ذخیره"}
         </button>
         {mode === "edit" && canDelete ? (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={pending}
-            className="rounded border border-rule px-6 py-2 text-sm text-ink hover:bg-surface disabled:opacity-50"
-          >
-            حذف
-          </button>
+          form.status === "archived" ? (
+            <button
+              type="button"
+              onClick={handlePermanentDelete}
+              disabled={pending}
+              className="rounded border border-rule px-6 py-2 text-sm text-ink hover:bg-surface disabled:opacity-50"
+            >
+              حذف دائمی
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleArchive}
+              disabled={pending}
+              className="rounded border border-rule px-6 py-2 text-sm text-ink hover:bg-surface disabled:opacity-50"
+            >
+              ارسال به بایگانی
+            </button>
+          )
         ) : null}
       </div>
     </div>

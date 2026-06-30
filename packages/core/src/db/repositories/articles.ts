@@ -504,10 +504,70 @@ export async function updateArticle(
   await syncArticleTopics(id, input.topicIds);
 }
 
+export async function archiveArticle(
+  id: number,
+  access: AdminAccess,
+  media: { heroSrc: string; body: ArticleWriteInput["body"] },
+) {
+  const existing = await findArticleById(id);
+  if (!existing) {
+    throw new PermissionDeniedError();
+  }
+
+  await assertMemberCanEditArticle(access.memberId, existing);
+
+  const now = new Date().toISOString();
+  await db
+    .update(articles)
+    .set({
+      status: "archived",
+      heroSrc: media.heroSrc,
+      body: media.body,
+      isFeatured: false,
+      isEditorsPick: false,
+      updatedAt: now,
+    })
+    .where(eq(articles.id, id));
+}
+
+export async function restoreArticleFromArchive(
+  id: number,
+  access: AdminAccess,
+  media: { heroSrc: string; body: ArticleWriteInput["body"] },
+) {
+  const existing = await findArticleById(id);
+  if (!existing) {
+    throw new PermissionDeniedError();
+  }
+
+  await assertMemberCanEditArticle(access.memberId, existing);
+
+  if (existing.status !== "archived") {
+    throw new PermissionDeniedError("این محتوا در بایگانی نیست.");
+  }
+
+  const now = new Date().toISOString();
+  await db
+    .update(articles)
+    .set({
+      status: "draft",
+      heroSrc: media.heroSrc,
+      body: media.body,
+      updatedAt: now,
+    })
+    .where(eq(articles.id, id));
+}
+
 export async function deleteArticle(id: number, access: AdminAccess) {
   const existing = await findArticleById(id);
   if (!existing) {
     throw new PermissionDeniedError();
+  }
+
+  if (existing.status !== "archived") {
+    throw new PermissionDeniedError(
+      "فقط محتوای بایگانی‌شده قابل حذف دائمی است.",
+    );
   }
 
   await assertMemberCanDeleteArticle(access.memberId, existing);

@@ -19,6 +19,7 @@ type DocumentListProps<T> = {
   rowKey: (row: T) => string | number;
   editHref?: (row: T) => string;
   viewHref?: (row: T) => string | undefined;
+  renderActions?: (row: T) => ReactNode;
   emptyMessage?: string;
   toolbar?: ReactNode;
 };
@@ -32,6 +33,7 @@ export function DocumentList<T>({
   rowKey,
   editHref,
   viewHref,
+  renderActions,
   emptyMessage = "موردی یافت نشد.",
   toolbar,
 }: DocumentListProps<T>) {
@@ -81,45 +83,49 @@ export function DocumentList<T>({
               rows.map((row) => {
                 const viewUrl = viewHref?.(row);
                 return (
-                <tr
-                  key={rowKey(row)}
-                  className="border-b border-rule last:border-0"
-                >
-                  {columns.map((column) => (
-                    <td
-                      key={column.key}
-                      className={`px-4 py-3 text-ink ${column.className ?? ""} ${column.cellClassName ?? ""}`}
-                    >
-                      {column.render(row)}
+                  <tr
+                    key={rowKey(row)}
+                    className="border-b border-rule last:border-0"
+                  >
+                    {columns.map((column) => (
+                      <td
+                        key={column.key}
+                        className={`px-4 py-3 text-ink ${column.className ?? ""} ${column.cellClassName ?? ""}`}
+                      >
+                        {column.render(row)}
+                      </td>
+                    ))}
+                    <td className="px-4 py-3">
+                      {renderActions ? (
+                        <div className="flex items-center gap-3">
+                          {renderActions(row)}
+                        </div>
+                      ) : editHref || viewHref ? (
+                        <div className="flex items-center gap-3">
+                          {viewUrl ? (
+                            <Link
+                              href={viewUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-accent hover:underline"
+                            >
+                              مشاهده
+                            </Link>
+                          ) : null}
+                          {editHref ? (
+                            <Link
+                              href={editHref(row)}
+                              className="text-accent hover:underline"
+                            >
+                              ویرایش
+                            </Link>
+                          ) : null}
+                        </div>
+                      ) : (
+                        <span className="text-ink-faint">—</span>
+                      )}
                     </td>
-                  ))}
-                  <td className="px-4 py-3">
-                    {editHref || viewHref ? (
-                      <div className="flex items-center gap-3">
-                        {viewUrl ? (
-                          <Link
-                            href={viewUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-accent hover:underline"
-                          >
-                            مشاهده
-                          </Link>
-                        ) : null}
-                        {editHref ? (
-                          <Link
-                            href={editHref(row)}
-                            className="text-accent hover:underline"
-                          >
-                            ویرایش
-                          </Link>
-                        ) : null}
-                      </div>
-                    ) : (
-                      <span className="text-ink-faint">—</span>
-                    )}
-                  </td>
-                </tr>
+                  </tr>
                 );
               })
             )}

@@ -20,12 +20,15 @@ export type MediaAsset = {
   deletedAt: string | null;
 };
 
+export type ContentMediaHome = "active" | "archived";
+
 export type MediaUploadContext = {
   contentId?: number;
   contentGroupId?: number;
   videoId?: number;
   memberId?: number;
   folder?: string;
+  mediaHome?: ContentMediaHome;
 };
 
 export interface MediaProcessor {

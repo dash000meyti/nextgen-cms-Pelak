@@ -1,8 +1,10 @@
 import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
 import { listArticlesAdmin } from "@nextgen-cms/studio/cms/queries";
 import Link from "next/link";
+import { DeleteArchivedArticleButton } from "@/components/admin/studio/DeleteArchivedArticleButton";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
 import { DocumentListThumbnail } from "@/components/admin/studio/DocumentListThumbnail";
+import { RestoreArticleButton } from "@/components/admin/studio/RestoreArticleButton";
 import { StatusBadge } from "@/components/admin/studio/StatusBadge";
 
 type PageProps = {
@@ -20,6 +22,7 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
   const { status: statusParam } = await searchParams;
   const status = (statusParam as ArticleStatus | "all" | undefined) ?? "all";
   const articles = await listArticlesAdmin(status);
+  const isArchivedTab = status === "archived";
 
   return (
     <DocumentList
@@ -28,11 +31,31 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
       newLabel="محتوای جدید"
       rows={articles}
       rowKey={(row) => row.id}
-      editHref={(row) => `/admin/content/${row.id}/edit`}
+      editHref={
+        isArchivedTab ? undefined : (row) => `/admin/content/${row.id}/edit`
+      }
       viewHref={(row) =>
         row.status === "published"
           ? `/content/${row.slug}`
           : `/admin/content/${row.id}/preview`
+      }
+      renderActions={
+        isArchivedTab
+          ? (row) => (
+              <>
+                <Link
+                  href={`/admin/content/${row.id}/preview`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  مشاهده
+                </Link>
+                <RestoreArticleButton articleId={row.id} />
+                <DeleteArchivedArticleButton articleId={row.id} />
+              </>
+            )
+          : undefined
       }
       toolbar={
         <div className="flex flex-wrap gap-2">

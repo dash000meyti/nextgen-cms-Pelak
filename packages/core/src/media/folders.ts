@@ -1,8 +1,12 @@
 import { normalizeFolderPath } from "@nextgen-cms/contract/media/folder-path";
 import type { MediaUploadContext } from "@nextgen-cms/contract/types/media";
+import { archivedContentPath } from "@nextgen-cms/core/media/path-policy";
 
 export function resolveUploadFolder(context: MediaUploadContext = {}): string {
   if (context.contentId != null) {
+    if (context.mediaHome === "archived") {
+      return archivedContentPath(context.contentId);
+    }
     return normalizeFolderPath(`content/${context.contentId}`);
   }
 

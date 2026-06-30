@@ -10,15 +10,19 @@ import type { ArticleBlock } from "@nextgen-cms/contract/types/article";
 import { PermissionDeniedError } from "@nextgen-cms/core/db/access/permission-denied-error";
 import {
   type ArticleWriteInput,
+  archiveArticle as archiveArticleRepo,
   deleteArticle,
   findArticleById,
   insertArticle,
   resolveMemberIdsFromAuthorIds,
+  restoreArticleFromArchive as restoreArticleFromArchiveRepo,
   updateArticle,
 } from "@nextgen-cms/core/db/repositories/articles";
 import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
-import { purgeMediaForContent } from "@nextgen-cms/core/media/purge-folder";
+import { archiveMediaForContent } from "@nextgen-cms/core/media/archive";
+import { restoreMediaForContent } from "@nextgen-cms/core/media/content-media-lifecycle";
 import { promoteArticleMedia } from "@nextgen-cms/core/media/promote-article-media";
+import { purgeMediaForContent } from "@nextgen-cms/core/media/purge-folder";
 import {
   canDeleteArticle,
   canEditArticle,
@@ -255,7 +259,13 @@ export async function saveArticle(
   if (error) return { ok: false, error };
 
   try {
-    const promoted = await promoteArticleMedia(id, input.heroSrc, input.body);
+    const mediaHome = existing.status === "archived" ? "archived" : "active";
+    const promoted = await promoteArticleMedia(
+      id,
+      input.heroSrc,
+      input.body,
+      mediaHome,
+    );
     await updateArticle(
       id,
       promoted.changed
@@ -371,12 +381,78 @@ export async function unpublishArticle(id: number): Promise<MutationResult> {
   }
 }
 
+export async function archiveArticle(id: number): Promise<MutationResult> {
+  const session = await requireMember();
+
+  const existing = await findArticleById(id, access(session.memberId));
+  if (!existing) return { ok: false, error: "محتوا یافت نشد." };
+  if (!canEditArticle(session, existing)) return permissionDeniedResult();
+  if (existing.status === "archived") {
+    return { ok: false, error: "این محتوا قبلاً بایگانی شده است." };
+  }
+
+  try {
+    const relocated = await archiveMediaForContent(
+      id,
+      existing.heroSrc,
+      existing.body,
+    );
+    await archiveArticleRepo(id, access(session.memberId), {
+      heroSrc: relocated.heroSrc,
+      body: relocated.body,
+    });
+    await invalidateAfterSave(existing.slug, {
+      contentGroupNumber: existing.contentGroupNumber,
+    });
+    return { ok: true, id };
+  } catch (error) {
+    return handleMutationError(error);
+  }
+}
+
+export async function restoreArticleFromArchive(
+  id: number,
+): Promise<MutationResult> {
+  const session = await requireMember();
+
+  const existing = await findArticleById(id, access(session.memberId));
+  if (!existing) return { ok: false, error: "محتوا یافت نشد." };
+  if (!canEditArticle(session, existing)) return permissionDeniedResult();
+  if (existing.status !== "archived") {
+    return { ok: false, error: "این محتوا در بایگانی نیست." };
+  }
+
+  try {
+    const relocated = await restoreMediaForContent(
+      id,
+      existing.heroSrc,
+      existing.body,
+    );
+    await restoreArticleFromArchiveRepo(id, access(session.memberId), {
+      heroSrc: relocated.heroSrc,
+      body: relocated.body,
+    });
+    await invalidateAfterSave(existing.slug, {
+      contentGroupNumber: existing.contentGroupNumber,
+    });
+    return { ok: true, id };
+  } catch (error) {
+    return handleMutationError(error);
+  }
+}
+
 export async function removeArticle(id: number): Promise<MutationResult> {
   const session = await requireMember();
 
   const existing = await findArticleById(id, access(session.memberId));
   if (!existing) return { ok: false, error: "محتوا یافت نشد." };
   if (!canDeleteArticle(session, existing)) return permissionDeniedResult();
+  if (existing.status !== "archived") {
+    return {
+      ok: false,
+      error: "فقط محتوای بایگانی‌شده قابل حذف دائمی است.",
+    };
+  }
 
   try {
     await purgeMediaForContent(id);
@@ -403,8 +479,20 @@ export async function saveArticleAndStay(
   return saveArticle(id, data);
 }
 
+export async function archiveArticleAndRedirect(id: number) {
+  const result = await archiveArticle(id);
+  if (!result.ok) return result;
+  redirect("/admin/content?status=archived");
+}
+
+export async function restoreArticleFromArchiveAndRedirect(id: number) {
+  const result = await restoreArticleFromArchive(id);
+  if (!result.ok) return result;
+  redirect("/admin/content?status=draft");
+}
+
 export async function removeArticleAndRedirect(id: number) {
   const result = await removeArticle(id);
   if (!result.ok) return result;
-  redirect("/admin/content");
+  redirect("/admin/content?status=archived");
 }

@@ -37,6 +37,8 @@ export type MemberAdminListRow = {
   slug: string;
   name: string;
   email: string | null;
+  avatarSrc: string;
+  avatarAlt: string;
   roleName: string;
   roleSlug: string;
   isActive: boolean;
@@ -138,6 +140,8 @@ export async function findAllMembersAdmin(
       slug: members.slug,
       name: members.name,
       email: members.email,
+      avatarSrc: members.avatarSrc,
+      avatarAlt: members.avatarAlt,
       isActive: members.isActive,
       legacyAuthorId: members.legacyAuthorId,
       roleName: roles.name,
@@ -157,6 +161,8 @@ export async function findAllMembersAdmin(
     slug: row.slug,
     name: row.name,
     email: row.email,
+    avatarSrc: row.avatarSrc,
+    avatarAlt: row.avatarAlt,
     roleName: row.roleName,
     roleSlug: row.roleSlug,
     isActive: row.isActive,

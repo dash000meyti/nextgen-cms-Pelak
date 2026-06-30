@@ -8,6 +8,7 @@ import {
   updateVideo,
   type VideoWriteInput,
 } from "@nextgen-cms/core/db/repositories/videos-admin";
+import { promoteVideoThumbnailSrc } from "@nextgen-cms/core/media/promote-video-thumbnail";
 import { parseJalaliInput } from "@nextgen-cms/core/platform/datetime";
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";
@@ -79,6 +80,14 @@ async function validate(input: VideoWriteInput, excludeId?: number) {
   return undefined;
 }
 
+async function resolveVideoThumbnailSrc(
+  videoId: number,
+  thumbnailSrc: string,
+): Promise<string> {
+  if (!thumbnailSrc.trim()) return thumbnailSrc;
+  return promoteVideoThumbnailSrc(videoId, thumbnailSrc);
+}
+
 export async function createVideo(
   data: VideoFormData,
 ): Promise<MutationResult> {
@@ -94,6 +103,14 @@ export async function createVideo(
 
   try {
     const id = await insertVideo(input, access(session.memberId));
+    const thumbnailSrc = await resolveVideoThumbnailSrc(id, input.thumbnailSrc);
+    if (thumbnailSrc !== input.thumbnailSrc) {
+      await updateVideo(
+        id,
+        { ...input, thumbnailSrc },
+        access(session.memberId),
+      );
+    }
     invalidateVideos();
     return { ok: true, id };
   } catch (error) {
@@ -117,7 +134,12 @@ export async function saveVideo(
   if (error) return { ok: false, error };
 
   try {
-    await updateVideo(id, input, access(session.memberId));
+    const thumbnailSrc = await resolveVideoThumbnailSrc(id, input.thumbnailSrc);
+    await updateVideo(
+      id,
+      { ...input, thumbnailSrc },
+      access(session.memberId),
+    );
     invalidateVideos();
     return { ok: true, id };
   } catch (error) {

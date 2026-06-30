@@ -8,5 +8,6 @@ export async function POST() {
   }
 
   revalidateTag(CACHE_TAGS.articles, "max");
+  revalidateTag(CACHE_TAGS.contentGroups, "max");
   return NextResponse.json({ ok: true });
 }

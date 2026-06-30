@@ -5,6 +5,7 @@ import {
   saveVideo,
   type VideoFormData,
 } from "@nextgen-cms/studio/cms/mutations/video";
+import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ImageField } from "@/components/admin/fields/ImageField";
@@ -22,10 +23,14 @@ type VideoFormProps = {
 
 export function VideoForm({ mode, videoId, initial }: VideoFormProps) {
   const router = useRouter();
+  const session = useAdminMember();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [form, setForm] = useState(initial);
+  const uploadContext = videoId
+    ? { videoId }
+    : { memberId: session.memberId };
 
   function update<K extends keyof VideoFormData>(
     key: K,
@@ -101,6 +106,7 @@ export function VideoForm({ mode, videoId, initial }: VideoFormProps) {
         alt={form.thumbnailAlt}
         onSrcChange={(thumbnailSrc) => update("thumbnailSrc", thumbnailSrc)}
         onAltChange={(thumbnailAlt) => update("thumbnailAlt", thumbnailAlt)}
+        uploadContext={uploadContext}
         required
       />
       <button

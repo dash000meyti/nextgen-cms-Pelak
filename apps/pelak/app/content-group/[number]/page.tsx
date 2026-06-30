@@ -1,18 +1,38 @@
-import { getContentGroupByNumber } from "@nextgen-cms/site-data/get-content";
+import {
+  getAllContentGroupNumbers,
+  getContentGroupByNumber,
+} from "@nextgen-cms/site-data/get-content";
 import { requireFeatureModule } from "@nextgen-cms/site-data/require-feature-module";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { contentGroupCoverFrameClass } from "@/components/content-group/content-group-cover-aspect";
 import { ArticleListItem } from "@/components/article/ArticleListItem";
 import { SectionTitle } from "@/components/article/SectionHeader";
+import { ContentGroupEditionNav } from "@/components/content-group/ContentGroupEditionNav";
+import { ContentGroupPdfDownload } from "@/components/content-group/ContentGroupPdfDownload";
+import { contentGroupCoverFrameClass } from "@/components/content-group/content-group-cover-aspect";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Container } from "@/components/layout/Container";
 import { JalaliDate } from "@/components/ui/JalaliDate";
+import { ShareBar } from "@/components/ui/ShareBar";
 
 type ContentGroupPageProps = {
   params: Promise<{ number: string }>;
 };
+
+function adjacentContentGroupNumbers(
+  numbers: number[],
+  current: number,
+): { prevNumber: number | null; nextNumber: number | null } {
+  const index = numbers.indexOf(current);
+  if (index === -1) return { prevNumber: null, nextNumber: null };
+
+  return {
+    prevNumber:
+      index < numbers.length - 1 ? (numbers[index + 1] ?? null) : null,
+    nextNumber: index > 0 ? (numbers[index - 1] ?? null) : null,
+  };
+}
 
 export async function generateMetadata({
   params,
@@ -27,9 +47,23 @@ export default async function ContentGroupPage({
   params,
 }: ContentGroupPageProps) {
   await requireFeatureModule("contentGroup");
-  const { number } = await params;
-  const group = await getContentGroupByNumber(Number(number));
+  const { number: numberParam } = await params;
+  const number = Number(numberParam);
+  const [group, allNumbers] = await Promise.all([
+    getContentGroupByNumber(number),
+    getAllContentGroupNumbers(),
+  ]);
   if (!group) notFound();
+
+  const { prevNumber, nextNumber } = adjacentContentGroupNumbers(
+    allNumbers,
+    number,
+  );
+
+  const [prevGroup, nextGroup] = await Promise.all([
+    prevNumber != null ? getContentGroupByNumber(prevNumber) : undefined,
+    nextNumber != null ? getContentGroupByNumber(nextNumber) : undefined,
+  ]);
 
   return (
     <Container className="py-8 md:py-14">
@@ -55,27 +89,48 @@ export default async function ContentGroupPage({
           />
         </div>
         <div className="space-y-3 self-center">
-          <h1 className="font-heading text-2xl text-ink sm:text-3xl md:text-4xl">
-            {group.label}
-          </h1>
-          <p className="text-sm text-ink-muted">
+          <h1 className="text-page-title">{group.label}</h1>
+          <p className="text-meta">
             منتشر شده در <JalaliDate value={group.publishedAt} /> —{" "}
             {group.articleCount.toLocaleString("fa-IR")} محتوا
           </p>
+          <ContentGroupPdfDownload />
+          <ShareBar
+            title={group.label}
+            shareUrl={`/content-group/${number}`}
+          />
         </div>
       </div>
 
       <div className="mt-10 space-y-4">
         <SectionTitle title="فهرست محتوای این گروه" />
-        <ul>
-          {group.articles.map((article, index) => (
-            <ArticleListItem
-              key={article.slug}
-              article={article}
-              rank={index + 1}
-            />
-          ))}
-        </ul>
+        {group.articles.length > 0 ? (
+          <ul>
+            {group.articles.map((article, index) => (
+              <ArticleListItem
+                key={article.slug}
+                article={article}
+                rank={index + 1}
+              />
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-ink-muted">
+            هنوز محتوایی در این گروه منتشر نشده است.
+          </p>
+        )}
+        <ContentGroupEditionNav
+          prev={
+            prevGroup
+              ? { number: prevGroup.number, cover: prevGroup.cover }
+              : null
+          }
+          next={
+            nextGroup
+              ? { number: nextGroup.number, cover: nextGroup.cover }
+              : null
+          }
+        />
       </div>
     </Container>
   );

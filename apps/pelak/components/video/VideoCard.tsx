@@ -31,7 +31,7 @@ export function VideoCard({ video }: VideoCardProps) {
         </div>
       </div>
       <div className="space-y-1">
-        <h2 className="font-heading text-base leading-snug text-ink transition-colors group-hover:text-accent">
+        <h2 className="font-heading text-base leading-normal text-ink transition-colors group-hover:text-accent">
           {video.title}
         </h2>
         <p className="line-clamp-2 text-sm leading-relaxed text-ink-muted">

@@ -3,6 +3,8 @@
 import {
   invalidateArticle,
   invalidateArticles,
+  invalidateContentGroup,
+  invalidateContentGroups,
 } from "@nextgen-cms/config/cache";
 import type { ArticleBlock } from "@nextgen-cms/contract/types/article";
 import { PermissionDeniedError } from "@nextgen-cms/core/db/access/permission-denied-error";
@@ -140,12 +142,34 @@ async function validateArticleInput(
   return undefined;
 }
 
-async function invalidateAfterSave(slug: string, previousSlug?: string) {
+function invalidateContentGroupsForArticle(
+  current: number | null,
+  previous?: number | null,
+) {
+  invalidateContentGroups();
+  if (current != null) invalidateContentGroup(current);
+  if (previous != null && previous !== current) {
+    invalidateContentGroup(previous);
+  }
+}
+
+async function invalidateAfterSave(
+  slug: string,
+  options?: {
+    previousSlug?: string;
+    contentGroupNumber?: number | null;
+    previousContentGroupNumber?: number | null;
+  },
+) {
   invalidateArticles();
   invalidateArticle(slug);
-  if (previousSlug && previousSlug !== slug) {
-    invalidateArticle(previousSlug);
+  if (options?.previousSlug && options.previousSlug !== slug) {
+    invalidateArticle(options.previousSlug);
   }
+  invalidateContentGroupsForArticle(
+    options?.contentGroupNumber ?? null,
+    options?.previousContentGroupNumber,
+  );
 }
 
 async function existingMemberIds(
@@ -195,7 +219,9 @@ export async function createArticle(
       );
     }
 
-    await invalidateAfterSave(input.slug);
+    await invalidateAfterSave(input.slug, {
+      contentGroupNumber: input.contentGroupNumber,
+    });
     return { ok: true, id };
   } catch (error) {
     return handleMutationError(error);
@@ -237,7 +263,11 @@ export async function saveArticle(
         : input,
       access(session.memberId),
     );
-    await invalidateAfterSave(input.slug, existing.slug);
+    await invalidateAfterSave(input.slug, {
+      previousSlug: existing.slug,
+      contentGroupNumber: input.contentGroupNumber,
+      previousContentGroupNumber: existing.contentGroupNumber,
+    });
     return { ok: true, id };
   } catch (error) {
     return handleMutationError(error);
@@ -287,7 +317,9 @@ export async function publishArticle(id: number): Promise<MutationResult> {
       access(session.memberId),
     );
 
-    await invalidateAfterSave(existing.slug);
+    await invalidateAfterSave(existing.slug, {
+      contentGroupNumber: existing.contentGroupNumber,
+    });
     return { ok: true, id };
   } catch (error) {
     return handleMutationError(error);
@@ -330,7 +362,9 @@ export async function unpublishArticle(id: number): Promise<MutationResult> {
       access(session.memberId),
     );
 
-    await invalidateAfterSave(existing.slug);
+    await invalidateAfterSave(existing.slug, {
+      contentGroupNumber: existing.contentGroupNumber,
+    });
     return { ok: true, id };
   } catch (error) {
     return handleMutationError(error);
@@ -347,7 +381,9 @@ export async function removeArticle(id: number): Promise<MutationResult> {
   try {
     await archiveMediaForContent(id);
     await deleteArticle(id, access(session.memberId));
-    await invalidateAfterSave(existing.slug);
+    await invalidateAfterSave(existing.slug, {
+      contentGroupNumber: existing.contentGroupNumber,
+    });
     return { ok: true };
   } catch (error) {
     return handleMutationError(error);

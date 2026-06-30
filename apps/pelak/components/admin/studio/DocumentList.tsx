@@ -6,6 +6,8 @@ export type DocumentListColumn<T> = {
   header: string;
   render: (row: T) => ReactNode;
   className?: string;
+  headerClassName?: string;
+  cellClassName?: string;
 };
 
 type DocumentListProps<T> = {
@@ -55,7 +57,7 @@ export function DocumentList<T>({
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`px-4 py-3 text-start font-medium ${column.className ?? ""}`}
+                  className={`px-4 py-3 text-start font-medium ${column.className ?? ""} ${column.headerClassName ?? ""}`}
                 >
                   {column.header}
                 </th>
@@ -82,7 +84,7 @@ export function DocumentList<T>({
                   {columns.map((column) => (
                     <td
                       key={column.key}
-                      className={`px-4 py-3 text-ink ${column.className ?? ""}`}
+                      className={`px-4 py-3 text-ink ${column.className ?? ""} ${column.cellClassName ?? ""}`}
                     >
                       {column.render(row)}
                     </td>

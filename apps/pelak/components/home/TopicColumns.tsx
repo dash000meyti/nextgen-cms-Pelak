@@ -19,7 +19,7 @@ export function TopicColumns({ topics }: TopicColumnsProps) {
           <div key={topic.slug} className="space-y-5">
             <Link
               href={`/topics/${topic.slug}`}
-              className="font-heading text-lg text-ink transition-colors hover:text-accent"
+              className="text-block-title transition-colors hover:text-accent"
             >
               {topic.name}
             </Link>

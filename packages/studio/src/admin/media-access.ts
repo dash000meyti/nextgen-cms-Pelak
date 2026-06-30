@@ -5,6 +5,7 @@ import { PERMISSION_DENIED } from "@nextgen-cms/core/db/access/permission-messag
 import {
   contentPath,
   isContentGroupMediaPath,
+  isVideoMediaPath,
   writerDraftPath,
 } from "@nextgen-cms/core/media/path-policy";
 import { hasPermission } from "@nextgen-cms/studio/admin/article-access";
@@ -21,6 +22,14 @@ function canAccessContentGroupFolder(
   return (
     hasPermission(session, "modules.contentGroup.create") ||
     hasPermission(session, "modules.contentGroup.edit")
+  );
+}
+
+function canAccessVideoFolder(session: MemberSession, folder: string): boolean {
+  if (!isVideoMediaPath(folder)) return false;
+  return (
+    hasPermission(session, "modules.video.create") ||
+    hasPermission(session, "modules.video.edit")
   );
 }
 
@@ -45,6 +54,10 @@ export function canReadFolder(
   }
 
   if (canAccessContentGroupFolder(session, normalized)) {
+    return true;
+  }
+
+  if (canAccessVideoFolder(session, normalized)) {
     return true;
   }
 
@@ -98,6 +111,12 @@ export function getVirtualRootFolders(
     hasPermission(session, "modules.contentGroup.edit")
   ) {
     roots.push(normalizeFolderPath("content-group"));
+  }
+  if (
+    hasPermission(session, "modules.video.create") ||
+    hasPermission(session, "modules.video.edit")
+  ) {
+    roots.push(normalizeFolderPath("videos"));
   }
   return roots;
 }

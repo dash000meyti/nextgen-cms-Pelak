@@ -19,7 +19,10 @@ import {
 } from "@nextgen-cms/core/db/repositories/media-assets";
 import { getExtensionForMimeType } from "@nextgen-cms/core/media/constants";
 import { resolveUploadFolder } from "@nextgen-cms/core/media/folders";
-import { contentGroupPath } from "@nextgen-cms/core/media/path-policy";
+import {
+  contentGroupPath,
+  videoPath,
+} from "@nextgen-cms/core/media/path-policy";
 import { getMediaProcessor } from "@nextgen-cms/core/media/processor";
 import {
   countMediaReferences,
@@ -53,6 +56,7 @@ function parseUploadContext(
 ): MediaUploadContext {
   const contentIdRaw = formData.get("contentId");
   const contentGroupIdRaw = formData.get("contentGroupId");
+  const videoIdRaw = formData.get("videoId");
   const folderRaw = formData.get("folder");
   const memberIdRaw = formData.get("memberId");
 
@@ -66,6 +70,11 @@ function parseUploadContext(
       context?.contentGroupId ??
       (typeof contentGroupIdRaw === "string" && contentGroupIdRaw
         ? Number.parseInt(contentGroupIdRaw, 10)
+        : undefined),
+    videoId:
+      context?.videoId ??
+      (typeof videoIdRaw === "string" && videoIdRaw
+        ? Number.parseInt(videoIdRaw, 10)
         : undefined),
     memberId:
       context?.memberId ??
@@ -123,6 +132,19 @@ async function validateUploadAccess(
     }
   }
 
+  if (uploadContext.videoId != null) {
+    const expectedFolder = videoPath(uploadContext.videoId);
+    if (folderPath !== expectedFolder) {
+      return { ok: false, error: PERMISSION_DENIED };
+    }
+    if (
+      !hasPermission(session, "modules.video.create") &&
+      !hasPermission(session, "modules.video.edit")
+    ) {
+      return { ok: false, error: PERMISSION_DENIED };
+    }
+  }
+
   if (
     uploadContext.memberId != null &&
     uploadContext.memberId !== session.memberId &&
@@ -168,7 +190,9 @@ export async function uploadMedia(
   const uploadContext = parseUploadContext(formData, {
     ...context,
     memberId:
-      context?.contentGroupId != null || context?.contentId != null
+      context?.contentGroupId != null ||
+      context?.contentId != null ||
+      context?.videoId != null
         ? context.memberId
         : (context?.memberId ?? session.memberId),
   });

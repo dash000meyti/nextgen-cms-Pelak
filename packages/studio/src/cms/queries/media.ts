@@ -12,6 +12,7 @@ import {
 import {
   contentGroupPath,
   contentPath,
+  videoPath,
   writerDraftPath,
 } from "@nextgen-cms/core/media/path-policy";
 import { hasPermission } from "@nextgen-cms/studio/admin/article-access";
@@ -29,6 +30,7 @@ export type ListMediaOptions = {
   folder?: string;
   contentId?: number;
   contentGroupId?: number;
+  videoId?: number;
 };
 
 export type MediaBrowseContext = {
@@ -70,6 +72,13 @@ export async function listMedia(
 
   if (options.contentGroupId != null) {
     const folder = contentGroupPath(options.contentGroupId);
+    const access = assertMediaFolderAccess(session, folder, ownedContentIds);
+    if (!access.ok) return [];
+    return listMediaAssets({ folderPath: folder });
+  }
+
+  if (options.videoId != null) {
+    const folder = videoPath(options.videoId);
     const access = assertMediaFolderAccess(session, folder, ownedContentIds);
     if (!access.ok) return [];
     return listMediaAssets({ folderPath: folder });
@@ -126,6 +135,10 @@ export async function listMediaForPicker(
 
   if (context.contentGroupId != null) {
     return listMedia({ contentGroupId: context.contentGroupId });
+  }
+
+  if (context.videoId != null) {
+    return listMedia({ videoId: context.videoId });
   }
 
   const memberId = context.memberId ?? session.memberId;

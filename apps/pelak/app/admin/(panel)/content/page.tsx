@@ -2,6 +2,7 @@ import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
 import { listArticlesAdmin } from "@nextgen-cms/studio/cms/queries";
 import Link from "next/link";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
+import { DocumentListThumbnail } from "@/components/admin/studio/DocumentListThumbnail";
 import { StatusBadge } from "@/components/admin/studio/StatusBadge";
 
 type PageProps = {
@@ -51,10 +52,23 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
       }
       columns={[
         {
+          key: "thumb",
+          header: "",
+          className: "w-12",
+          headerClassName: "!p-0 w-12",
+          cellClassName: "!p-0 w-12",
+          render: (row) => (
+            <DocumentListThumbnail
+              src={row.heroSrc}
+              alt={row.heroAlt || row.title}
+            />
+          ),
+        },
+        {
           key: "title",
           header: "عنوان",
           render: (row) => (
-            <div>
+            <div className="min-w-0">
               <p className="font-medium">{row.title}</p>
               <p className="text-xs text-ink-faint" dir="ltr">
                 {row.slug}

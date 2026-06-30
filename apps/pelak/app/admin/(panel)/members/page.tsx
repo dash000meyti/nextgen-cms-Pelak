@@ -31,8 +31,28 @@ export default async function AdminMembersPage() {
       editHref={canEdit ? (row) => `/admin/members/${row.id}/edit` : undefined}
       columns={[
         {
+          key: "avatar",
+          header: "",
+          className: "w-16",
+          headerClassName: "w-16 p-0",
+          cellClassName: "w-16 p-0",
+          render: (row) => (
+            <div className="size-16 overflow-hidden bg-surface-2">
+              {row.avatarSrc ? (
+                // biome-ignore lint/performance/noImgElement: admin upload URLs may be session-gated
+                <img
+                  src={row.avatarSrc}
+                  alt={row.avatarAlt || row.name}
+                  className="size-full object-cover"
+                />
+              ) : null}
+            </div>
+          ),
+        },
+        {
           key: "name",
           header: "نام",
+          cellClassName: "py-3 pe-4 ps-0",
           render: (row) => (
             <div>
               <p className="font-medium">{row.name}</p>

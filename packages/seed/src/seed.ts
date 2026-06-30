@@ -363,12 +363,32 @@ const adminSlug = adminEmail.includes("@")
       .toLowerCase()
       .replace(/\./g, "-")
   : "admin";
+const adminMemberSlug = memberIdBySlug.has(adminSlug)
+  ? `admin-${adminSlug}`
+  : adminSlug;
+
+const adminAuthorResult = db
+  .insert(schema.authors)
+  .values({
+    slug: adminMemberSlug,
+    name: adminSlug,
+    role: "",
+    bio: "",
+    avatarSrc: "",
+    avatarAlt: "",
+  })
+  .returning({ id: schema.authors.id })
+  .all();
+const adminAuthorId = adminAuthorResult[0]?.id;
+if (!adminAuthorId) {
+  throw new Error("Failed to seed admin author profile");
+}
 
 db.insert(schema.members)
   .values({
     email: adminEmail,
     passwordHash,
-    slug: memberIdBySlug.has(adminSlug) ? `admin-${adminSlug}` : adminSlug,
+    slug: adminMemberSlug,
     name: adminSlug,
     displayRole: "",
     bio: "",
@@ -376,7 +396,7 @@ db.insert(schema.members)
     avatarAlt: "",
     roleId: superAdminRoleId,
     isActive: true,
-    legacyAuthorId: null,
+    legacyAuthorId: adminAuthorId,
     createdAt: now,
     updatedAt: now,
   })

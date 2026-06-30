@@ -20,10 +20,8 @@ export default async function ContactPage() {
 
       <div className="mt-8 space-y-10">
         <header className="space-y-3">
-          <h1 className="font-heading text-3xl text-ink md:text-4xl">
-            تماس با ما
-          </h1>
-          <p className="max-w-xl text-base leading-relaxed text-ink-muted">
+          <h1 className="text-page-title">تماس با ما</h1>
+          <p className="text-lead max-w-xl">
             برای ارسال پیام، پیشنهاد یا همکاری می‌توانید از فرم زیر استفاده کنید.
           </p>
         </header>
@@ -31,7 +29,7 @@ export default async function ContactPage() {
         <ContactForm />
 
         <section className="border-t border-rule pt-8">
-          <h2 className="font-heading text-lg text-ink">راه‌های دیگر</h2>
+          <h2 className="text-block-title">راه‌های دیگر</h2>
           <p className="mt-2 text-sm text-ink-muted">
             ایمیل:{" "}
             <a

@@ -105,6 +105,8 @@ export async function listArticlesAdmin(status?: ArticleStatus | "all") {
       id: row.id,
       slug: row.slug,
       title: row.title,
+      heroSrc: row.heroSrc,
+      heroAlt: row.heroAlt,
       status: row.status,
       publishedAt: row.publishedAt,
       updatedAt: row.updatedAt,

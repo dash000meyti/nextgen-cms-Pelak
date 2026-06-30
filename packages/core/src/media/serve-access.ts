@@ -4,6 +4,7 @@ import {
   isContentGroupMediaPath,
   isDraftMediaPath,
   isSharedMediaPath,
+  isVideoMediaPath,
   parseContentIdFromPath,
 } from "@nextgen-cms/core/media/path-policy";
 
@@ -17,6 +18,9 @@ export function classifyUploadPath(relativePath: string): UploadServeDecision {
     return { access: "public" };
   }
   if (isContentGroupMediaPath(relativePath)) {
+    return { access: "public" };
+  }
+  if (isVideoMediaPath(relativePath)) {
     return { access: "public" };
   }
   if (isDraftMediaPath(relativePath)) {

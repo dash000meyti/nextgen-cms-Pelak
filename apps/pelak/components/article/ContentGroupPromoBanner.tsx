@@ -33,7 +33,7 @@ export function ContentGroupPromoBanner({
         <p className="text-xs font-medium tracking-wide text-ink-muted uppercase">
           آخرین گروه محتوا
         </p>
-        <p className="font-heading text-sm leading-snug text-ink">
+        <p className="font-heading text-sm leading-normal text-ink">
           {group.label}
         </p>
         <p className="text-xs text-ink-muted">

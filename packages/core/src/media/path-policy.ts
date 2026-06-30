@@ -46,7 +46,20 @@ export function contentGroupPath(contentGroupId: number): string {
   return normalizeFolderPath(`content-group/${contentGroupId}`);
 }
 
+export function videoPath(videoId: number): string {
+  return normalizeFolderPath(`videos/${videoId}`);
+}
+
+export function memberAvatarPath(memberId: number): string {
+  return normalizeFolderPath(`shared/members/${memberId}`);
+}
+
 export function isContentGroupMediaPath(relativePath: string): boolean {
   const normalized = relativePath.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
   return /^content-group\/\d+/.test(normalized);
+}
+
+export function isVideoMediaPath(relativePath: string): boolean {
+  const normalized = relativePath.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+  return /^videos\/\d+/.test(normalized);
 }

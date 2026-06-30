@@ -17,6 +17,7 @@ import {
   updateMemberAdmin,
 } from "@nextgen-cms/core/db/repositories/members-admin";
 import { findRoleById } from "@nextgen-cms/core/db/repositories/roles";
+import { promoteMemberAvatarUrl } from "@nextgen-cms/core/media/promote-member-avatar";
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import {
   assertCanAssignRole,
@@ -262,10 +263,15 @@ export async function savePersonalSettings(
     await setMemberPassword(session.memberId, passwordHash);
   }
 
+  const promotedAvatarSrc = await promoteMemberAvatarUrl(
+    session.memberId,
+    avatarSrc,
+  );
+
   await updateMemberPersonal(session.memberId, {
     name,
     bio,
-    avatarSrc,
+    avatarSrc: promotedAvatarSrc,
     avatarAlt,
   });
 
@@ -293,6 +299,17 @@ export async function createMember(
 
   try {
     const id = await insertMemberAdmin(writeInput, access(session.memberId));
+    const promotedAvatarSrc = await promoteMemberAvatarUrl(
+      id,
+      writeInput.avatarSrc,
+    );
+    if (promotedAvatarSrc !== writeInput.avatarSrc) {
+      await updateMemberAdmin(
+        id,
+        { ...writeInput, avatarSrc: promotedAvatarSrc },
+        access(session.memberId),
+      );
+    }
     await invalidateAfterSave(writeInput.slug);
     return { ok: true, id };
   } catch (error) {
@@ -334,6 +351,7 @@ export async function saveMember(
   }
 
   const writeInput = await buildWriteInput(parsed);
+  writeInput.avatarSrc = await promoteMemberAvatarUrl(id, writeInput.avatarSrc);
 
   try {
     await updateMemberAdmin(id, writeInput, access(session.memberId));

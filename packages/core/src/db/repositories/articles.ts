@@ -17,6 +17,7 @@ import {
   mapArticleRowToArticle,
   mapArticleRowToPreview,
 } from "@nextgen-cms/core/db/mappers/article";
+import { ensureMemberAuthorProfiles } from "@nextgen-cms/core/db/repositories/members";
 import { getMemberPermissions } from "@nextgen-cms/core/db/repositories/permissions";
 import {
   articleAuthors,
@@ -271,25 +272,7 @@ export type ArticleWriteInput = {
 export async function resolveAuthorIdsFromMemberIds(
   memberIds: number[],
 ): Promise<number[]> {
-  if (memberIds.length === 0) return [];
-
-  const rows = await db
-    .select({
-      id: members.id,
-      legacyAuthorId: members.legacyAuthorId,
-    })
-    .from(members)
-    .where(inArray(members.id, memberIds));
-
-  const byMemberId = new Map(rows.map((row) => [row.id, row.legacyAuthorId]));
-
-  return memberIds.map((memberId) => {
-    const authorId = byMemberId.get(memberId);
-    if (authorId == null) {
-      throw new Error("پروفایل عمومی عضو یافت نشد.");
-    }
-    return authorId;
-  });
+  return ensureMemberAuthorProfiles(memberIds);
 }
 
 export async function resolveMemberIdsFromAuthorIds(

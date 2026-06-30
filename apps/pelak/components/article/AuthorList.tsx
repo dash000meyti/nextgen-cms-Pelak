@@ -20,7 +20,7 @@ export function AuthorList({
   return (
     <section aria-labelledby="authors-heading" className="space-y-6">
       {!isSidebar ? <Divider /> : null}
-      <h2 id="authors-heading" className="font-heading text-lg text-ink">
+      <h2 id="authors-heading" className="text-block-title">
         {isSidebar ? "درباره عضو" : "درباره اعضا"}
       </h2>
       <ul className={`grid gap-4 ${isSidebar ? "" : "sm:grid-cols-2"}`}>

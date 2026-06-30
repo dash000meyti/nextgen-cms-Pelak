@@ -22,7 +22,7 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
           return (
             <h2
               key={key}
-              className="mt-10! border-r-4 border-accent pr-4 pt-2 font-heading text-xl leading-snug text-ink md:text-2xl"
+              className="mt-10! border-r-4 border-accent pr-4 pt-2 font-heading text-lg leading-normal text-ink md:text-xl"
             >
               {block.content}
             </h2>

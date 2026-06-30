@@ -19,7 +19,7 @@ alwaysApply: false
 - لوگو: `public/images/hokmran-logo.svg` — SVG خالص قرمز، در هر دو تم ثابت. هرگز از PNG با `invert` استفاده نکن.
 - فونت:
   - `font-sans` → IRANSansX Regular (بدنه)
-  - `font-heading` → IRANSansX Black (عناوین h1–h6 خودکار، `leading-1.25`)
+  - `font-heading` → IRANSansX Black (عناوین h1–h6 خودکار، `line-height: 1.45`)
 - تم روشن/تیره: کلاس `dark` روی `<html>` توسط `ThemeProvider`. FOUC با اسکریپت inline در `app/layout.tsx`.
 - عرض‌های استاندارد: `max-w-content` (۴۲rem) برای بدنهٔ مقاله، `max-w-wide` (۷۶rem) برای گرید/هدر. همیشه داخل `Container`.
 - بدنهٔ مقاله: کلاس `prose-article` روی wrapper — اندازه/leading پاراگراف‌ها یکدست می‌شود.

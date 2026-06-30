@@ -12,7 +12,7 @@ export function VideoSection({ videos }: VideoSectionProps) {
   if (videos.length === 0) return null;
 
   return (
-    <Container className="border-t border-rule py-10 md:py-12">
+    <Container className="border-t border-rule py-10 md:py-8">
       <SectionTitle title="ویدیوها" />
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {videos.map((video) => (
@@ -40,7 +40,7 @@ export function VideoSection({ videos }: VideoSectionProps) {
               </div>
             </div>
             <div className="space-y-1">
-              <h3 className="font-heading text-base leading-snug text-ink transition-colors group-hover:text-accent">
+              <h3 className="font-heading text-base leading-normal text-ink transition-colors group-hover:text-accent">
                 {video.title}
               </h3>
               <p className="text-xs text-ink-muted">{video.duration}</p>

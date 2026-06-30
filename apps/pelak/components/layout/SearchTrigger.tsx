@@ -3,6 +3,7 @@
 import type { ArticlePreview } from "@nextgen-cms/contract/types/article";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 type SearchTriggerProps = {
   articles: ArticlePreview[];
@@ -10,6 +11,11 @@ type SearchTriggerProps = {
 
 export function SearchTrigger({ articles }: SearchTriggerProps) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -22,6 +28,15 @@ export function SearchTrigger({ articles }: SearchTriggerProps) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   return (
     <>
@@ -46,9 +61,15 @@ export function SearchTrigger({ articles }: SearchTriggerProps) {
           <path d="m21 21-4.3-4.3" />
         </svg>
       </button>
-      {open ? (
-        <SearchOverlay articles={articles} onClose={() => setOpen(false)} />
-      ) : null}
+      {open && mounted
+        ? createPortal(
+            <SearchOverlay
+              articles={articles}
+              onClose={() => setOpen(false)}
+            />,
+            document.body,
+          )
+        : null}
     </>
   );
 }
@@ -92,7 +113,7 @@ function SearchOverlay({ articles, onClose }: SearchOverlayProps) {
         className="absolute inset-0 cursor-default"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-xl overflow-hidden rounded-lg border border-rule bg-paper shadow-xl">
+      <div className="relative z-10 w-full max-w-xl overflow-hidden rounded-lg border border-rule bg-paper shadow-xl">
         <div className="flex items-center gap-3 border-b border-rule px-4 py-3">
           <svg
             width="20"

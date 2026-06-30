@@ -15,6 +15,7 @@
     "db:purge-archived-media": "tsx scripts/purge-archived-media.ts",
     "db:promote-content-group-covers": "tsx scripts/promote-content-group-covers.ts",
     "db:promote-article-media": "tsx scripts/promote-article-media.ts",
+    "db:promote-video-thumbnails": "tsx scripts/promote-video-thumbnails.ts",
     "db:migrate-content-group-uploads": "tsx scripts/migrate-content-group-uploads.ts"
   },
   "dependencies": {

@@ -1,33 +1,59 @@
 import type { ArticlePreview } from "@nextgen-cms/contract/types/article";
+import Image from "next/image";
 import Link from "next/link";
-import { SectionBadge } from "@/components/ui/SectionBadge";
 
 type ArticleListItemProps = {
   article: ArticlePreview;
-  rank: number;
+  rank?: number;
+  priority?: boolean;
 };
 
-export function ArticleListItem({ article, rank }: ArticleListItemProps) {
-  const primaryTopic = article.topics[0];
+const imgClass =
+  "object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]";
+
+export function ArticleListItem({
+  article,
+  rank,
+  priority = false,
+}: ArticleListItemProps) {
   return (
-    <li className="group flex items-start gap-3 border-b border-rule py-4 last:border-0 sm:gap-5">
-      <span
-        className="w-7 shrink-0 pt-0.5 font-heading text-2xl leading-none text-accent/85 tabular-nums sm:w-9 sm:text-3xl"
-        aria-hidden="true"
-      >
-        {rank.toLocaleString("fa-IR")}
-      </span>
+    <li className="group flex items-center gap-3 border-b border-rule py-4 sm:gap-5">
+      {rank != null ? (
+        <span
+          className="w-7 shrink-0 font-heading text-xl leading-none text-accent/85 tabular-nums sm:w-9 sm:text-2xl"
+          aria-hidden="true"
+        >
+          {rank.toLocaleString("fa-IR")}
+        </span>
+      ) : null}
       <div className="min-w-0 flex-1 space-y-1.5">
-        {primaryTopic ? <SectionBadge topic={primaryTopic} /> : null}
         <Link href={`/content/${article.slug}`}>
-          <h3 className="font-heading text-base leading-snug text-ink transition-colors group-hover:text-accent">
+          <h3 className="text-card-title-sm transition-colors group-hover:text-accent">
             {article.title}
           </h3>
         </Link>
+        {article.subtitle ? (
+          <p className="line-clamp-2 text-sm leading-relaxed text-ink-muted">
+            {article.subtitle}
+          </p>
+        ) : null}
         <p className="text-xs text-ink-faint">
           {article.authors.map((author) => author.name).join(" و ")}
         </p>
       </div>
+      <Link
+        href={`/content/${article.slug}`}
+        className="relative block aspect-square w-20 shrink-0 overflow-hidden rounded bg-rule sm:w-24"
+      >
+        <Image
+          src={article.heroImage.src}
+          alt={article.heroImage.alt}
+          fill
+          className={imgClass}
+          sizes="96px"
+          priority={priority}
+        />
+      </Link>
     </li>
   );
 }

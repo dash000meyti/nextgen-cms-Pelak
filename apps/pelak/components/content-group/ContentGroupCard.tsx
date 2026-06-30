@@ -26,7 +26,9 @@ export function ContentGroupCard({ group }: ContentGroupCardProps) {
         <p className="font-heading text-base text-ink transition-colors group-hover:text-accent">
           {group.label}
         </p>
-        <p className="text-xs text-ink-muted">{group.articleCount} محتوا</p>
+        <p className="text-xs text-ink-muted">
+          {group.articleCount.toLocaleString("fa-IR")} محتوا
+        </p>
       </div>
     </Link>
   );

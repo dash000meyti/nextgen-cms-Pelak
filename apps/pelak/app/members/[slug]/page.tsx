@@ -70,11 +70,9 @@ export default async function MemberPage({ params }: MemberPageProps) {
           />
         </div>
         <div className="space-y-3">
-          <h1 className="font-heading text-2xl text-ink sm:text-3xl">
-            {member.name}
-          </h1>
+          <h1 className="text-page-title">{member.name}</h1>
           <p className="text-sm text-accent">{member.role}</p>
-          <p className="max-w-2xl text-sm leading-relaxed text-ink-muted sm:text-base">
+          <p className="max-w-2xl text-base leading-relaxed text-ink-muted">
             {member.bio}
           </p>
           <div className="flex flex-wrap items-center gap-4">

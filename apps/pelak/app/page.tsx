@@ -10,7 +10,7 @@ import {
 import { CurrentContentGroupHero } from "@/components/home/CurrentContentGroupHero";
 import { EditorsPick } from "@/components/home/EditorsPick";
 import { FeaturedContent } from "@/components/home/FeaturedContent";
-import { NewsletterCta } from "@/components/home/NewsletterCta";
+import { SurveyCta } from "@/components/home/SurveyCta";
 import { TopicsWithContent } from "@/components/home/TopicsWithContent";
 import { TopContentGroup } from "@/components/home/TopContentGroup";
 import { VideoSection } from "@/components/home/VideoSection";
@@ -48,7 +48,7 @@ export default async function HomePage() {
 
       <TopicsWithContent sections={topicSections} />
 
-      <NewsletterCta />
+      <SurveyCta />
     </>
   );
 }

@@ -26,7 +26,7 @@ export function CurrentContentGroupHero({
               title={group.label}
               action={
                 <Button href={`/content-group/${group.number}`} variant="outline">
-                  مشاهده گروه محتوا
+                  {`مشاهده محتوای شماره ${group.number.toLocaleString("fa-IR")}`}
                 </Button>
               }
               bordered={true}
@@ -48,7 +48,7 @@ export function CurrentContentGroupHero({
               <p className="min-w-0 font-sans leading-none text-ink-muted">
                 تعداد محتوا در این شماره :
               </p>
-              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-t-full bg-surface-2 text-[0.55em] leading-none text-ink-muted tabular-nums">
+              <span className="inline-flex shrink-0 items-center justify-center rounded-t-full bg-surface-2 px-2.5 py-1 text-base leading-none text-ink-muted tabular-nums md:text-lg">
                 {group.articleCount.toLocaleString("fa-IR")}
               </span>
             </div>

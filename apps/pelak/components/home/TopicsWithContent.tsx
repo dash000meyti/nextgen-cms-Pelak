@@ -47,7 +47,7 @@ export function TopicsWithContent({ sections }: TopicsWithContentProps) {
                     titleWeight="normal"
                     action={
                       <Button href={`/topics/${topic.slug}`} variant="outline">
-                        مشاهده تمام محتوا
+                        {`تمام محتوای ${topic.name}`}
                       </Button>
                     }
                     bordered

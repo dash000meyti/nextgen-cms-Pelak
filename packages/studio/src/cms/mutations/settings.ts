@@ -5,6 +5,7 @@ import {
   invalidateSiteConfig,
   invalidateThemeConfig,
 } from "@nextgen-cms/config/cache";
+import { normalizeMemberSettings } from "@nextgen-cms/config/theme/defaults";
 import type {
   ContentGroupModuleSettings,
   ContentSettings,
@@ -108,7 +109,7 @@ export async function saveMemberSettings(data: MemberSettings) {
   if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
 
   try {
-    await updateMemberSettings(data);
+    await updateMemberSettings(normalizeMemberSettings(data));
     invalidateSiteConfig();
   } catch (error) {
     return handleMutationError(error);

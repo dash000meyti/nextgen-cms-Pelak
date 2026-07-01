@@ -80,8 +80,18 @@ export const memberSettingsSchema = {
       kind: "number",
       required: true,
     },
-    { key: "allowRegistration", label: "ثبت‌نام عمومی", kind: "boolean" },
-    { key: "requireApproval", label: "نیاز به تأیید", kind: "boolean" },
+    {
+      key: "memberLabel",
+      label: "نام معرفی عضو",
+      kind: "text",
+      required: true,
+    },
+    {
+      key: "membersLabel",
+      label: "نام معرفی اعضا",
+      kind: "text",
+      required: true,
+    },
   ],
 } satisfies DocumentSchema;
 

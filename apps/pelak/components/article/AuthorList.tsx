@@ -8,21 +8,26 @@ import { SocialLinks } from "@/components/ui/SocialLinks";
 type AuthorListProps = {
   authors: Author[];
   socialLinks: SocialLink[];
+  memberLabel: string;
+  membersLabel: string;
   variant?: "default" | "sidebar";
 };
 
 export function AuthorList({
   authors,
   socialLinks,
+  memberLabel,
+  membersLabel,
   variant = "default",
 }: AuthorListProps) {
   const isSidebar = variant === "sidebar";
+  const headingLabel = authors.length === 1 ? memberLabel : membersLabel;
 
   return (
     <section aria-labelledby="authors-heading" className="space-y-6">
       {!isSidebar ? <Divider /> : null}
       <h2 id="authors-heading" className="text-block-title">
-        {isSidebar ? "درباره عضو" : "درباره اعضا"}
+        {`درباره ${headingLabel}`}
       </h2>
       <ul className={`grid gap-4 ${isSidebar ? "" : "sm:grid-cols-2"}`}>
         {authors.map((author) => {

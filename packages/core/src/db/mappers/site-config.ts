@@ -2,12 +2,12 @@ import {
   DEFAULT_CONTENT_GROUP_MODULE_SETTINGS,
   DEFAULT_CONTENT_SETTINGS,
   DEFAULT_MEDIA_SETTINGS,
-  DEFAULT_MEMBER_SETTINGS,
   DEFAULT_MODULE_SETTINGS,
   DEFAULT_VIDEO_MODULE_SETTINGS,
   featureModulesToModuleSettings,
   moduleSettingsToFeatureModules,
   normalizeContentGroupModuleSettings,
+  normalizeMemberSettings,
   normalizeModuleSettings,
   normalizeVideoModuleSettings,
 } from "@nextgen-cms/config/theme/defaults";
@@ -39,6 +39,7 @@ function parseLegacyModuleSettings(
 }
 
 export function mapSiteSettingsRow(row: SiteSettingsRow): SiteConfig {
+  const memberSettings = mapMemberSettingsRow(row);
   return {
     name: row.name,
     tagline: row.tagline,
@@ -53,6 +54,8 @@ export function mapSiteSettingsRow(row: SiteSettingsRow): SiteConfig {
     socialLinks: parseJson(row.socialLinks) ?? row.socialLinks,
     hotTopics: parseJson(row.hotTopics) ?? row.hotTopics,
     contactEmail: row.contactEmail,
+    memberLabel: memberSettings.memberLabel,
+    membersLabel: memberSettings.membersLabel,
   };
 }
 
@@ -75,7 +78,10 @@ export function mapContentGroupModuleSettingsRow(
   const stored = parseJson<ContentGroupModuleSettings>(
     row.contentGroupModuleSettings,
   );
-  return normalizeContentGroupModuleSettings(stored, parseLegacyModuleSettings(row));
+  return normalizeContentGroupModuleSettings(
+    stored,
+    parseLegacyModuleSettings(row),
+  );
 }
 
 export function mapVideoModuleSettingsRow(
@@ -90,9 +96,7 @@ export function mapMediaSettingsRow(row: SiteSettingsRow): MediaSettings {
 }
 
 export function mapMemberSettingsRow(row: SiteSettingsRow): MemberSettings {
-  return (
-    parseJson<MemberSettings>(row.memberSettings) ?? DEFAULT_MEMBER_SETTINGS
-  );
+  return normalizeMemberSettings(parseJson<MemberSettings>(row.memberSettings));
 }
 
 export function mapContentSettingsRow(row: SiteSettingsRow): ContentSettings {

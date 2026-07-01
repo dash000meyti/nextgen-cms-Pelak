@@ -135,9 +135,22 @@ export const DEFAULT_MEDIA_SETTINGS: MediaSettings = {
 
 export const DEFAULT_MEMBER_SETTINGS: MemberSettings = {
   defaultRoleId: 3,
-  allowRegistration: false,
-  requireApproval: true,
+  memberLabel: "نویسنده",
+  membersLabel: "نویسنده‌ها",
 };
+
+export function normalizeMemberSettings(
+  stored: Partial<MemberSettings> | null | undefined,
+): MemberSettings {
+  const memberLabel = stored?.memberLabel?.trim();
+  const membersLabel = stored?.membersLabel?.trim();
+  return {
+    defaultRoleId:
+      stored?.defaultRoleId ?? DEFAULT_MEMBER_SETTINGS.defaultRoleId,
+    memberLabel: memberLabel || DEFAULT_MEMBER_SETTINGS.memberLabel,
+    membersLabel: membersLabel || DEFAULT_MEMBER_SETTINGS.membersLabel,
+  };
+}
 
 export const DEFAULT_CONTENT_SETTINGS: ContentSettings = {
   defaultArticleStatus: "draft",

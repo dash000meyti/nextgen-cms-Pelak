@@ -1,5 +1,6 @@
 "use client";
 
+import { normalizeMemberSettings } from "@nextgen-cms/config/theme/defaults";
 import type { MemberSettings } from "@nextgen-cms/contract/types/modules";
 import type { RoleRow } from "@nextgen-cms/core/db/schema/roles";
 import { saveMemberSettings } from "@nextgen-cms/studio/cms/mutations/settings";
@@ -22,9 +23,11 @@ export function MemberSettingsForm({ value, roles }: MemberSettingsFormProps) {
   function save() {
     setError(null);
     setSuccess(null);
+    const normalized = normalizeMemberSettings(settings);
     startTransition(async () => {
       try {
-        await saveMemberSettings(settings);
+        await saveMemberSettings(normalized);
+        setSettings(normalized);
         setSuccess("ذخیره شد.");
         router.refresh();
       } catch {
@@ -55,27 +58,27 @@ export function MemberSettingsForm({ value, roles }: MemberSettingsFormProps) {
           ))}
         </select>
       </label>
-      <label className="flex items-center gap-3 text-sm text-ink">
+      <label className="block space-y-1.5 text-sm">
+        <span className="font-medium text-ink">نام معرفی عضو</span>
         <input
-          type="checkbox"
-          checked={settings.allowRegistration}
+          type="text"
+          value={settings.memberLabel}
           onChange={(e) =>
-            setSettings({ ...settings, allowRegistration: e.target.checked })
+            setSettings({ ...settings, memberLabel: e.target.value })
           }
-          className="accent-accent"
+          className="w-full rounded border border-rule bg-paper px-3 py-2 text-ink"
         />
-        <span>ثبت‌نام عمومی از صفحهٔ ورود</span>
       </label>
-      <label className="flex items-center gap-3 text-sm text-ink">
+      <label className="block space-y-1.5 text-sm">
+        <span className="font-medium text-ink">نام معرفی اعضا</span>
         <input
-          type="checkbox"
-          checked={settings.requireApproval}
+          type="text"
+          value={settings.membersLabel}
           onChange={(e) =>
-            setSettings({ ...settings, requireApproval: e.target.checked })
+            setSettings({ ...settings, membersLabel: e.target.value })
           }
-          className="accent-accent"
+          className="w-full rounded border border-rule bg-paper px-3 py-2 text-ink"
         />
-        <span>عضو جدید تا تأیید مدیر غیرفعال بماند</span>
       </label>
       <button
         type="button"

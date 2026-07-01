@@ -38,8 +38,8 @@ export type MediaSettings = {
 
 export type MemberSettings = {
   defaultRoleId: number;
-  allowRegistration: boolean;
-  requireApproval: boolean;
+  memberLabel: string;
+  membersLabel: string;
 };
 
 export type ContentSettings = {

@@ -89,4 +89,7 @@ export const siteConfig: SiteConfig = {
   hotTopics: ["ترامپ", "پوتین", "تحریم‌ها", "سوریه", "اقتصاد"],
 
   contactEmail: "info@hokmran.example",
+
+  memberLabel: "نویسنده",
+  membersLabel: "نویسنده‌ها",
 };

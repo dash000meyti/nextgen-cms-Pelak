@@ -47,6 +47,8 @@ export type SiteConfig = {
   socialLinks: SocialLink[];
   hotTopics: string[];
   contactEmail: string;
+  memberLabel: string;
+  membersLabel: string;
 };
 
 export type CurrentContentGroupInfo = {

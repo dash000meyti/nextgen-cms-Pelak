@@ -38,7 +38,8 @@ export default async function AboutPage() {
         <h2 className="text-block-title pt-4">خط‌مشی تحریریه</h2>
         <p>
           تحریریه حکمران به استقلال از منابع مالی و سیاسی پایبند است. هر مطلب با
-          ذکر منبع منتشر می‌شود و نظر عضو لزوماً نظر پایگاه نیست.
+          ذکر منبع منتشر می‌شود و نظر {siteConfig.memberLabel} لزوماً نظر پایگاه
+          نیست.
         </p>
       </article>
     </Container>

@@ -59,6 +59,8 @@ export function ArticleDetailView({
           <AuthorList
             authors={article.authors}
             socialLinks={siteConfig.socialLinks}
+            memberLabel={siteConfig.memberLabel}
+            membersLabel={siteConfig.membersLabel}
           />
         </div>
 
@@ -79,6 +81,8 @@ export function ArticleDetailView({
             <AuthorList
               authors={article.authors}
               socialLinks={siteConfig.socialLinks}
+              memberLabel={siteConfig.memberLabel}
+              membersLabel={siteConfig.membersLabel}
               variant="sidebar"
             />
             <div className="w-full sticky top-[18dvh] z-10">

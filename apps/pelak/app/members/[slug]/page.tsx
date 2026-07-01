@@ -21,8 +21,11 @@ export async function generateMetadata({
   params,
 }: MemberPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const member = await getMemberBySlug(slug);
-  if (!member) return { title: "عضو یافت نشد" };
+  const [member, siteConfig] = await Promise.all([
+    getMemberBySlug(slug),
+    getSiteConfig(),
+  ]);
+  if (!member) return { title: `${siteConfig.memberLabel} یافت نشد` };
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hokmran.example";
 
@@ -85,7 +88,7 @@ export default async function MemberPage({ params }: MemberPageProps) {
       </div>
 
       <div className="mt-10 space-y-8">
-        <SectionTitle title="محتوای این عضو" />
+        <SectionTitle title={`محتوای این ${siteConfig.memberLabel}`} />
         <ArticleCardGrid columns={3}>
           {articles.map((article, index) => (
             <ArticleCard

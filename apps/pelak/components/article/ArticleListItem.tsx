@@ -1,6 +1,7 @@
 import type { ArticlePreview } from "@nextgen-cms/contract/types/article";
 import Image from "next/image";
 import Link from "next/link";
+import { AuthorChipList } from "@/components/ui/AuthorChip";
 
 type ArticleListItemProps = {
   article: ArticlePreview;
@@ -39,13 +40,10 @@ export function ArticleListItem({
             {article.subtitle}
           </p>
         ) : null}
-        <p
-          className={
-            authorTone === "ink" ? "text-sm text-ink" : "text-xs text-ink-faint"
-          }
-        >
-          {article.authors.map((author) => author.name).join(" و ")}
-        </p>
+        <AuthorChipList
+          authors={article.authors}
+          tone={authorTone === "ink" ? "ink" : "faint"}
+        />
       </div>
       <Link
         href={`/content/${article.slug}`}

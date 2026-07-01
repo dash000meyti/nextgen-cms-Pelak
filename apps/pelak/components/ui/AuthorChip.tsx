@@ -1,9 +1,11 @@
 import type { Author } from "@nextgen-cms/contract/types/article";
 import Link from "next/link";
+import { Avatar } from "@/components/ui/Avatar";
 
-type AuthorChipTone = "muted" | "ink";
+type AuthorChipTone = "muted" | "ink" | "faint";
 
 const authorToneClasses: Record<AuthorChipTone, string> = {
+  faint: "text-xs text-ink-faint",
   muted: "text-sm text-ink-muted",
   ink: "text-base text-ink",
 };
@@ -22,8 +24,14 @@ export function AuthorChip({
   return (
     <Link
       href={`/members/${author.slug}`}
-      className={`${authorToneClasses[tone]} transition-colors hover:text-accent ${className}`.trim()}
+      className={`inline-flex items-center gap-1.5 ${authorToneClasses[tone]} transition-colors hover:text-accent ${className}`.trim()}
     >
+      <Avatar
+        src={author.avatar.src}
+        alt={author.avatar.alt}
+        name={author.name}
+        className="size-[1.25em]"
+      />
       {author.name}
     </Link>
   );

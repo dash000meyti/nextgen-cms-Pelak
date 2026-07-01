@@ -1,6 +1,7 @@
 import type { Author } from "@nextgen-cms/contract/types/article";
 import type { SocialLink } from "@nextgen-cms/contract/types/site";
 import Link from "next/link";
+import { Avatar } from "@/components/ui/Avatar";
 import { Divider } from "@/components/ui/Divider";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 
@@ -33,23 +34,31 @@ export function AuthorList({
           return (
             <li
               key={author.slug}
-              className="border border-rule bg-surface/50 p-5"
+              className="flex gap-4 border border-rule bg-surface/50 p-5"
             >
-              <Link
-                href={`/members/${author.slug}`}
-                className="font-heading text-base text-ink transition-colors hover:text-accent"
-              >
-                {author.name}
-              </Link>
-              <p className="mt-1 text-xs text-accent">{author.role}</p>
-              <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-                {author.bio}
-              </p>
-              {socials.length > 0 ? (
-                <div className="mt-4">
-                  <SocialLinks links={socials} />
-                </div>
-              ) : null}
+              <Avatar
+                src={author.avatar.src}
+                alt={author.avatar.alt}
+                name={author.name}
+                className="size-12 shrink-0 text-xl sm:size-14 sm:text-2xl"
+              />
+              <div className="min-w-0 flex-1">
+                <Link
+                  href={`/members/${author.slug}`}
+                  className="font-heading text-base text-ink transition-colors hover:text-accent"
+                >
+                  {author.name}
+                </Link>
+                <p className="mt-1 text-xs text-accent">{author.role}</p>
+                <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+                  {author.bio}
+                </p>
+                {socials.length > 0 ? (
+                  <div className="mt-4">
+                    <SocialLinks links={socials} />
+                  </div>
+                ) : null}
+              </div>
             </li>
           );
         })}

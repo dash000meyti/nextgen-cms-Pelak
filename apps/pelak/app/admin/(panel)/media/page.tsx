@@ -1,4 +1,5 @@
 import { normalizeFolderPath } from "@nextgen-cms/contract/media/folder-path";
+import { getMediaSettings } from "@nextgen-cms/site-data/get-content";
 import {
   canBrowseMediaRoot,
   canDeleteAsset,
@@ -15,7 +16,7 @@ import { redirect } from "next/navigation";
 import { MediaLibrary } from "@/components/admin/media/MediaLibrary";
 
 type AdminMediaPageProps = {
-  searchParams: Promise<{ folder?: string }>;
+  searchParams: Promise<{ folder?: string; tab?: string }>;
 };
 
 export default async function AdminMediaPage({
@@ -31,11 +32,7 @@ export default async function AdminMediaPage({
   if (params.folder !== undefined) {
     const requestedFolder = normalizeFolderPath(params.folder);
     if (
-      !canReadFolder(
-        session,
-        requestedFolder,
-        browseContext.ownedContentIds,
-      )
+      !canReadFolder(session, requestedFolder, browseContext.ownedContentIds)
     ) {
       redirect("/admin/media");
     }
@@ -65,6 +62,12 @@ export default async function AdminMediaPage({
     browseContext.ownedContentIds,
   );
 
+  const canManageSettings = session.permissions.includes("settings.media");
+  const mediaSettings = canManageSettings
+    ? await getMediaSettings()
+    : undefined;
+  const initialTab = params.tab === "settings" ? "settings" : "files";
+
   return (
     <MediaLibrary
       browseFolder={browseFolder}
@@ -73,6 +76,9 @@ export default async function AdminMediaPage({
       subfolders={subfolders}
       canUpload={canUpload}
       deletableIds={deletableIds}
+      initialTab={initialTab}
+      canManageSettings={canManageSettings}
+      mediaSettings={mediaSettings}
     />
   );
 }

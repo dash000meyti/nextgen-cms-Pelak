@@ -1,8 +1,12 @@
+import { modulePermissionGroups } from "@nextgen-cms/contract/permissions";
 import type {
+  ContentGroupModuleSettings,
   ContentSettings,
+  LegacyModuleSettings,
   MediaSettings,
   MemberSettings,
   ModuleSettings,
+  VideoModuleSettings,
 } from "@nextgen-cms/contract/types/modules";
 import type {
   FeatureModules as LegacyFeatureModules,
@@ -52,10 +56,76 @@ export const DEFAULT_FEATURE_MODULES: LegacyFeatureModules = {
 };
 
 export const DEFAULT_MODULE_SETTINGS: ModuleSettings = {
-  contentGroup: { enabled: true, period: "seasonal" },
-  video: { enabled: true, pageTitle: "ویدیو", itemsPerPage: 12 },
-  newsletter: { enabled: false },
+  contentGroup: { enabled: true, label: "" },
+  video: { enabled: true, label: "" },
+  newsletter: { enabled: false, label: "" },
 };
+
+export const DEFAULT_CONTENT_GROUP_MODULE_SETTINGS: ContentGroupModuleSettings =
+  {
+    period: "seasonal",
+  };
+
+export const DEFAULT_VIDEO_MODULE_SETTINGS: VideoModuleSettings = {
+  pageTitle: "ویدیو",
+  itemsPerPage: 12,
+};
+
+function defaultModuleLabel(moduleId: keyof ModuleSettings): string {
+  const group = modulePermissionGroups.find((g) => g.id === moduleId);
+  return group?.label ?? moduleId;
+}
+
+export function normalizeModuleSettings(
+  stored: ModuleSettings | LegacyModuleSettings | null | undefined,
+): ModuleSettings {
+  if (!stored) return DEFAULT_MODULE_SETTINGS;
+
+  const contentGroup = stored.contentGroup ?? { enabled: false };
+  const video = stored.video ?? { enabled: false };
+  const newsletter = stored.newsletter ?? { enabled: false };
+
+  return {
+    contentGroup: {
+      enabled: contentGroup.enabled ?? false,
+      label:
+        contentGroup.label?.trim() || defaultModuleLabel("contentGroup"),
+    },
+    video: {
+      enabled: video.enabled ?? false,
+      label: video.label?.trim() || defaultModuleLabel("video"),
+    },
+    newsletter: {
+      enabled: newsletter.enabled ?? false,
+      label:
+        newsletter.label?.trim() || defaultModuleLabel("newsletter"),
+    },
+  };
+}
+
+export function normalizeContentGroupModuleSettings(
+  stored: ContentGroupModuleSettings | null | undefined,
+  legacyModuleSettings?: LegacyModuleSettings | null,
+): ContentGroupModuleSettings {
+  if (stored?.period) return stored;
+  if (legacyModuleSettings?.contentGroup?.period) {
+    return { period: legacyModuleSettings.contentGroup.period };
+  }
+  return DEFAULT_CONTENT_GROUP_MODULE_SETTINGS;
+}
+
+export function normalizeVideoModuleSettings(
+  stored: VideoModuleSettings | null | undefined,
+  legacyModuleSettings?: LegacyModuleSettings | null,
+): VideoModuleSettings {
+  if (stored) return stored;
+  const legacy = legacyModuleSettings?.video;
+  return {
+    pageTitle: legacy?.pageTitle ?? DEFAULT_VIDEO_MODULE_SETTINGS.pageTitle,
+    itemsPerPage:
+      legacy?.itemsPerPage ?? DEFAULT_VIDEO_MODULE_SETTINGS.itemsPerPage,
+  };
+}
 
 export const DEFAULT_MEDIA_SETTINGS: MediaSettings = {
   maxBytes: 5 * 1024 * 1024,
@@ -77,28 +147,23 @@ export const DEFAULT_CONTENT_SETTINGS: ContentSettings = {
 };
 
 export function featureModulesToModuleSettings(
-  legacy: LegacyFeatureModules | ModuleSettings,
+  legacy: LegacyFeatureModules | ModuleSettings | LegacyModuleSettings,
 ): ModuleSettings {
   if (
     "contentGroup" in legacy &&
     typeof legacy.contentGroup === "object" &&
     legacy.contentGroup !== null
   ) {
-    return legacy;
+    return normalizeModuleSettings(legacy as LegacyModuleSettings);
   }
   const flags = legacy as LegacyFeatureModules & { issues?: boolean };
-  return {
+  return normalizeModuleSettings({
     contentGroup: {
       enabled: flags.contentGroup ?? flags.issues ?? false,
-      period: "seasonal",
     },
-    video: {
-      enabled: flags.video,
-      pageTitle: DEFAULT_MODULE_SETTINGS.video.pageTitle,
-      itemsPerPage: DEFAULT_MODULE_SETTINGS.video.itemsPerPage,
-    },
+    video: { enabled: flags.video },
     newsletter: { enabled: flags.newsletter },
-  };
+  });
 }
 
 export function moduleSettingsToFeatureModules(

@@ -1,9 +1,30 @@
 export type ContentGroupPeriod = "yearly" | "seasonal" | "monthly" | "weekly";
 
 export type ModuleSettings = {
-  contentGroup: { enabled: boolean; period: ContentGroupPeriod };
-  video: { enabled: boolean; pageTitle: string; itemsPerPage: number };
-  newsletter: { enabled: boolean };
+  contentGroup: { enabled: boolean; label: string };
+  video: { enabled: boolean; label: string };
+  newsletter: { enabled: boolean; label: string };
+};
+
+export type ContentGroupModuleSettings = {
+  period: ContentGroupPeriod;
+};
+
+export type VideoModuleSettings = {
+  pageTitle: string;
+  itemsPerPage: number;
+};
+
+/** Legacy shape stored in module_settings before settings restructure */
+export type LegacyModuleSettings = {
+  contentGroup: { enabled: boolean; period?: ContentGroupPeriod; label?: string };
+  video: {
+    enabled: boolean;
+    pageTitle?: string;
+    itemsPerPage?: number;
+    label?: string;
+  };
+  newsletter: { enabled: boolean; label?: string };
 };
 
 export type MediaSettings = {

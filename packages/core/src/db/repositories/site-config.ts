@@ -1,23 +1,31 @@
-import { moduleSettingsToFeatureModules } from "@nextgen-cms/config/theme/defaults";
 import type {
+  ContentGroupModuleSettings,
   ContentSettings,
   MediaSettings,
   MemberSettings,
   ModuleSettings,
+  VideoModuleSettings,
 } from "@nextgen-cms/contract/types/modules";
 import type { SiteConfig } from "@nextgen-cms/contract/types/site";
 import type { FeatureModules } from "@nextgen-cms/contract/types/theme";
 import { db } from "@nextgen-cms/core/db";
 import {
+  mapContentGroupModuleSettingsRow,
   mapContentSettingsRow,
   mapFeatureModulesRow,
   mapMediaSettingsRow,
   mapMemberSettingsRow,
   mapModuleSettingsRow,
   mapSiteSettingsRow,
+  mapVideoModuleSettingsRow,
 } from "@nextgen-cms/core/db/mappers/site-config";
 import { siteSettings } from "@nextgen-cms/core/db/schema";
 import { eq } from "drizzle-orm";
+
+/** better-sqlite3 bind fails on nested JSON objects — store as string */
+function jsonColumn<T>(value: T): T {
+  return JSON.stringify(value) as T;
+}
 
 async function getSiteSettingsRow() {
   const rows = await db
@@ -57,46 +65,65 @@ export async function findContentSettings() {
   return mapContentSettingsRow(await getSiteSettingsRow());
 }
 
+export async function findContentGroupModuleSettings() {
+  return mapContentGroupModuleSettingsRow(await getSiteSettingsRow());
+}
+
+export async function findVideoModuleSettings() {
+  return mapVideoModuleSettingsRow(await getSiteSettingsRow());
+}
+
+/** @deprecated Use updateModuleSettings */
 export async function updateFeatureModules(modules: FeatureModules) {
+  const current = await findModuleSettings();
   await updateModuleSettings({
-    contentGroup: { enabled: modules.contentGroup, period: "seasonal" },
-    video: {
-      enabled: modules.video,
-      pageTitle: "ویدیو",
-      itemsPerPage: 12,
-    },
-    newsletter: { enabled: modules.newsletter },
+    contentGroup: { enabled: modules.contentGroup, label: current.contentGroup.label },
+    video: { enabled: modules.video, label: current.video.label },
+    newsletter: { enabled: modules.newsletter, label: current.newsletter.label },
   });
 }
 
 export async function updateModuleSettings(settings: ModuleSettings) {
   await db
     .update(siteSettings)
-    .set({
-      moduleSettings: settings,
-      featureModules: moduleSettingsToFeatureModules(settings),
-    })
+    .set({ moduleSettings: jsonColumn(settings) })
+    .where(eq(siteSettings.id, 1));
+}
+
+export async function updateContentGroupModuleSettings(
+  settings: ContentGroupModuleSettings,
+) {
+  await db
+    .update(siteSettings)
+    .set({ contentGroupModuleSettings: jsonColumn(settings) })
+    .where(eq(siteSettings.id, 1));
+}
+
+export async function updateVideoModuleSettings(settings: VideoModuleSettings) {
+  await db
+    .update(siteSettings)
+    .set({ videoModuleSettings: jsonColumn(settings) })
     .where(eq(siteSettings.id, 1));
 }
 
 export async function updateMediaSettings(settings: MediaSettings) {
   await db
     .update(siteSettings)
-    .set({ mediaSettings: settings })
+    .set({ mediaSettings: jsonColumn(settings) })
     .where(eq(siteSettings.id, 1));
 }
 
 export async function updateMemberSettings(settings: MemberSettings) {
   await db
     .update(siteSettings)
-    .set({ memberSettings: settings })
+    .set({ memberSettings: jsonColumn(settings) })
     .where(eq(siteSettings.id, 1));
 }
 
 export async function updateContentSettings(settings: ContentSettings) {
   await db
     .update(siteSettings)
-    .set({ contentSettings: settings })
+    .set({ contentSettings: jsonColumn(settings) })
     .where(eq(siteSettings.id, 1));
 }
 
@@ -111,16 +138,16 @@ export async function updateSiteSettings(data: Partial<SiteConfig>) {
   if (data.defaultDirection !== undefined) {
     payload.defaultDirection = data.defaultDirection;
   }
-  if (data.typography !== undefined) payload.typography = data.typography;
-  if (data.navSections !== undefined) payload.navSections = data.navSections;
+  if (data.typography !== undefined) payload.typography = jsonColumn(data.typography);
+  if (data.navSections !== undefined) payload.navSections = jsonColumn(data.navSections);
   if (data.utilityLinks !== undefined) {
-    payload.utilityLinks = data.utilityLinks;
+    payload.utilityLinks = jsonColumn(data.utilityLinks);
   }
   if (data.footerColumns !== undefined) {
-    payload.footerColumns = data.footerColumns;
+    payload.footerColumns = jsonColumn(data.footerColumns);
   }
-  if (data.socialLinks !== undefined) payload.socialLinks = data.socialLinks;
-  if (data.hotTopics !== undefined) payload.hotTopics = data.hotTopics;
+  if (data.socialLinks !== undefined) payload.socialLinks = jsonColumn(data.socialLinks);
+  if (data.hotTopics !== undefined) payload.hotTopics = jsonColumn(data.hotTopics);
   if (data.contactEmail !== undefined) payload.contactEmail = data.contactEmail;
 
   if (Object.keys(payload).length === 0) return;

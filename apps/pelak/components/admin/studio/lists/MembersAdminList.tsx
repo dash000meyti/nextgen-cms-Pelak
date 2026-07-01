@@ -1,6 +1,8 @@
 "use client";
 
+import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
+import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
 import { idColumn } from "@/components/admin/studio/document-list-columns";
 
 export type MembersAdminListRow = {
@@ -33,11 +35,19 @@ type MembersAdminListProps = {
 };
 
 export function MembersAdminList({ members, canEdit }: MembersAdminListProps) {
+  const { permissions } = useAdminMember();
+  const canManageSettings = permissions.includes("settings.members");
+
   return (
     <DocumentList
       title="اعضا"
       newHref="/admin/members/new"
       newLabel="عضؤ جدید"
+      toolbar={
+        canManageSettings ? (
+          <SectionSettingsLink href="/admin/members/settings" />
+        ) : null
+      }
       rows={members}
       rowKey={(row) => row.id}
       defaultSort={{ key: "name", direction: "asc" }}

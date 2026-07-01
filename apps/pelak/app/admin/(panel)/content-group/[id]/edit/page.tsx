@@ -1,4 +1,4 @@
-import { getModuleSettings } from "@nextgen-cms/site-data/get-content";
+import { getContentGroupModuleSettings } from "@nextgen-cms/site-data/get-content";
 import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
 import type { ContentGroupFormData } from "@nextgen-cms/studio/cms/mutations/content-group";
 import { getContentGroupForAdmin } from "@nextgen-cms/studio/cms/queries";
@@ -18,7 +18,7 @@ export default async function EditContentGroupPage({ params }: PageProps) {
   const group = await getContentGroupForAdmin(contentGroupId);
   if (!group) notFound();
 
-  const moduleSettings = await getModuleSettings();
+  const settings = await getContentGroupModuleSettings();
 
   const initial: ContentGroupFormData = {
     number: group.number,
@@ -37,7 +37,7 @@ export default async function EditContentGroupPage({ params }: PageProps) {
         mode="edit"
         contentGroupId={contentGroupId}
         initial={initial}
-        contentGroupPeriod={moduleSettings.contentGroup.period}
+        contentGroupPeriod={settings.period}
       />
     </div>
   );

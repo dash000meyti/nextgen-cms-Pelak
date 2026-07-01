@@ -31,12 +31,14 @@ import {
 } from "@nextgen-cms/core/db/repositories/members-public";
 import { findMostRead } from "@nextgen-cms/core/db/repositories/most-read";
 import {
+  findContentGroupModuleSettings,
   findContentSettings,
   findFeatureModules,
   findMediaSettings,
   findMemberSettings,
   findModuleSettings,
   findSiteConfig,
+  findVideoModuleSettings,
 } from "@nextgen-cms/core/db/repositories/site-config";
 import { findThemeTokens } from "@nextgen-cms/core/db/repositories/theme";
 import {
@@ -70,6 +72,18 @@ export const getModuleSettings = platformCache(
   ["module-settings"],
   [CACHE_TAGS.siteConfig],
   findModuleSettings,
+);
+
+export const getContentGroupModuleSettings = platformCache(
+  ["content-group-module-settings"],
+  [CACHE_TAGS.siteConfig],
+  findContentGroupModuleSettings,
+);
+
+export const getVideoModuleSettings = platformCache(
+  ["video-module-settings"],
+  [CACHE_TAGS.siteConfig],
+  findVideoModuleSettings,
 );
 
 export const getMediaSettings = platformCache(

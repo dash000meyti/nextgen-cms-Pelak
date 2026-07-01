@@ -29,22 +29,42 @@ const routeRedirects = [
   },
   {
     source: "/admin/settings/topics",
-    destination: "/admin/settings/content/topics",
+    destination: "/admin/content/topics",
     permanent: true,
   },
   {
     source: "/admin/settings/topics/:path*",
-    destination: "/admin/settings/content/topics/:path*",
+    destination: "/admin/content/topics/:path*",
     permanent: true,
   },
   {
     source: "/admin/topics",
-    destination: "/admin/settings/content/topics",
+    destination: "/admin/content/topics",
     permanent: true,
   },
   {
     source: "/admin/topics/:path*",
-    destination: "/admin/settings/content/topics/:path*",
+    destination: "/admin/content/topics/:path*",
+    permanent: true,
+  },
+  {
+    source: "/admin/settings/content",
+    destination: "/admin/content/settings",
+    permanent: true,
+  },
+  {
+    source: "/admin/settings/content/:path*",
+    destination: "/admin/content/:path*",
+    permanent: true,
+  },
+  {
+    source: "/admin/settings/members",
+    destination: "/admin/members/settings",
+    permanent: true,
+  },
+  {
+    source: "/admin/settings/media",
+    destination: "/admin/media?tab=settings",
     permanent: true,
   },
   { source: "/issues", destination: "/content-group", permanent: true },

@@ -20,17 +20,23 @@ const NAV_ITEMS = [
 const MODULE_NAV_ITEMS = [
   {
     href: "/admin/content-group",
-    label: "گروه‌های محتوا",
-    permission: "modules.contentGroup.view" as Permission,
     module: "contentGroup" as const,
+    permission: "modules.contentGroup.view" as Permission,
   },
   {
     href: "/admin/videos",
-    label: "ویدیو",
-    permission: "modules.video.view" as Permission,
     module: "video" as const,
+    permission: "modules.video.view" as Permission,
   },
 ] as const;
+
+type NavEntry =
+  | { href: string; label: string; exact?: boolean }
+  | {
+      href: string;
+      label: string;
+      module: (typeof MODULE_NAV_ITEMS)[number]["module"];
+    };
 
 function isActive(pathname: string, href: string, exact?: boolean) {
   if (exact) return pathname === href;
@@ -58,15 +64,20 @@ function canSeeModuleNavItem(
 
 export function AdminSidebar() {
   const pathname = usePathname();
-  const { permissions, enabledModules } = useAdminMember();
+  const { permissions, enabledModules, moduleLabels } = useAdminMember();
 
   const coreItems = NAV_ITEMS.filter((item) =>
     canSeeNavItem(permissions, item),
   );
-  const moduleItems = MODULE_NAV_ITEMS.filter((item) =>
+  const moduleItems: NavEntry[] = MODULE_NAV_ITEMS.filter((item) =>
     canSeeModuleNavItem(permissions, enabledModules, item),
-  );
-  const visibleItems = [
+  ).map((item) => ({
+    href: item.href,
+    label: moduleLabels[item.module],
+    module: item.module,
+  }));
+
+  const visibleItems: NavEntry[] = [
     ...coreItems.slice(0, 2),
     ...moduleItems,
     ...coreItems.slice(2),

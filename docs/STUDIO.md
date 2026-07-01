@@ -14,7 +14,7 @@
 
 ## تنظیمات (`/admin/settings`)
 
-هاب **۸ تب** مجوزمحور — تعریف در `packages/studio/src/admin/settings-tabs.ts`:
+هاب **۵ تب** مجوزمحور — تعریف در `packages/studio/src/admin/settings-tabs.ts`:
 
 | تب | مسیر | مجوز |
 |----|------|------|
@@ -22,14 +22,22 @@
 | سایت | `/admin/settings/site` | `settings.site` |
 | رنگ‌ها | `/admin/settings/theme` | `settings.theme` |
 | نقش‌ها | `/admin/settings/roles` | `settings.roles` |
-| محتوا | `/admin/settings/content` | `settings.content` |
-| اعضا | `/admin/settings/members` | `settings.members` |
-| مدیا | `/admin/settings/media` | `settings.media` |
 | ماژول‌ها | `/admin/settings/modules` | `settings.modules` |
 
 `/admin/settings` به اولین تب مجاز redirect می‌شود.
 
-**موضوعات** زیرمجموعهٔ تنظیمات محتوا — نه تب جدا: `/admin/settings/content/topics` (مجوز `settings.content`). مسیرهای قدیم (`/admin/settings/topics`, `/admin/topics`) → redirect.
+### تنظیمات بخش‌ها (خارج از هاب)
+
+| بخش | مسیر | مجوز |
+|-----|------|------|
+| محتوا | `/admin/content/settings` | `settings.content` |
+| موضوعات | `/admin/content/topics` | `settings.content` |
+| اعضا | `/admin/members/settings` | `settings.members` |
+| مدیا | تب «تنظیمات» در `/admin/media` | `settings.media` |
+| گروه محتوا | `/admin/content-group/settings` | `modules.contentGroup.edit` |
+| ویدیو | `/admin/videos/settings` | `modules.video.edit` |
+
+مسیرهای قدیم (`/admin/settings/content`, `/admin/settings/topics`, …) → redirect.
 
 ## مسیرهای دیگر
 
@@ -78,16 +86,21 @@ packages/core/src/db/repositories/ — نوشتن DB
 
 | عمل | مجوز | UI |
 |-----|------|-----|
-| toggle فعال/غیرفعال ماژول | `settings.modules` | `/admin/settings/modules` |
+| نام نمایشی + فعال/غیرفعال ماژول | `settings.modules` | `/admin/settings/modules` |
 | CRUD محتوای ماژول | `modules.*` | `/admin/content-group`, `/admin/videos` |
+| تنظیمات بخش ماژول | `modules.*.edit` | `/admin/content-group/settings`, `/admin/videos/settings` |
 | مدیریت خبرنامه | `modules.newsletter.manage` | تنظیمات ماژول |
 
 ## ماژول‌ها
 
 `ModuleSettings` در `site_settings.module_settings`:
-- `contentGroup`: فعال/غیرفعال + دوره (`yearly|seasonal|monthly|weekly`)
-- `video`: فعال + عنوان صفحه + تعداد در صفحه
-- `newsletter`: فعال/غیرفعال
+- `contentGroup` / `video` / `newsletter`: فعال/غیرفعال + `label` (نام منوی کنار)
+
+تنظیمات بخش ماژول (ستون‌های جدا):
+- `content_group_module_settings`: `period` (`yearly|seasonal|monthly|weekly`)
+- `video_module_settings`: `pageTitle`, `itemsPerPage`
+
+برچسب پیش‌فرض: `packages/contract/src/modules/labels.ts` + `modulePermissionGroups`
 
 جزئیات تم: `docs/THEMING.md`
 
@@ -107,7 +120,7 @@ packages/core/src/db/repositories/ — نوشتن DB
 
 - آپلود: `packages/studio/src/cms/mutations/media.ts`
 - promote یکپارچه: `packages/core/src/media/promote-media.ts`
-- تنظیمات: تب `/admin/settings/media` — max size، MIME، pipeline flags
+- تنظیمات: تب «تنظیمات» در `/admin/media` — max size، MIME، pipeline flags
 - serve: `GET /uploads/[[...path]]` — `packages/core/src/media/serve-access.ts`
 - پیش‌فرض‌ها: `packages/core/src/media/constants.ts` (fallback اگر DB خالی)
 

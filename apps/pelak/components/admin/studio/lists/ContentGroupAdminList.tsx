@@ -1,6 +1,7 @@
 "use client";
 
 import { DocumentList } from "@/components/admin/studio/DocumentList";
+import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
 import { idColumn } from "@/components/admin/studio/document-list-columns";
 
 export type ContentGroupAdminListRow = {
@@ -21,6 +22,7 @@ export function ContentGroupAdminList({ groups }: ContentGroupAdminListProps) {
       title="گروه‌های محتوا"
       newHref="/admin/content-group/new"
       newLabel="گروه محتوای جدید"
+      toolbar={<SectionSettingsLink href="/admin/content-group/settings" />}
       rows={groups}
       rowKey={(row) => row.id}
       defaultSort={{ key: "number", direction: "asc" }}

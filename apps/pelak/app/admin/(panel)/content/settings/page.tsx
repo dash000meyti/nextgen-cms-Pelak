@@ -5,16 +5,25 @@ import Link from "next/link";
 import { ContentSettingsForm } from "@/components/admin/studio/ContentSettingsForm";
 
 export const metadata: Metadata = {
-  title: "محتوا — تنظیمات",
+  title: "تنظیمات محتوا",
   robots: { index: false, follow: false },
 };
 
-export default async function ContentSettingsPage() {
+export default async function ContentSectionSettingsPage() {
   await requirePermission("settings.content");
   const contentSettings = await getContentSettings();
 
   return (
     <div className="space-y-10">
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="font-heading text-2xl text-ink">تنظیمات محتوا</h1>
+        <Link
+          href="/admin/content"
+          className="text-sm text-ink-muted hover:text-accent"
+        >
+          بازگشت به محتوا
+        </Link>
+      </div>
       <ContentSettingsForm value={contentSettings} />
       <section className="border-t border-rule pt-10">
         <div className="flex items-center justify-between gap-4">
@@ -25,7 +34,7 @@ export default async function ContentSettingsPage() {
             </p>
           </div>
           <Link
-            href="/admin/settings/content/topics"
+            href="/admin/content/topics"
             className="rounded border border-rule px-4 py-2 text-sm text-ink hover:border-accent hover:text-accent"
           >
             مدیریت موضوعات

@@ -6,24 +6,24 @@ import {
   invalidateThemeConfig,
 } from "@nextgen-cms/config/cache";
 import type {
+  ContentGroupModuleSettings,
   ContentSettings,
   MediaSettings,
   MemberSettings,
   ModuleSettings,
+  VideoModuleSettings,
 } from "@nextgen-cms/contract/types/modules";
 import type { SiteConfig } from "@nextgen-cms/contract/types/site";
-import type {
-  FeatureModules,
-  ThemeTokens,
-} from "@nextgen-cms/contract/types/theme";
+import type { ThemeTokens } from "@nextgen-cms/contract/types/theme";
 import { PermissionDeniedError } from "@nextgen-cms/core/db/access/permission-denied-error";
 import {
+  updateContentGroupModuleSettings,
   updateContentSettings,
-  updateFeatureModules,
   updateMediaSettings,
   updateMemberSettings,
   updateModuleSettings,
   updateSiteSettings,
+  updateVideoModuleSettings,
 } from "@nextgen-cms/core/db/repositories/site-config";
 import { updateThemeTokens } from "@nextgen-cms/core/db/repositories/theme";
 import { clearMediaSettingsCache } from "@nextgen-cms/core/media/settings";
@@ -50,24 +50,40 @@ export async function saveThemeTokens(data: ThemeTokens) {
   }
 }
 
-export async function saveFeatureModules(data: FeatureModules) {
-  const sessionOrDenied = await requirePermissionMutation("settings.modules");
-  if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
-
-  try {
-    await updateFeatureModules(data);
-    invalidateSiteConfig();
-  } catch (error) {
-    return handleMutationError(error);
-  }
-}
-
 export async function saveModuleSettings(data: ModuleSettings) {
   const sessionOrDenied = await requirePermissionMutation("settings.modules");
   if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
 
   try {
     await updateModuleSettings(data);
+    invalidateSiteConfig();
+  } catch (error) {
+    return handleMutationError(error);
+  }
+}
+
+export async function saveContentGroupModuleSettings(
+  data: ContentGroupModuleSettings,
+) {
+  const sessionOrDenied = await requirePermissionMutation(
+    "modules.contentGroup.edit",
+  );
+  if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
+
+  try {
+    await updateContentGroupModuleSettings(data);
+    invalidateSiteConfig();
+  } catch (error) {
+    return handleMutationError(error);
+  }
+}
+
+export async function saveVideoModuleSettings(data: VideoModuleSettings) {
+  const sessionOrDenied = await requirePermissionMutation("modules.video.edit");
+  if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
+
+  try {
+    await updateVideoModuleSettings(data);
     invalidateSiteConfig();
   } catch (error) {
     return handleMutationError(error);

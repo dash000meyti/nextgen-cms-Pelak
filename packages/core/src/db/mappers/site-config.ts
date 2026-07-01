@@ -1,16 +1,24 @@
 import {
+  DEFAULT_CONTENT_GROUP_MODULE_SETTINGS,
   DEFAULT_CONTENT_SETTINGS,
   DEFAULT_MEDIA_SETTINGS,
   DEFAULT_MEMBER_SETTINGS,
   DEFAULT_MODULE_SETTINGS,
+  DEFAULT_VIDEO_MODULE_SETTINGS,
   featureModulesToModuleSettings,
   moduleSettingsToFeatureModules,
+  normalizeContentGroupModuleSettings,
+  normalizeModuleSettings,
+  normalizeVideoModuleSettings,
 } from "@nextgen-cms/config/theme/defaults";
 import type {
+  ContentGroupModuleSettings,
   ContentSettings,
+  LegacyModuleSettings,
   MediaSettings,
   MemberSettings,
   ModuleSettings,
+  VideoModuleSettings,
 } from "@nextgen-cms/contract/types/modules";
 import type { SiteConfig } from "@nextgen-cms/contract/types/site";
 import type { FeatureModules } from "@nextgen-cms/contract/types/theme";
@@ -22,6 +30,12 @@ function parseJson<T>(value: T | string | null | undefined): T | null {
     return JSON.parse(value) as T;
   }
   return value;
+}
+
+function parseLegacyModuleSettings(
+  row: SiteSettingsRow,
+): LegacyModuleSettings | null {
+  return parseJson<LegacyModuleSettings>(row.moduleSettings);
 }
 
 export function mapSiteSettingsRow(row: SiteSettingsRow): SiteConfig {
@@ -48,11 +62,27 @@ export function mapFeatureModulesRow(row: SiteSettingsRow): FeatureModules {
 }
 
 export function mapModuleSettingsRow(row: SiteSettingsRow): ModuleSettings {
-  const stored = parseJson<ModuleSettings>(row.moduleSettings);
-  if (stored) return stored;
+  const stored = parseLegacyModuleSettings(row);
+  if (stored) return normalizeModuleSettings(stored);
   const legacy = parseJson<FeatureModules>(row.featureModules);
   if (legacy) return featureModulesToModuleSettings(legacy);
   return DEFAULT_MODULE_SETTINGS;
+}
+
+export function mapContentGroupModuleSettingsRow(
+  row: SiteSettingsRow,
+): ContentGroupModuleSettings {
+  const stored = parseJson<ContentGroupModuleSettings>(
+    row.contentGroupModuleSettings,
+  );
+  return normalizeContentGroupModuleSettings(stored, parseLegacyModuleSettings(row));
+}
+
+export function mapVideoModuleSettingsRow(
+  row: SiteSettingsRow,
+): VideoModuleSettings {
+  const stored = parseJson<VideoModuleSettings>(row.videoModuleSettings);
+  return normalizeVideoModuleSettings(stored, parseLegacyModuleSettings(row));
 }
 
 export function mapMediaSettingsRow(row: SiteSettingsRow): MediaSettings {

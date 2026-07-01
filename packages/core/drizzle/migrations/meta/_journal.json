@@ -78,6 +78,13 @@
       "when": 1782662000000,
       "tag": "0010_rename_issues_to_content_groups",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1782663000000,
+      "tag": "0011_module_section_settings",
+      "breakpoints": true
     }
   ]
 }

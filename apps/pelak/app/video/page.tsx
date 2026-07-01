@@ -1,4 +1,7 @@
-import { getVideos } from "@nextgen-cms/site-data/get-content";
+import {
+  getVideoModuleSettings,
+  getVideos,
+} from "@nextgen-cms/site-data/get-content";
 import { requireFeatureModule } from "@nextgen-cms/site-data/require-feature-module";
 import type { Metadata } from "next";
 import { SectionHeader } from "@/components/article/SectionHeader";
@@ -7,23 +10,29 @@ import { Container } from "@/components/layout/Container";
 import { VideoCard } from "@/components/video/VideoCard";
 import { VideoCardGrid } from "@/components/video/VideoCardGrid";
 
-export const metadata: Metadata = {
-  title: "ویدیوها",
-  description: "ویدیوها و گفت‌و‌گوهای هفته‌نامه حکمران",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getVideoModuleSettings();
+  return {
+    title: settings.pageTitle,
+    description: "ویدیوها و گفت‌و‌گوهای هفته‌نامه حکمران",
+  };
+}
 
 export default async function VideoPage() {
   await requireFeatureModule("video");
-  const videos = await getVideos();
+  const [allVideos, settings] = await Promise.all([
+    getVideos(),
+    getVideoModuleSettings(),
+  ]);
+  const videos = allVideos.slice(0, settings.itemsPerPage);
+  const title = settings.pageTitle;
 
   return (
     <Container className="py-8 md:py-14">
-      <Breadcrumbs
-        items={[{ label: "خانه", href: "/" }, { label: "ویدیوها" }]}
-      />
+      <Breadcrumbs items={[{ label: "خانه", href: "/" }, { label: title }]} />
       <div className="mt-6">
         <SectionHeader
-          title="ویدیوها"
+          title={title}
           description="گفت‌و‌گوها و تحلیل‌های ویدیویی هفته‌نامه حکمران."
         />
       </div>

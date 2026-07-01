@@ -13,6 +13,10 @@ export type AdminMemberContextValue = {
     contentGroup: boolean;
     video: boolean;
   };
+  moduleLabels: {
+    contentGroup: string;
+    video: string;
+  };
 };
 
 const AdminMemberContext = createContext<AdminMemberContextValue | null>(null);

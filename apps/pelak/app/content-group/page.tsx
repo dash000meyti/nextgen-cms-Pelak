@@ -1,7 +1,7 @@
 import { CONTENT_GROUP_PERIOD_LABELS } from "@nextgen-cms/contract/cms-schema/content-group";
 import {
+  getContentGroupModuleSettings,
   getContentGroups,
-  getModuleSettings,
 } from "@nextgen-cms/site-data/get-content";
 import { requireFeatureModule } from "@nextgen-cms/site-data/require-feature-module";
 import type { Metadata } from "next";
@@ -12,8 +12,8 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Container } from "@/components/layout/Container";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const moduleSettings = await getModuleSettings();
-  const title = CONTENT_GROUP_PERIOD_LABELS[moduleSettings.contentGroup.period];
+  const settings = await getContentGroupModuleSettings();
+  const title = CONTENT_GROUP_PERIOD_LABELS[settings.period];
   return {
     title,
     description: `آرشیو گروه‌های محتوای ${title} حکمران`,
@@ -22,11 +22,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ContentGroupsPage() {
   await requireFeatureModule("contentGroup");
-  const [groups, moduleSettings] = await Promise.all([
+  const [groups, settings] = await Promise.all([
     getContentGroups(),
-    getModuleSettings(),
+    getContentGroupModuleSettings(),
   ]);
-  const title = CONTENT_GROUP_PERIOD_LABELS[moduleSettings.contentGroup.period];
+  const title = CONTENT_GROUP_PERIOD_LABELS[settings.period];
 
   return (
     <Container className="py-8 md:py-14">

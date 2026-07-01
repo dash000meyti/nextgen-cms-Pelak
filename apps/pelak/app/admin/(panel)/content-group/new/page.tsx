@@ -2,15 +2,15 @@ import {
   currentJalaliYear,
   todayIsoIran,
 } from "@nextgen-cms/core/platform/datetime";
-import { getModuleSettings } from "@nextgen-cms/site-data/get-content";
+import { getContentGroupModuleSettings } from "@nextgen-cms/site-data/get-content";
 import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
 import type { ContentGroupFormData } from "@nextgen-cms/studio/cms/mutations/content-group";
 import { ContentGroupForm } from "@/components/admin/studio/ContentGroupForm";
 
 export default async function NewContentGroupPage() {
   await requirePermission("modules.contentGroup.create");
-  const moduleSettings = await getModuleSettings();
-  const period = moduleSettings.contentGroup.period;
+  const settings = await getContentGroupModuleSettings();
+  const period = settings.period;
 
   const EMPTY_FORM: ContentGroupFormData = {
     number: 1,

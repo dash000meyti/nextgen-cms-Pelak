@@ -121,5 +121,5 @@ export async function deleteTopic(id: number): Promise<MutationResult> {
 export async function createTopicAndRedirect(data: TopicFormData) {
   const result = await createTopic(data);
   if (!result.ok) return result;
-  redirect(`/admin/settings/content/topics/${result.id}/edit`);
+  redirect(`/admin/content/topics/${result.id}/edit`);
 }

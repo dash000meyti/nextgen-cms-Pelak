@@ -1,8 +1,10 @@
 import type {
+  ContentGroupModuleSettings,
   ContentSettings,
   MediaSettings,
   MemberSettings,
   ModuleSettings,
+  VideoModuleSettings,
 } from "@nextgen-cms/contract/types/modules";
 import type {
   FooterColumn,
@@ -33,6 +35,12 @@ export const siteSettings = sqliteTable("site_settings", {
   contactEmail: text("contact_email").notNull(),
   featureModules: text("feature_modules").notNull().$type<FeatureModules>(),
   moduleSettings: text("module_settings").$type<ModuleSettings>(),
+  contentGroupModuleSettings: text(
+    "content_group_module_settings",
+  ).$type<ContentGroupModuleSettings>(),
+  videoModuleSettings: text(
+    "video_module_settings",
+  ).$type<VideoModuleSettings>(),
   mediaSettings: text("media_settings").$type<MediaSettings>(),
   memberSettings: text("member_settings").$type<MemberSettings>(),
   contentSettings: text("content_settings").$type<ContentSettings>(),

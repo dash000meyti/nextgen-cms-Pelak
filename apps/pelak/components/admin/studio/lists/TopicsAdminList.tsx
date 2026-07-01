@@ -18,12 +18,12 @@ export function TopicsAdminList({ topics }: TopicsAdminListProps) {
   return (
     <DocumentList
       title=""
-      newHref="/admin/settings/content/topics/new"
+      newHref="/admin/content/topics/new"
       newLabel="موضوع جدید"
       rows={topics}
       rowKey={(row) => row.id}
       defaultSort={{ key: "name", direction: "asc" }}
-      editHref={(row) => `/admin/settings/content/topics/${row.id}/edit`}
+      editHref={(row) => `/admin/content/topics/${row.id}/edit`}
       columns={[
         idColumn<TopicsAdminListRow>(),
         {

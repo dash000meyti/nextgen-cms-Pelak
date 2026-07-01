@@ -2,6 +2,7 @@
 
 import { getFolderBrowseLabel } from "@nextgen-cms/contract/media/folder-display";
 import type { MediaAsset } from "@nextgen-cms/contract/types/media";
+import type { MediaSettings } from "@nextgen-cms/contract/types/modules";
 import {
   deleteMedia,
   uploadMedia,
@@ -11,8 +12,8 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { FolderBreadcrumb } from "@/components/admin/media/FolderBreadcrumb";
 import { MediaGrid } from "@/components/admin/media/MediaGrid";
-import { MediaSettingsTab } from "@/components/admin/media/MediaSettingsTab";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { MediaSettingsForm } from "@/components/admin/studio/MediaSettingsForm";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
 
 type MediaLibraryProps = {
@@ -22,6 +23,9 @@ type MediaLibraryProps = {
   subfolders: string[];
   canUpload: boolean;
   deletableIds: number[];
+  initialTab?: "files" | "settings";
+  canManageSettings: boolean;
+  mediaSettings?: MediaSettings;
 };
 
 type TabId = "files" | "settings";
@@ -33,10 +37,15 @@ export function MediaLibrary({
   subfolders,
   canUpload,
   deletableIds,
+  initialTab = "files",
+  canManageSettings,
+  mediaSettings,
 }: MediaLibraryProps) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [tab, setTab] = useState<TabId>("files");
+  const [tab, setTab] = useState<TabId>(
+    initialTab === "settings" && canManageSettings ? "settings" : "files",
+  );
   const [pending, startTransition] = useTransition();
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -113,35 +122,37 @@ export function MediaLibrary({
         ) : null}
       </div>
 
-      <div className="flex gap-2 border-b border-rule">
-        <button
-          type="button"
-          onClick={() => setTab("files")}
-          className={`border-b-2 px-3 py-2 text-sm ${
-            tab === "files"
-              ? "border-accent text-ink"
-              : "border-transparent text-ink-muted hover:text-ink"
-          }`}
-        >
-          فایل‌ها
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("settings")}
-          className={`border-b-2 px-3 py-2 text-sm ${
-            tab === "settings"
-              ? "border-accent text-ink"
-              : "border-transparent text-ink-muted hover:text-ink"
-          }`}
-        >
-          تنظیمات
-        </button>
-      </div>
+      {canManageSettings ? (
+        <div className="flex gap-2 border-b border-rule">
+          <button
+            type="button"
+            onClick={() => setTab("files")}
+            className={`border-b-2 px-3 py-2 text-sm ${
+              tab === "files"
+                ? "border-accent text-ink"
+                : "border-transparent text-ink-muted hover:text-ink"
+            }`}
+          >
+            فایل‌ها
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("settings")}
+            className={`border-b-2 px-3 py-2 text-sm ${
+              tab === "settings"
+                ? "border-accent text-ink"
+                : "border-transparent text-ink-muted hover:text-ink"
+            }`}
+          >
+            تنظیمات
+          </button>
+        </div>
+      ) : null}
 
       <FormMessage error={error} success={success} />
 
-      {tab === "settings" ? (
-        <MediaSettingsTab />
+      {tab === "settings" && canManageSettings && mediaSettings ? (
+        <MediaSettingsForm value={mediaSettings} />
       ) : (
         <div className="space-y-6">
           <FolderBreadcrumb folder={browseFolder} />

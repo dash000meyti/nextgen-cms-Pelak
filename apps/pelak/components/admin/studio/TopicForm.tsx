@@ -69,7 +69,7 @@ export function TopicForm({ mode, topicId, initial }: TopicFormProps) {
         setError(result.error);
         return;
       }
-      router.push("/admin/settings/content/topics");
+      router.push("/admin/content/topics");
       router.refresh();
     });
   }

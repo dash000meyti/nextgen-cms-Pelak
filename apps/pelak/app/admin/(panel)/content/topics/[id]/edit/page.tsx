@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { TopicForm } from "@/components/admin/studio/TopicForm";
 
 export const metadata: Metadata = {
-  title: "ویرایش موضوع — تنظیمات محتوا",
+  title: "ویرایش موضوع",
   robots: { index: false, follow: false },
 };
 
@@ -35,7 +35,7 @@ export default async function EditContentTopicPage({ params }: PageProps) {
       <div className="flex items-center justify-between gap-4">
         <h2 className="font-heading text-xl text-ink">ویرایش موضوع</h2>
         <Link
-          href="/admin/settings/content/topics"
+          href="/admin/content/topics"
           className="text-sm text-ink-muted hover:text-accent"
         >
           بازگشت به موضوعات

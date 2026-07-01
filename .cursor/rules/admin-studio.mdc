@@ -23,15 +23,16 @@ requirePermissionMutation("…") → validate → repository write → invalidat
 
 ## RBAC
 
-- `settings.*` — تب‌های `/admin/settings/*`
+- `settings.*` — تب‌های هاب `/admin/settings/*` (۵ تب)
 - `content.*` / `members.*` / `media.*` — بخش هسته
 - `modules.*` — CRUD ماژول (`/admin/content-group`, `/admin/videos`)
-- `settings.modules` — فقط toggle فعال/غیرفعال ماژول
-- موضوعات: `/admin/settings/content/topics` — مجوز `settings.content`
+- `settings.modules` — نام نمایشی + فعال/غیرفعال ماژول
+- موضوعات: `/admin/content/topics` — مجوز `settings.content`
 
 ## Settings hub
 
-- ۸ تب: `packages/studio/src/admin/settings-tabs.ts`
+- ۵ تب: `packages/studio/src/admin/settings-tabs.ts`
+- تنظیمات بخش: `/admin/content/settings`, `/admin/members/settings`, تب مدیا، `/admin/content-group/settings`, `/admin/videos/settings`
 - layout: بدون هیچ `settings.*` → `forbidden()`
 
 ## Schema-driven

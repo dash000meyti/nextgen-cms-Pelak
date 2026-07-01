@@ -47,13 +47,14 @@ export {
   saveRole,
 } from "@nextgen-cms/studio/cms/mutations/role";
 export {
+  saveContentGroupModuleSettings,
   saveContentSettings,
-  saveFeatureModules,
   saveMediaSettings,
   saveMemberSettings,
   saveModuleSettings,
   saveSiteSettings,
   saveThemeTokens,
+  saveVideoModuleSettings,
 } from "@nextgen-cms/studio/cms/mutations/settings";
 export {
   createTopic,

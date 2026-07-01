@@ -27,9 +27,10 @@ description: راهنمای Studio CMS و افزودن document type در پلت
 
 ## Settings
 
-- هاب ۸ تب: `/admin/settings/<tab>` — `packages/studio/src/admin/settings-tabs.ts`
-- موضوعات: `/admin/settings/content/topics` — زیر تنظیمات محتوا (`settings.content`)، نه تب جدا
-- ماژول‌ها: `settings.modules` = toggle · `modules.*` = CRUD — `ModuleSettingsEditor`
+- هاب ۵ تب: `/admin/settings/<tab>` — `packages/studio/src/admin/settings-tabs.ts`
+- تنظیمات بخش: `/admin/content/settings`, `/admin/members/settings`, تب مدیا، `/admin/content-group/settings`, `/admin/videos/settings`
+- موضوعات: `/admin/content/topics` — (`settings.content`)
+- ماژول‌ها: `settings.modules` = نام + toggle · `modules.*` = CRUD — `ModuleSettingsEditor`
 
 ## Publish
 
@@ -44,7 +45,7 @@ description: راهنمای Studio CMS و افزودن document type در پلت
 ## Media
 
 `ImageField` + `uploadMedia` → URL `/uploads/{uuid}.ext`
-تنظیمات: `/admin/settings/media`
+تنظیمات: تب «تنظیمات» در `/admin/media`
 
 ## قوانین
 

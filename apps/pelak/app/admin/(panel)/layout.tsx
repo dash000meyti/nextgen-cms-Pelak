@@ -1,3 +1,4 @@
+import { getModuleAdminLabel } from "@nextgen-cms/contract/modules/labels";
 import { getModuleSettings } from "@nextgen-cms/site-data/get-content";
 import { logoutAdmin } from "@nextgen-cms/studio/admin/actions";
 import { AdminMemberProvider } from "@nextgen-cms/studio/admin/admin-member-context";
@@ -27,6 +28,10 @@ export default async function AdminPanelLayout({
     enabledModules: {
       contentGroup: moduleSettings.contentGroup.enabled,
       video: moduleSettings.video.enabled,
+    },
+    moduleLabels: {
+      contentGroup: getModuleAdminLabel("contentGroup", moduleSettings),
+      video: getModuleAdminLabel("video", moduleSettings),
     },
   };
 

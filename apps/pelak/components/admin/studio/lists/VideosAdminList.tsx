@@ -2,6 +2,7 @@
 
 import { DocumentList } from "@/components/admin/studio/DocumentList";
 import { DocumentListThumbnail } from "@/components/admin/studio/DocumentListThumbnail";
+import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
 import { idColumn } from "@/components/admin/studio/document-list-columns";
 
 export type VideosAdminListRow = {
@@ -24,6 +25,7 @@ export function VideosAdminList({ videos }: VideosAdminListProps) {
       title="ویدیوها"
       newHref="/admin/videos/new"
       newLabel="ویدیو جدید"
+      toolbar={<SectionSettingsLink href="/admin/videos/settings" />}
       rows={videos}
       rowKey={(row) => row.id}
       defaultSort={{ key: "publishedAt", direction: "asc" }}

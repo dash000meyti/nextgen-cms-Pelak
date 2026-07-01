@@ -1,12 +1,14 @@
 "use client";
 
 import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
+import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import Link from "next/link";
 import { DeleteArchivedArticleButton } from "@/components/admin/studio/DeleteArchivedArticleButton";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
 import { DocumentListThumbnail } from "@/components/admin/studio/DocumentListThumbnail";
 import { idColumn } from "@/components/admin/studio/document-list-columns";
 import { RestoreArticleButton } from "@/components/admin/studio/RestoreArticleButton";
+import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
 import { StatusBadge } from "@/components/admin/studio/StatusBadge";
 import { TableActionLink } from "@/components/admin/studio/TableActionButton";
 
@@ -36,12 +38,38 @@ type ContentAdminListProps = {
 
 export function ContentAdminList({ articles, status }: ContentAdminListProps) {
   const isArchivedTab = status === "archived";
+  const { permissions } = useAdminMember();
+  const canManageSettings = permissions.includes("settings.content");
 
   return (
     <DocumentList
       title="محتوا"
       newHref="/admin/content/new"
       newLabel="محتوای جدید"
+      toolbar={
+        <div className="flex flex-wrap items-center gap-2">
+          {STATUS_OPTIONS.map((option) => (
+            <Link
+              key={option.value}
+              href={
+                option.value === "all"
+                  ? "/admin/content"
+                  : `/admin/content?status=${option.value}`
+              }
+              className={`rounded px-3 py-1.5 text-xs ${
+                status === option.value
+                  ? "bg-accent-soft text-accent"
+                  : "border border-rule text-ink-muted hover:text-ink"
+              }`}
+            >
+              {option.label}
+            </Link>
+          ))}
+          {canManageSettings ? (
+            <SectionSettingsLink href="/admin/content/settings" />
+          ) : null}
+        </div>
+      }
       rows={articles}
       rowKey={(row) => row.id}
       defaultSort={{ key: "updated", direction: "desc" }}
@@ -69,27 +97,6 @@ export function ContentAdminList({ articles, status }: ContentAdminListProps) {
               </>
             )
           : undefined
-      }
-      toolbar={
-        <div className="flex flex-wrap gap-2">
-          {STATUS_OPTIONS.map((option) => (
-            <Link
-              key={option.value}
-              href={
-                option.value === "all"
-                  ? "/admin/content"
-                  : `/admin/content?status=${option.value}`
-              }
-              className={`rounded px-3 py-1.5 text-xs ${
-                status === option.value
-                  ? "bg-accent-soft text-accent"
-                  : "border border-rule text-ink-muted hover:text-ink"
-              }`}
-            >
-              {option.label}
-            </Link>
-          ))}
-        </div>
       }
       columns={[
         {

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { TopicsAdminList } from "@/components/admin/studio/lists/TopicsAdminList";
 
 export const metadata: Metadata = {
-  title: "موضوعات — تنظیمات محتوا",
+  title: "موضوعات",
   robots: { index: false, follow: false },
 };
 
@@ -18,7 +18,7 @@ export default async function ContentTopicsPage() {
       <div className="flex items-center justify-between gap-4">
         <h2 className="font-heading text-xl text-ink">موضوعات</h2>
         <Link
-          href="/admin/settings/content"
+          href="/admin/content/settings"
           className="text-sm text-ink-muted hover:text-accent"
         >
           بازگشت به تنظیمات محتوا

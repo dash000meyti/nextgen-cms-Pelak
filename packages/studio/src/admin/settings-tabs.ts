@@ -5,9 +5,6 @@ export type SettingsTabId =
   | "site"
   | "theme"
   | "roles"
-  | "content"
-  | "members"
-  | "media"
   | "modules";
 
 export type SettingsTab = {
@@ -41,24 +38,6 @@ export const SETTINGS_TABS: SettingsTab[] = [
     label: "نقش‌ها",
     href: "/admin/settings/roles",
     permission: "settings.roles",
-  },
-  {
-    id: "content",
-    label: "محتوا",
-    href: "/admin/settings/content",
-    permission: "settings.content",
-  },
-  {
-    id: "members",
-    label: "اعضا",
-    href: "/admin/settings/members",
-    permission: "settings.members",
-  },
-  {
-    id: "media",
-    label: "مدیا",
-    href: "/admin/settings/media",
-    permission: "settings.media",
   },
   {
     id: "modules",

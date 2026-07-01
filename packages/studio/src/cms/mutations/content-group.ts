@@ -12,7 +12,8 @@ import {
   insertContentGroup,
   updateContentGroup,
 } from "@nextgen-cms/core/db/repositories/content-groups-admin";
-import { promoteContentGroupCoverSrc } from "@nextgen-cms/core/media/promote-content-group-cover";
+import { contentGroupPath } from "@nextgen-cms/core/media/path-policy";
+import { promoteMediaToFolder } from "@nextgen-cms/core/media/promote-media";
 import { parseJalaliInput } from "@nextgen-cms/core/platform/datetime";
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";
@@ -82,7 +83,7 @@ async function resolveContentGroupCoverSrc(
   coverSrc: string,
 ): Promise<string> {
   if (!coverSrc.trim()) return coverSrc;
-  return promoteContentGroupCoverSrc(contentGroupId, coverSrc);
+  return promoteMediaToFolder(coverSrc, contentGroupPath(contentGroupId));
 }
 
 export async function createContentGroup(

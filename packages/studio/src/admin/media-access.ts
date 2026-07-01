@@ -3,13 +3,13 @@ import type { MediaAsset } from "@nextgen-cms/contract/types/media";
 import type { MemberSession } from "@nextgen-cms/contract/types/member";
 import { PERMISSION_DENIED } from "@nextgen-cms/core/db/access/permission-messages";
 import {
-  contentGroupPath,
   contentPath,
   isContentGroupMediaPath,
+  isMemberDraftPath,
   isVideoMediaPath,
   memberAvatarPath,
-  videoPath,
-  writerDraftPath,
+  memberDraftPath,
+  sitePath,
 } from "@nextgen-cms/core/media/path-policy";
 import { hasPermission } from "@nextgen-cms/studio/admin/article-access";
 
@@ -66,22 +66,21 @@ export function canReadFolder(
   if (hasFullMediaAccess(session)) return true;
 
   const normalized = normalizeFolderPath(folder);
-  const draftPath = writerDraftPath(session.memberId);
+  const draftPath = memberDraftPath(session.memberId);
   if (normalized === draftPath || normalized.startsWith(draftPath)) {
     return true;
   }
 
-  if (
-    normalized === normalizeFolderPath("shared") ||
-    normalized.startsWith("shared/")
-  ) {
+  const site = sitePath();
+  if (normalized === site || normalized.startsWith(site)) {
     return false;
   }
 
-  if (
-    normalized === normalizeFolderPath("archived") ||
-    normalized.startsWith("archived/")
-  ) {
+  if (normalized === normalizeFolderPath("members")) {
+    return false;
+  }
+
+  if (isMemberDraftPath(normalized.replace(/\/$/, ""))) {
     return false;
   }
 
@@ -144,9 +143,9 @@ export function canDeleteAsset(
 
 export function getDefaultMediaFolder(session: MemberSession): string {
   if (hasFullMediaAccess(session)) {
-    return normalizeFolderPath("shared/site");
+    return sitePath();
   }
-  return writerDraftPath(session.memberId);
+  return memberDraftPath(session.memberId);
 }
 
 export function getVirtualRootFolders(
@@ -155,15 +154,15 @@ export function getVirtualRootFolders(
 ): string[] {
   if (hasFullMediaAccess(session)) {
     return [
-      normalizeFolderPath("shared"),
+      sitePath(),
+      normalizeFolderPath("members"),
       normalizeFolderPath("content"),
       normalizeFolderPath("content-group"),
       normalizeFolderPath("videos"),
-      normalizeFolderPath("archived"),
     ];
   }
   const roots = [
-    writerDraftPath(session.memberId),
+    memberDraftPath(session.memberId),
     ...ownedContentIds.map((id) => contentPath(id)),
   ];
   if (canAccessContentGroupModule(session)) {

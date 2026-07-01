@@ -6,7 +6,7 @@ import {
   mediaAssets,
 } from "@nextgen-cms/core/db/schema";
 import { resolveUploadPublicPath } from "@nextgen-cms/core/media/urls";
-import { and, desc, eq, isNull, like, lt, or, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, like, or, sql } from "drizzle-orm";
 import { normalizeFolderPath } from "@nextgen-cms/contract/media/folder-path";
 
 export type ListMediaAssetsOptions = {
@@ -173,23 +173,6 @@ export async function updateMediaAssetFolder(
       ...(contentId !== undefined ? { contentId } : {}),
     })
     .where(eq(mediaAssets.id, id));
-}
-
-export async function listArchivedMediaAssetsOlderThan(
-  cutoffIso: string,
-): Promise<MediaAsset[]> {
-  const rows = await db
-    .select()
-    .from(mediaAssets)
-    .where(
-      and(
-        isNull(mediaAssets.deletedAt),
-        like(mediaAssets.folderPath, "archived/%"),
-        lt(mediaAssets.createdAt, cutoffIso),
-      ),
-    );
-
-  return rows.map(mapRowToMediaAsset);
 }
 
 export function buildPublicUrl(

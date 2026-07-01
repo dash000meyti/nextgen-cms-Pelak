@@ -19,8 +19,6 @@ import {
   updateArticle,
 } from "@nextgen-cms/core/db/repositories/articles";
 import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
-import { archiveMediaForContent } from "@nextgen-cms/core/media/archive";
-import { restoreMediaForContent } from "@nextgen-cms/core/media/content-media-lifecycle";
 import { promoteArticleMedia } from "@nextgen-cms/core/media/promote-article-media";
 import { purgeMediaForContent } from "@nextgen-cms/core/media/purge-folder";
 import {
@@ -259,13 +257,7 @@ export async function saveArticle(
   if (error) return { ok: false, error };
 
   try {
-    const mediaHome = existing.status === "archived" ? "archived" : "active";
-    const promoted = await promoteArticleMedia(
-      id,
-      input.heroSrc,
-      input.body,
-      mediaHome,
-    );
+    const promoted = await promoteArticleMedia(id, input.heroSrc, input.body);
     await updateArticle(
       id,
       promoted.changed
@@ -392,14 +384,9 @@ export async function archiveArticle(id: number): Promise<MutationResult> {
   }
 
   try {
-    const relocated = await archiveMediaForContent(
-      id,
-      existing.heroSrc,
-      existing.body,
-    );
     await archiveArticleRepo(id, access(session.memberId), {
-      heroSrc: relocated.heroSrc,
-      body: relocated.body,
+      heroSrc: existing.heroSrc,
+      body: existing.body,
     });
     await invalidateAfterSave(existing.slug, {
       contentGroupNumber: existing.contentGroupNumber,
@@ -423,14 +410,9 @@ export async function restoreArticleFromArchive(
   }
 
   try {
-    const relocated = await restoreMediaForContent(
-      id,
-      existing.heroSrc,
-      existing.body,
-    );
     await restoreArticleFromArchiveRepo(id, access(session.memberId), {
-      heroSrc: relocated.heroSrc,
-      body: relocated.body,
+      heroSrc: existing.heroSrc,
+      body: existing.body,
     });
     await invalidateAfterSave(existing.slug, {
       contentGroupNumber: existing.contentGroupNumber,

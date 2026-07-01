@@ -21,6 +21,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 | دادهٔ سایت | Site Data | `packages/site-data` |
 | seed | Seed | `packages/seed` |
 | DB | pelak.sqlite | `./data/` (dev) · `/data/` (prod) |
+| آپلودها | uploads | `./data/uploads/` (dev) · `/data/uploads/` (prod) |
 
 ## Monorepo
 

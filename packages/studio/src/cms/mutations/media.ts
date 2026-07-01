@@ -187,13 +187,15 @@ export async function uploadMedia(
     return { ok: false, error: "فرمت فایل مجاز نیست." };
   }
 
+  const hasExplicitFolder = context?.folder != null && context.folder !== "";
   const uploadContext = parseUploadContext(formData, {
     ...context,
-    memberId:
-      context?.contentGroupId != null ||
-      context?.contentId != null ||
-      context?.videoId != null
-        ? context.memberId
+    memberId: hasExplicitFolder
+      ? context?.memberId
+      : context?.contentGroupId != null ||
+          context?.contentId != null ||
+          context?.videoId != null
+        ? context?.memberId
         : (context?.memberId ?? session.memberId),
   });
   const folderPath = resolveUploadFolder(uploadContext);

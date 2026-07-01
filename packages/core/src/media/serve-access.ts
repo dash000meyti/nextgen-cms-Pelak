@@ -1,9 +1,9 @@
 import type { ArticleStatus } from "@nextgen-cms/contract/article-status";
 import {
-  isArchivedMediaPath,
   isContentGroupMediaPath,
-  isDraftMediaPath,
-  isSharedMediaPath,
+  isMemberAvatarPath,
+  isMemberDraftPath,
+  isSiteMediaPath,
   isVideoMediaPath,
   parseContentIdFromPath,
 } from "@nextgen-cms/core/media/path-policy";
@@ -14,7 +14,13 @@ export type UploadServeDecision =
   | { access: "conditional"; contentId: number };
 
 export function classifyUploadPath(relativePath: string): UploadServeDecision {
-  if (isSharedMediaPath(relativePath)) {
+  if (isMemberDraftPath(relativePath)) {
+    return { access: "private" };
+  }
+  if (isSiteMediaPath(relativePath)) {
+    return { access: "public" };
+  }
+  if (isMemberAvatarPath(relativePath)) {
     return { access: "public" };
   }
   if (isContentGroupMediaPath(relativePath)) {
@@ -22,12 +28,6 @@ export function classifyUploadPath(relativePath: string): UploadServeDecision {
   }
   if (isVideoMediaPath(relativePath)) {
     return { access: "public" };
-  }
-  if (isDraftMediaPath(relativePath)) {
-    return { access: "private" };
-  }
-  if (isArchivedMediaPath(relativePath)) {
-    return { access: "private" };
   }
   const contentId = parseContentIdFromPath(relativePath);
   if (contentId !== null) {

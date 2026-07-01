@@ -61,13 +61,7 @@ export function ArticleForm({
   const [form, setForm] = useState(initial);
 
   const uploadContext = articleId
-    ? {
-        contentId: articleId,
-        mediaHome:
-          form.status === "archived"
-            ? ("archived" as const)
-            : ("active" as const),
-      }
+    ? { contentId: articleId }
     : { memberId: session.memberId };
 
   function update<K extends keyof ArticleFormData>(

@@ -1,5 +1,10 @@
 import { db } from "@nextgen-cms/core/db";
-import { articles, contentGroups, members, videos } from "@nextgen-cms/core/db/schema";
+import {
+  articles,
+  contentGroups,
+  members,
+  videos,
+} from "@nextgen-cms/core/db/schema";
 import { asc, eq, inArray } from "drizzle-orm";
 
 export async function findAllArticleIds(): Promise<number[]> {

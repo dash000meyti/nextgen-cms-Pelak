@@ -12,7 +12,7 @@
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:backup": "tsx scripts/backup-db.ts",
-    "db:purge-archived-media": "tsx scripts/purge-archived-media.ts",
+    "db:migrate-media-paths": "tsx scripts/migrate-media-paths.ts",
     "db:promote-content-group-covers": "tsx scripts/promote-content-group-covers.ts",
     "db:promote-article-media": "tsx scripts/promote-article-media.ts",
     "db:promote-video-thumbnails": "tsx scripts/promote-video-thumbnails.ts",

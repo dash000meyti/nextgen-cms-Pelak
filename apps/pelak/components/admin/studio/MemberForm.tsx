@@ -1,5 +1,7 @@
 "use client";
 
+import { memberAvatarPath } from "@nextgen-cms/core/media/path-policy";
+import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import {
   createMemberAndRedirect,
   type MemberFormData,
@@ -37,11 +39,16 @@ export function MemberForm({
   canDelete = false,
 }: MemberFormProps) {
   const router = useRouter();
+  const session = useAdminMember();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [form, setForm] = useState(initial);
   const { confirm, dialog } = useConfirmDialog();
+  const uploadContext =
+    mode === "edit" && memberId
+      ? { folder: memberAvatarPath(memberId) }
+      : { memberId: session.memberId };
 
   function update<K extends keyof MemberFormData>(
     key: K,
@@ -187,6 +194,7 @@ export function MemberForm({
         alt={form.avatarAlt}
         onSrcChange={(avatarSrc) => update("avatarSrc", avatarSrc)}
         onAltChange={(avatarAlt) => update("avatarAlt", avatarAlt)}
+        uploadContext={uploadContext}
         required
       />
 

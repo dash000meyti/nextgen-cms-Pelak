@@ -106,9 +106,37 @@ packages/core/src/db/repositories/ — نوشتن DB
 ## Media
 
 - آپلود: `packages/studio/src/cms/mutations/media.ts`
+- promote یکپارچه: `packages/core/src/media/promote-media.ts`
 - تنظیمات: تب `/admin/settings/media` — max size، MIME، pipeline flags
-- serve: `GET /uploads/[[...path]]`
+- serve: `GET /uploads/[[...path]]` — `packages/core/src/media/serve-access.ts`
 - پیش‌فرض‌ها: `packages/core/src/media/constants.ts` (fallback اگر DB خالی)
+
+### درخت فولدر (`data/uploads/`)
+
+```
+site/                      دارایی عمومی سایت (public)
+members/{memberId}/        آواتار عضو (public)
+members/{memberId}/draft/  staging قبل از ثبت entity (private)
+content/{articleId}/       مدیا مقاله (public فقط وقتی status=published)
+content-group/{groupId}/   جلد گروه محتوا (public)
+videos/{videoId}/          بندانگشتی ویدیو (public)
+```
+
+### جریان آپلود
+
+1. **قبل از ثبت** (مقاله، گروه، ویدیو، عضو): `uploadContext.memberId` → `members/{memberId}/draft/`
+2. **بعد از ثبت**: آپلود مستقیم در فولدر entity (`content/{id}/`, `content-group/{id}/`, …)
+3. **save/create**: `promoteMediaToFolder` — فایل‌های استفاده‌شده از draft به فولدر نهایی منتقل می‌شوند
+4. **بایگانی مقاله**: فقط status در DB؛ مدیا در `content/{id}/` می‌ماند
+5. **حذف دائمی**: `purgeMediaForContent` — پاکسازی `content/{id}/`
+
+Media picker: entity نساخته → فولدر draft عضو؛ entity ساخته → فولدر همان entity.
+
+### migration legacy
+
+```bash
+npm run db:migrate-media-paths   # یک‌بار: shared/، content/draft/، archived/ → ساختار جدید
+```
 
 ## Cache invalidation
 

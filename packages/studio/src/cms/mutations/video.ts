@@ -8,7 +8,8 @@ import {
   updateVideo,
   type VideoWriteInput,
 } from "@nextgen-cms/core/db/repositories/videos-admin";
-import { promoteVideoThumbnailSrc } from "@nextgen-cms/core/media/promote-video-thumbnail";
+import { videoPath } from "@nextgen-cms/core/media/path-policy";
+import { promoteMediaToFolder } from "@nextgen-cms/core/media/promote-media";
 import { parseJalaliInput } from "@nextgen-cms/core/platform/datetime";
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";
@@ -85,7 +86,7 @@ async function resolveVideoThumbnailSrc(
   thumbnailSrc: string,
 ): Promise<string> {
   if (!thumbnailSrc.trim()) return thumbnailSrc;
-  return promoteVideoThumbnailSrc(videoId, thumbnailSrc);
+  return promoteMediaToFolder(thumbnailSrc, videoPath(videoId));
 }
 
 export async function createVideo(
@@ -135,11 +136,7 @@ export async function saveVideo(
 
   try {
     const thumbnailSrc = await resolveVideoThumbnailSrc(id, input.thumbnailSrc);
-    await updateVideo(
-      id,
-      { ...input, thumbnailSrc },
-      access(session.memberId),
-    );
+    await updateVideo(id, { ...input, thumbnailSrc }, access(session.memberId));
     invalidateVideos();
     return { ok: true, id };
   } catch (error) {

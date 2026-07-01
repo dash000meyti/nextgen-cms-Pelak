@@ -1,16 +1,17 @@
 import { eq } from "drizzle-orm";
 import { db } from "../src/db/index";
-import { videos } from "../src/db/schema/videos";
-import { promoteVideoThumbnailSrc } from "../src/media/promote-video-thumbnail";
+import { videos } from "../src/db/schema";
+import { videoPath } from "../src/media/path-policy";
+import { promoteMediaToFolder } from "../src/media/promote-media";
 
 async function main() {
   const rows = await db.select().from(videos);
   let updated = 0;
 
   for (const video of rows) {
-    const thumbnailSrc = await promoteVideoThumbnailSrc(
-      video.id,
+    const thumbnailSrc = await promoteMediaToFolder(
       video.thumbnailSrc,
+      videoPath(video.id),
     );
     if (thumbnailSrc === video.thumbnailSrc) continue;
 
@@ -19,12 +20,10 @@ async function main() {
       .set({ thumbnailSrc })
       .where(eq(videos.id, video.id));
     updated++;
-    console.log(
-      `video ${video.id} (${video.slug}): ${video.thumbnailSrc} -> ${thumbnailSrc}`,
-    );
+    console.log(`video ${video.id}: thumbnail promoted`);
   }
 
-  console.log(`Updated ${updated} of ${rows.length} video thumbnail(s).`);
+  console.log(`Updated ${updated} of ${rows.length} video(s).`);
 }
 
 main().catch((error) => {

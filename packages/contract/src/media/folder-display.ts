@@ -1,16 +1,15 @@
 import { normalizeFolderPath } from "./folder-path";
 
 const ROOT_LABELS: Record<string, string> = {
-  shared: "اشتراکی",
+  site: "سایت",
+  members: "اعضا",
   content: "محتوا",
   "content-group": "گروه محتوا",
   videos: "ویدیو",
-  archived: "بایگانی",
 };
 
-const SHARED_CHILD_LABELS: Record<string, string> = {
-  site: "سایت",
-  members: "اعضا",
+const MEMBER_CHILD_LABELS: Record<string, string> = {
+  draft: "پیش‌نویس",
 };
 
 export function getImmediateChildSegment(
@@ -24,7 +23,12 @@ export function getImmediateChildSegment(
   if (!parent) {
     return full.split("/").filter(Boolean)[0] ?? full;
   }
-  return full.slice(parent.length + 1).split("/").filter(Boolean)[0] ?? full;
+  return (
+    full
+      .slice(parent.length + 1)
+      .split("/")
+      .filter(Boolean)[0] ?? full
+  );
 }
 
 export function getFolderBrowseLabel(
@@ -36,8 +40,8 @@ export function getFolderBrowseLabel(
     return ROOT_LABELS[segment] ?? segment;
   }
   const parentNorm = normalizeFolderPath(parentFolder).replace(/\/$/, "");
-  if (parentNorm === "shared") {
-    return SHARED_CHILD_LABELS[segment] ?? segment;
+  if (/^members\/\d+$/.test(parentNorm)) {
+    return MEMBER_CHILD_LABELS[segment] ?? segment;
   }
   return segment;
 }

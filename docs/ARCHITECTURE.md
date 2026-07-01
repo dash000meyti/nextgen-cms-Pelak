@@ -114,6 +114,19 @@ sequenceDiagram
 | `schema_revision` | آخرین tag در `packages/core/drizzle/migrations` |
 | `installed_at` | first-boot seed |
 
+## Media lifecycle
+
+فایل‌های آپلود در volume (`data/uploads/` یا `/data/uploads/`) نگه‌داری می‌شوند؛ متادیتا در جدول `media_assets`.
+
+- **staging:** `members/{memberId}/draft/` — قبل از ثبت entity (مقاله، گروه، ویدیو، عضو)
+- **نهایی:** `content/{id}/`, `content-group/{id}/`, `videos/{id}/`, `members/{id}/` (آواتار), `site/` (عمومی)
+- **promote:** در save/create، URLهای استفاده‌شده از draft به فولدر entity منتقل می‌شوند (`promote-media.ts`)
+- **بایگانی مقاله:** فقط `status` در DB — فایل‌ها در `content/{id}/` می‌مانند
+- **حذف دائمی:** purge فولدر `content/{id}/`
+- **serve:** `site/`, `members/{id}/` (غیر-draft), ماژول‌ها public؛ draft و مدیا مقالهٔ unpublished نیاز به session دارند
+
+جزئیات: `docs/STUDIO.md` · migration legacy: `npm run db:migrate-media-paths`
+
 ## فایل‌های کلیدی
 
 - [`packages/site-data/src/get-content.ts`](../packages/site-data/src/get-content.ts)

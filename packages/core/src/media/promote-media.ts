@@ -2,10 +2,7 @@ import {
   getMediaAssetByUuid,
   updateMediaAssetFolder,
 } from "@nextgen-cms/core/db/repositories/media-assets";
-import {
-  isSharedMediaPath,
-  memberAvatarPath,
-} from "@nextgen-cms/core/media/path-policy";
+import { shouldSkipMediaPromote } from "@nextgen-cms/core/media/path-policy";
 import { moveMediaFile } from "@nextgen-cms/core/media/storage";
 import {
   parseUploadPublicUrl,
@@ -18,23 +15,32 @@ function filenameUuid(filename: string): string | null {
   return filename.slice(0, dot);
 }
 
-export async function promoteMemberAvatarUrl(
-  memberId: number,
+export type PromoteMediaOptions = {
+  contentId?: number | null;
+};
+
+export async function promoteMediaToFolder(
   publicUrl: string,
+  targetFolder: string,
+  options: PromoteMediaOptions = {},
 ): Promise<string> {
   const parsed = parseUploadPublicUrl(publicUrl);
   if (!parsed?.filename) return publicUrl;
 
-  const targetFolder = memberAvatarPath(memberId);
-  if (parsed.folderPath === targetFolder) return publicUrl;
+  const normalizedTarget = targetFolder.replace(/\/$/, "");
+  const sourceFolder = parsed.folderPath;
+  const sourceKey = sourceFolder.replace(/\/$/, "");
 
-  const folderKey = parsed.folderPath.replace(/\/$/, "");
-  if (isSharedMediaPath(folderKey) || isSharedMediaPath(parsed.folderPath)) {
+  if (sourceKey === normalizedTarget || sourceFolder === targetFolder) {
+    return publicUrl;
+  }
+
+  if (shouldSkipMediaPromote(sourceFolder)) {
     return publicUrl;
   }
 
   try {
-    await moveMediaFile(parsed.folderPath, targetFolder, parsed.filename);
+    await moveMediaFile(sourceFolder, targetFolder, parsed.filename);
   } catch {
     return publicUrl;
   }
@@ -43,7 +49,11 @@ export async function promoteMemberAvatarUrl(
   if (uuid) {
     const asset = await getMediaAssetByUuid(uuid);
     if (asset) {
-      await updateMediaAssetFolder(asset.id, targetFolder, null);
+      await updateMediaAssetFolder(
+        asset.id,
+        targetFolder,
+        options.contentId !== undefined ? options.contentId : undefined,
+      );
     }
   }
 

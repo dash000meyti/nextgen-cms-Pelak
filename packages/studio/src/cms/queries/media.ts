@@ -21,8 +21,8 @@ import {
   contentGroupPath,
   contentPath,
   memberAvatarPath,
+  memberDraftPath,
   videoPath,
-  writerDraftPath,
 } from "@nextgen-cms/core/media/path-policy";
 import { hasPermission } from "@nextgen-cms/studio/admin/article-access";
 import {
@@ -116,16 +116,17 @@ async function resolveEntityChildFolders(
 ): Promise<string[]> {
   const parent = parentPrefix.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
 
-  if (parent === "shared") {
-    return [
-      normalizeFolderPath("shared/site"),
-      normalizeFolderPath("shared/members"),
-    ];
-  }
-
-  if (parent === "shared/members") {
+  if (parent === "members") {
     const memberIds = await findAllMemberIds();
     return memberIds.map((id) => memberAvatarPath(id));
+  }
+
+  const memberMatch = parent.match(/^members\/(\d+)$/);
+  if (memberMatch) {
+    const memberId = Number.parseInt(memberMatch[1], 10);
+    if (!Number.isNaN(memberId)) {
+      return [memberDraftPath(memberId)];
+    }
   }
 
   if (parent === "content") {
@@ -145,7 +146,7 @@ async function resolveEntityChildFolders(
     return videoIds.map((id) => videoPath(id));
   }
 
-  if (parent.startsWith("content/draft/")) {
+  if (parent.startsWith("members/") && parent.endsWith("/draft")) {
     return [];
   }
 
@@ -202,7 +203,7 @@ export async function listMediaForPicker(
     return [];
   }
 
-  return listMedia({ folder: writerDraftPath(memberId) });
+  return listMedia({ folder: memberDraftPath(memberId) });
 }
 
 export function canUploadToFolder(

@@ -10,7 +10,9 @@ import {
   removeMediaFolderDir,
 } from "@nextgen-cms/core/media/storage";
 
-async function purgeAssets(assets: Awaited<ReturnType<typeof listMediaAssets>>) {
+async function purgeAssets(
+  assets: Awaited<ReturnType<typeof listMediaAssets>>,
+) {
   const seen = new Set<number>();
   for (const asset of assets) {
     if (seen.has(asset.id)) continue;
@@ -43,5 +45,4 @@ export async function purgeMediaForContent(contentId: number): Promise<void> {
   });
   await purgeAssets(linked);
   await purgeMediaFolder(`content/${contentId}`);
-  await purgeMediaFolderTree(`archived/content/${contentId}`);
 }

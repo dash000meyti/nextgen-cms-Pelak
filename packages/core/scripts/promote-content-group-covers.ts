@@ -1,16 +1,17 @@
 import { eq } from "drizzle-orm";
 import { db } from "../src/db/index";
-import { contentGroups } from "../src/db/schema/content-groups";
-import { promoteContentGroupCoverSrc } from "../src/media/promote-content-group-cover";
+import { contentGroups } from "../src/db/schema";
+import { contentGroupPath } from "../src/media/path-policy";
+import { promoteMediaToFolder } from "../src/media/promote-media";
 
 async function main() {
   const rows = await db.select().from(contentGroups);
   let updated = 0;
 
   for (const group of rows) {
-    const coverSrc = await promoteContentGroupCoverSrc(
-      group.id,
+    const coverSrc = await promoteMediaToFolder(
       group.coverSrc,
+      contentGroupPath(group.id),
     );
     if (coverSrc === group.coverSrc) continue;
 
@@ -19,12 +20,10 @@ async function main() {
       .set({ coverSrc })
       .where(eq(contentGroups.id, group.id));
     updated++;
-    console.log(
-      `content group ${group.number}: ${group.coverSrc} -> ${coverSrc}`,
-    );
+    console.log(`content-group ${group.id}: cover promoted`);
   }
 
-  console.log(`Updated ${updated} of ${rows.length} content group cover(s).`);
+  console.log(`Updated ${updated} of ${rows.length} content group(s).`);
 }
 
 main().catch((error) => {

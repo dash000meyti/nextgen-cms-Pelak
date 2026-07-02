@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "src",
     "paths": {
       "@nextgen-cms/contract": ["../contract/src/index.ts"],
       "@nextgen-cms/contract/*": ["../contract/src/*"]

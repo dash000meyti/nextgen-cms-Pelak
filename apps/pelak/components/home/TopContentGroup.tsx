@@ -7,13 +7,17 @@ import { Button } from "@/components/ui/Button";
 
 type TopContentGroupProps = {
   group: ContentGroup;
+  contentGroupPageTitle: string;
 };
 
-export function TopContentGroup({ group }: TopContentGroupProps) {
+export function TopContentGroup({
+  group,
+  contentGroupPageTitle,
+}: TopContentGroupProps) {
   return (
     <section className="bg-surface">
       <Container className="flex flex-col items-stretch">
-        <div className="flex w-full flex-row items-center justify-between gap-2 py-1 sm:py-2">
+        <div className="flex w-full flex-row items-center justify-between gap-2 py-0.5 sm:py-2">
           <Link
             href={`/content-group/${group.number}`}
             className={`relative hidden ${contentGroupCoverAspectClass} w-[50px] shrink-0 overflow-hidden rounded-md transition-opacity duration-300 hover:opacity-80 sm:block`}
@@ -31,20 +35,22 @@ export function TopContentGroup({ group }: TopContentGroupProps) {
             href={`/content-group/${group.number}`}
             className="min-w-0 flex-1"
           >
-            <p className="text-start font-heading text-sm text-ink sm:text-center sm:text-base md:text-lg">
-              <span className="block px-1 text-ink-muted sm:inline">
-                جدیدترین گروه محتوا:{" "}
+            <p className="py-1.5 text-center font-heading text-sm text-ink sm:text-center sm:text-base md:text-lg">
+              <span className="px-1 text-ink-muted">
+                جدیدترین {contentGroupPageTitle}:{" "}
               </span>{" "}
               {group.label}
             </p>
           </Link>
-          <Button
-            href={`/content-group/${group.number}`}
-            variant="outline"
-            className="shrink-0 px-3 py-1 text-xs sm:px-5 sm:py-2 sm:text-sm"
-          >
-            مشاهده
-          </Button>
+          <div className="hidden shrink-0 sm:block">
+            <Button
+              href={`/content-group/${group.number}`}
+              variant="outline"
+              className="px-3 py-1 text-xs sm:px-5 sm:py-2 sm:text-sm"
+            >
+              مشاهده
+            </Button>
+          </div>
         </div>
 
         <div className="h-0.25 bg-rule w-full max-w-6xl mx-auto -mb-0.25" />

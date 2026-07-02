@@ -4,12 +4,18 @@ type JalaliDateProps = {
   value: string;
   dateTime?: string;
   className?: string;
+  style?: "short" | "long";
 };
 
-export function JalaliDate({ value, dateTime, className }: JalaliDateProps) {
+export function JalaliDate({
+  value,
+  dateTime,
+  className,
+  style = "short",
+}: JalaliDateProps) {
   let display = value;
   try {
-    display = formatJalali(value);
+    display = formatJalali(value, style);
   } catch {
     display = value;
   }

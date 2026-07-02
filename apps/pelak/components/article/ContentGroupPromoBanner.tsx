@@ -6,14 +6,16 @@ import { Button } from "@/components/ui/Button";
 
 type ContentGroupPromoBannerProps = {
   group: ContentGroupSummary;
+  contentGroupPageTitle: string;
 };
 
 export function ContentGroupPromoBanner({
   group,
+  contentGroupPageTitle,
 }: ContentGroupPromoBannerProps) {
   return (
     <aside
-      aria-label="آخرین گروه محتوا"
+      aria-label={`آخرین ${contentGroupPageTitle}`}
       className="w-full overflow-hidden rounded border border-rule bg-surface/50"
     >
       <Link
@@ -34,7 +36,7 @@ export function ContentGroupPromoBanner({
       </Link>
       <div className="space-y-3 p-4">
         <p className="text-xs font-medium tracking-wide text-ink-muted uppercase">
-          آخرین گروه محتوا
+          آخرین {contentGroupPageTitle}
         </p>
         <p className="font-heading text-sm leading-normal text-ink">
           {group.label}
@@ -47,7 +49,7 @@ export function ContentGroupPromoBanner({
           variant="outline"
           className="w-full text-xs"
         >
-          مشاهده گروه محتوا
+          مشاهده {contentGroupPageTitle}
         </Button>
       </div>
     </aside>

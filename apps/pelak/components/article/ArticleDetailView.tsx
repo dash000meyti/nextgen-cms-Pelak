@@ -10,7 +10,6 @@ import { ArticleHero } from "@/components/article/ArticleHero";
 import { AuthorList } from "@/components/article/AuthorList";
 import { ContentGroupPromoBanner } from "@/components/article/ContentGroupPromoBanner";
 import { RelatedArticles } from "@/components/article/RelatedArticles";
-import { TopicTags } from "@/components/article/TopicTags";
 import { TopContentGroup } from "@/components/home/TopContentGroup";
 import { Container } from "@/components/layout/Container";
 import { ShareBar } from "@/components/ui/ShareBar";
@@ -21,6 +20,7 @@ type ArticleDetailViewProps = {
   pdfDownloadUrl?: string;
   related: ArticlePreview[];
   currentContentGroup: ContentGroup;
+  contentGroupPageTitle: string;
   siteConfig: SiteConfig;
 };
 
@@ -30,23 +30,25 @@ export function ArticleDetailView({
   pdfDownloadUrl,
   related,
   currentContentGroup,
+  contentGroupPageTitle,
   siteConfig,
 }: ArticleDetailViewProps) {
   return (
     <>
-      <TopContentGroup group={currentContentGroup} />
+      <TopContentGroup
+        group={currentContentGroup}
+        contentGroupPageTitle={contentGroupPageTitle}
+      />
 
       <Container variant="wide" className="py-6 md:py-12">
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="mx-auto py-12 w-full max-w-content space-y-5 md:space-y-6 lg:my-0 lg:flex lg:w-1/2 lg:max-w-none lg:flex-col lg:self-center">
-            <TopicTags topics={article.topics} />
+        <div className="flex flex-col lg:flex-row gap-20">
+          <div className="mx-auto py-[18px] w-full max-w-content space-y-5 md:space-y-6 lg:my-0 lg:flex lg:w-1/2 lg:max-w-none lg:flex-col lg:self-center">
             <ArticleHeader
               title={article.title}
               subtitle={article.subtitle}
               excerpt={article.excerpt}
               authors={article.authors}
               publishedAt={article.publishedAt}
-              readingMinutes={article.readingMinutes}
             />
           </div>
           <ArticleHero
@@ -96,7 +98,10 @@ export function ArticleDetailView({
               variant="sidebar"
             />
             <div className="w-full sticky top-[18dvh] z-10">
-              <ContentGroupPromoBanner group={currentContentGroup} />
+              <ContentGroupPromoBanner
+                group={currentContentGroup}
+                contentGroupPageTitle={contentGroupPageTitle}
+              />
             </div>
           </aside>
         </div>

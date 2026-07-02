@@ -141,6 +141,18 @@ a:hover {
 .prose-article p + p {
   margin-top: 1.25rem;
 }
+.prose-article p.first-article-paragraph {
+  display: flow-root;
+}
+.prose-article p.first-article-paragraph .article-drop-cap {
+  float: inline-start;
+  font-family: var(--font-heading);
+  font-size: 4em;
+  line-height: 1.1;
+  color: var(--ink-muted);
+  margin-inline-end: 8px;
+  margin-top: 1px;
+}
 
 /* Public site typography scale */
 @layer components {

@@ -4,6 +4,7 @@ import {
 } from "@nextgen-cms/contract/short-links";
 import {
   getArticleBySlug,
+  getContentGroupModuleSettings,
   getArticleShareMetaBySlug,
   getCurrentContentGroup,
   getRelatedArticles,
@@ -48,10 +49,12 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   if (!article) notFound();
 
   const related = await getRelatedArticles(slug, 4);
-  const [currentContentGroup, siteConfig, shareMeta] = await Promise.all([
+  const [currentContentGroup, siteConfig, shareMeta, contentGroupModuleSettings] =
+    await Promise.all([
     getCurrentContentGroup(),
     getSiteConfig(),
     getArticleShareMetaBySlug(slug),
+    getContentGroupModuleSettings(),
   ]);
 
   const shareUrl = shareMeta
@@ -68,6 +71,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
       pdfDownloadUrl={pdfDownloadUrl}
       related={related}
       currentContentGroup={currentContentGroup}
+      contentGroupPageTitle={contentGroupModuleSettings.pageTitle}
       siteConfig={siteConfig}
     />
   );

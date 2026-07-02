@@ -1,7 +1,6 @@
 import type { Article } from "@nextgen-cms/contract/types/article";
 import { AuthorChipList } from "@/components/ui/AuthorChip";
 import { JalaliDate } from "@/components/ui/JalaliDate";
-import { ReadingTime } from "@/components/ui/ReadingTime";
 
 type ArticleHeaderProps = {
   title: string;
@@ -9,7 +8,6 @@ type ArticleHeaderProps = {
   excerpt?: string;
   authors: Article["authors"];
   publishedAt: string;
-  readingMinutes: number;
 };
 
 export function ArticleHeader({
@@ -18,28 +16,26 @@ export function ArticleHeader({
   excerpt,
   authors,
   publishedAt,
-  readingMinutes,
 }: ArticleHeaderProps) {
   return (
-    <header className="space-y-4 md:space-y-5">
-      <h1 className="font-heading text-2xl leading-normal text-ink sm:text-2xl md:text-3xl">
-        {title}
-      </h1>
-      <p className="text-lead">{subtitle}</p>
+    <>
+      <header className="space-y-4 md:space-y-5">
+        <h1 className="font-heading text-[28px] leading-normal text-ink text-center md:text-start">
+          {title}
+        </h1>
+        <p className="text-lead text-center md:text-start">{subtitle}</p>
 
-      <div className="text-meta flex flex-wrap items-center gap-x-3 gap-y-2">
-        <AuthorChipList authors={authors} />
-        <span aria-hidden="true">·</span>
-        <JalaliDate value={publishedAt} />
-        <span aria-hidden="true">·</span>
-        <ReadingTime minutes={readingMinutes} />
-      </div>
+        {excerpt ? (
+          <p className="font-heading text-base leading-relaxed text-ink-muted italic text-center md:text-start md:leading-7">
+            {excerpt}
+          </p>
+        ) : null}
 
-      {excerpt ? (
-        <p className="text-base leading-relaxed text-ink-muted md:leading-7">
-          {excerpt}
-        </p>
-      ) : null}
-    </header>
+        <div className="text-meta flex flex-wrap items-center justify-center text-center gap-x-3 gap-y-2 md:justify-start md:text-start">
+          <AuthorChipList authors={authors} />
+        </div>
+      </header>
+      <JalaliDate value={publishedAt} className="fa-num" style="long" />
+    </>
   );
 }

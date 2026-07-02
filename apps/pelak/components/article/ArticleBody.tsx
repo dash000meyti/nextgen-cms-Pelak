@@ -12,9 +12,12 @@ type ArticleBodyProps = {
 export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
   const siteConfig = await getSiteConfig();
   const paragraphClassName = articleParagraphClassName(siteConfig, dir);
+  const firstParagraphIndex = blocks.findIndex(
+    (block) => block.type === "paragraph",
+  );
 
   return (
-    <div className="prose-article space-y-7">
+    <div className="prose-article flex flex-col justify-start items-start gap-0">
       {blocks.map((block, index) => {
         const key = `${block.type}-${index}`;
 
@@ -22,7 +25,7 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
           return (
             <h2
               key={key}
-              className="mt-10! border-r-4 border-accent pr-4 pt-2 font-heading text-lg leading-normal text-ink md:text-xl"
+              className="mt-5 mb-5 border-r-4 border-accent pr-4 pt-2 font-heading text-lg leading-normal text-ink md:text-xl"
             >
               {block.content}
             </h2>
@@ -69,9 +72,26 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
           );
         }
 
+        const isFirstParagraph = index === firstParagraphIndex;
+        const [dropCap = "", ...restChars] = isFirstParagraph
+          ? Array.from(block.content)
+          : [];
+        const restContent = restChars.join("");
         return (
-          <p key={key} className={paragraphClassName}>
-            {block.content}
+          <p
+            key={key}
+            className={`${paragraphClassName}${isFirstParagraph ? " first-article-paragraph" : ""}`}
+          >
+            {isFirstParagraph ? (
+              <>
+                <span className="article-drop-cap" aria-hidden="true">
+                  {dropCap}
+                </span>
+                <span>{restContent}</span>
+              </>
+            ) : (
+              block.content
+            )}
           </p>
         );
       })}

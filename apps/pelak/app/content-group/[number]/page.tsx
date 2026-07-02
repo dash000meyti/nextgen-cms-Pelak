@@ -2,6 +2,7 @@ import { buildContentGroupShortPath } from "@nextgen-cms/contract/short-links";
 import {
   getAllContentGroupNumbers,
   getContentGroupByNumber,
+  getContentGroupModuleSettings,
 } from "@nextgen-cms/site-data/get-content";
 import { requireFeatureModule } from "@nextgen-cms/site-data/require-feature-module";
 import type { Metadata } from "next";
@@ -49,9 +50,10 @@ export default async function ContentGroupPage({
   await requireFeatureModule("contentGroup");
   const { number: numberParam } = await params;
   const number = Number(numberParam);
-  const [group, allNumbers] = await Promise.all([
+  const [group, allNumbers, contentGroupModuleSettings] = await Promise.all([
     getContentGroupByNumber(number),
     getAllContentGroupNumbers(),
+    getContentGroupModuleSettings(),
   ]);
   if (!group) notFound();
 
@@ -103,7 +105,7 @@ export default async function ContentGroupPage({
       </div>
 
       <div className="mt-10 space-y-4">
-        <SectionTitle title="فهرست محتوای این گروه" />
+        <SectionTitle title={`فهرست محتوای این ${contentGroupModuleSettings.pageTitle}`} />
         {group.articles.length > 0 ? (
           <ul>
             {group.articles.map((article, index) => (

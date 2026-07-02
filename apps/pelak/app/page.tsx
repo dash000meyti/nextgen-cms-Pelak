@@ -1,4 +1,5 @@
 import {
+  getContentGroupModuleSettings,
   getCurrentContentGroup,
   getEditorsPicks,
   getFeaturedArticles,
@@ -16,7 +17,10 @@ import { TopContentGroup } from "@/components/home/TopContentGroup";
 import { VideoSection } from "@/components/home/VideoSection";
 
 export default async function HomePage() {
-  const featureModules = await getFeatureModules();
+  const [featureModules, contentGroupModuleSettings] = await Promise.all([
+    getFeatureModules(),
+    getContentGroupModuleSettings(),
+  ]);
 
   const [featuredArticles, editorsPicks] = await Promise.all([
     getFeaturedArticles(3),
@@ -32,7 +36,12 @@ export default async function HomePage() {
 
   return (
     <>
-      {group ? <TopContentGroup group={group} /> : null}
+      {group ? (
+        <TopContentGroup
+          group={group}
+          contentGroupPageTitle={contentGroupModuleSettings.pageTitle}
+        />
+      ) : null}
 
       <FeaturedContent articles={featuredArticles} />
 

@@ -117,9 +117,9 @@ function EditionBoundary({
   direction: "start" | "end";
   align: "start" | "end";
 }) {
-  return (
+  const textContent = (
     <div
-      className={`flex max-w-[calc(50%-0.75rem)] flex-col gap-1 sm:max-w-none ${align === "end" ? "items-end text-end" : "items-start"}`}
+      className={`flex flex-col gap-1 ${align === "end" ? "items-end text-end" : "items-start"}`}
     >
       <span className="flex items-center gap-1.5 text-xs text-ink-faint">
         {direction === "end" ? (
@@ -135,6 +135,31 @@ function EditionBoundary({
         )}
       </span>
       <span className="font-heading text-lg text-ink-faint">{text}</span>
+    </div>
+  );
+
+  const coverPlaceholder = (
+    <div
+      aria-hidden="true"
+      className={`${contentGroupCoverFrameClass} w-14 shrink-0 rounded-md border border-rule/40 bg-surface sm:w-16`}
+    />
+  );
+
+  return (
+    <div
+      className={`flex max-w-[calc(50%-0.75rem)] items-center gap-3 sm:max-w-none sm:gap-4 ${align === "end" ? "justify-end" : "justify-start"}`}
+    >
+      {align === "end" ? (
+        <>
+          {textContent}
+          {coverPlaceholder}
+        </>
+      ) : (
+        <>
+          {coverPlaceholder}
+          {textContent}
+        </>
+      )}
     </div>
   );
 }

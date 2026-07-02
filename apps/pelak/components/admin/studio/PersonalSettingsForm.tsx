@@ -19,6 +19,7 @@ export function PersonalSettingsForm({ member }: PersonalSettingsFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [name, setName] = useState(member.name);
+  const [username, setUsername] = useState(member.username);
   const [email, setEmail] = useState(member.email ?? "");
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState(member.bio);
@@ -31,6 +32,7 @@ export function PersonalSettingsForm({ member }: PersonalSettingsFormProps) {
     startTransition(async () => {
       const result = await savePersonalSettings({
         name,
+        username: username || undefined,
         email: email || undefined,
         password: password || undefined,
         bio,
@@ -57,6 +59,13 @@ export function PersonalSettingsForm({ member }: PersonalSettingsFormProps) {
           label="نام"
           value={name}
           onChange={setName}
+          required
+        />
+        <TextField
+          id="personal-username"
+          label="نام کاربری"
+          value={username}
+          onChange={setUsername}
           required
         />
         <TextField

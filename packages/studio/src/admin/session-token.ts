@@ -13,7 +13,7 @@ export function getSessionSecret() {
 /** @deprecated Use MemberSession — kept for proxy and legacy callers */
 export type AdminSession = {
   userId: number;
-  email: string;
+  username: string;
 };
 
 export type { MemberSession };
@@ -25,13 +25,18 @@ export async function verifyAdminSessionToken(
   try {
     const { payload } = await jwtVerify(signed, getSessionSecret());
     const memberId = payload.memberId ?? payload.userId;
-    const email = payload.email;
+    const username =
+      typeof payload.username === "string"
+        ? payload.username
+        : typeof payload.email === "string"
+          ? payload.email
+          : null;
 
-    if (typeof memberId !== "number" || typeof email !== "string") {
+    if (typeof memberId !== "number" || !username) {
       return null;
     }
 
-    return { userId: memberId, email };
+    return { userId: memberId, username };
   } catch {
     return null;
   }

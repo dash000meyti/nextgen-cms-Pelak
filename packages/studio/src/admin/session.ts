@@ -21,6 +21,7 @@ export {
 
 export async function createMemberSession(
   memberId: number,
+  username: string,
   email: string | null,
 ) {
   const token = crypto.randomUUID();
@@ -37,6 +38,7 @@ export async function createMemberSession(
   const signed = await new SignJWT({
     token,
     memberId,
+    username,
     email: email ?? "",
   })
     .setProtectedHeader({ alg: "HS256" })
@@ -56,8 +58,8 @@ export async function createMemberSession(
 }
 
 /** @deprecated Use createMemberSession */
-export async function createAdminSession(userId: number, email: string) {
-  await createMemberSession(userId, email);
+export async function createAdminSession(userId: number, username: string) {
+  await createMemberSession(userId, username, null);
 }
 
 export async function destroyMemberSession() {
@@ -95,8 +97,8 @@ export async function getMemberSession(): Promise<MemberSession | null> {
 /** @deprecated Use getMemberSession */
 export async function getAdminSession(): Promise<AdminSession | null> {
   const session = await getMemberSession();
-  if (!session || !session.email) return null;
-  return { userId: session.memberId, email: session.email };
+  if (!session) return null;
+  return { userId: session.memberId, username: session.username };
 }
 
 export async function verifyMemberSessionInDb(
@@ -110,6 +112,7 @@ export async function verifyMemberSessionInDb(
     const rows = await db
       .select({
         memberId: members.id,
+        memberUsername: members.username,
         memberEmail: members.email,
         expiresAt: memberSessions.expiresAt,
         roleId: roles.id,
@@ -127,12 +130,13 @@ export async function verifyMemberSessionInDb(
     const row = rows[0];
     if (!row) return null;
     if (new Date(row.expiresAt).getTime() < Date.now()) return null;
-    if (!row.memberEmail) return null;
+    if (!row.memberUsername) return null;
 
     const permissions = await getMemberPermissions(row.memberId);
 
     return {
       memberId: row.memberId,
+      username: row.memberUsername,
       email: row.memberEmail,
       role: {
         id: row.roleId,
@@ -153,6 +157,6 @@ export async function verifyAdminSessionInDb(
   signed: string,
 ): Promise<AdminSession | null> {
   const session = await verifyMemberSessionInDb(signed);
-  if (!session || !session.email) return null;
-  return { userId: session.memberId, email: session.email };
+  if (!session) return null;
+  return { userId: session.memberId, username: session.username };
 }

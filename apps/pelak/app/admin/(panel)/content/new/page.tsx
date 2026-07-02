@@ -1,6 +1,6 @@
 import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
 import { getContentSettings } from "@nextgen-cms/site-data/get-content";
-import { requireMember } from "@nextgen-cms/studio/admin/require-member";
+import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
 import type { ArticleFormData } from "@nextgen-cms/studio/cms/mutations/article";
 import {
   findContentGroupsForPicker,
@@ -10,7 +10,7 @@ import {
 import { ArticleForm } from "@/components/admin/studio/ArticleForm";
 
 export default async function NewArticlePage() {
-  const session = await requireMember();
+  const session = await requirePermission("content.create");
   const [members, topics, contentGroups, contentSettings] = await Promise.all([
     findMembersForArticlePicker(),
     findTopicsForPicker(),

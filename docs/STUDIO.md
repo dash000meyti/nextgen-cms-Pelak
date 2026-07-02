@@ -14,7 +14,7 @@
 
 ## تنظیمات (`/admin/settings`)
 
-هاب **۵ تب** مجوزمحور — تعریف در `packages/studio/src/admin/settings-tabs.ts`:
+هاب **۶ تب** مجوزمحور — تعریف در `packages/studio/src/admin/settings-tabs.ts`:
 
 | تب | مسیر | مجوز |
 |----|------|------|
@@ -23,6 +23,7 @@
 | رنگ‌ها | `/admin/settings/theme` | `settings.theme` |
 | نقش‌ها | `/admin/settings/roles` | `settings.roles` |
 | ماژول‌ها | `/admin/settings/modules` | `settings.modules` |
+| پایگاه داده | `/admin/settings/database` | `settings.database` |
 
 `/admin/settings` به اولین تب مجاز redirect می‌شود.
 

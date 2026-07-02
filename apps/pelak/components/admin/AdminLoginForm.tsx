@@ -18,15 +18,15 @@ export function AdminLoginForm({ next, initialError }: AdminLoginFormProps) {
     <form action={formAction} className="mt-6 space-y-4">
       <input type="hidden" name="next" value={next} />
       <div>
-        <label htmlFor="email" className="block text-sm text-ink-muted">
-          ایمیل
+        <label htmlFor="username" className="block text-sm text-ink-muted">
+          نام کاربری
         </label>
         <input
-          id="email"
-          name="email"
-          type="email"
+          id="username"
+          name="username"
+          type="text"
           required
-          autoComplete="email"
+          autoComplete="username"
           className="mt-1 w-full rounded-md border border-rule bg-paper px-3 py-2 text-sm text-ink"
         />
       </div>

@@ -4,6 +4,7 @@ import { roles } from "./roles";
 
 export const members = sqliteTable("members", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  username: text("username").notNull().unique(),
   email: text("email").unique(),
   passwordHash: text("password_hash"),
   slug: text("slug").notNull().unique(),

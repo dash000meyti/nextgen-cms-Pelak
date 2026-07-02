@@ -9,6 +9,7 @@ import { and, eq, ne } from "drizzle-orm";
 
 const memberSelectFields = {
   id: members.id,
+  username: members.username,
   email: members.email,
   passwordHash: members.passwordHash,
   slug: members.slug,
@@ -39,6 +40,7 @@ function memberQuery() {
 }
 
 export type MemberWriteInput = {
+  username: string;
   email?: string | null;
   passwordHash?: string | null;
   slug: string;
@@ -61,6 +63,12 @@ export async function findMemberByEmail(email: string) {
   return row ? mapMemberRow(row as MemberRowWithRole) : null;
 }
 
+export async function findMemberByUsername(username: string) {
+  const rows = await memberQuery().where(eq(members.username, username)).limit(1);
+  const row = rows[0];
+  return row ? mapMemberRow(row as MemberRowWithRole) : null;
+}
+
 export async function findMemberById(id: number) {
   const rows = await memberQuery().where(eq(members.id, id)).limit(1);
   const row = rows[0];
@@ -73,16 +81,17 @@ export async function findMemberBySlug(slug: string) {
   return row ? mapMemberRow(row as MemberRowWithRole) : null;
 }
 
-export async function findMemberAuthByEmail(email: string) {
+export async function findMemberAuthByUsername(username: string) {
   const rows = await db
     .select({
       id: members.id,
+      username: members.username,
       email: members.email,
       passwordHash: members.passwordHash,
       isActive: members.isActive,
     })
     .from(members)
-    .where(eq(members.email, email))
+    .where(eq(members.username, username))
     .limit(1);
   return rows[0] ?? null;
 }
@@ -127,6 +136,7 @@ export async function insertMember(
   const result = await db
     .insert(members)
     .values({
+      username: input.username,
       email: input.email ?? null,
       passwordHash: input.passwordHash ?? null,
       slug: input.slug,
@@ -155,6 +165,7 @@ export async function updateMember(id: number, input: MemberWriteInput) {
   await db
     .update(members)
     .set({
+      username: input.username,
       email: input.email ?? null,
       passwordHash: input.passwordHash ?? null,
       slug: input.slug,
@@ -189,6 +200,16 @@ export async function updateMemberEmail(id: number, email: string) {
     .update(members)
     .set({
       email,
+      updatedAt: new Date().toISOString(),
+    })
+    .where(eq(members.id, id));
+}
+
+export async function updateMemberUsername(id: number, username: string) {
+  await db
+    .update(members)
+    .set({
+      username,
       updatedAt: new Date().toISOString(),
     })
     .where(eq(members.id, id));
@@ -312,6 +333,22 @@ export async function memberEmailExists(email: string, excludeId?: number) {
     excludeId != null
       ? and(eq(members.email, email), ne(members.id, excludeId))
       : eq(members.email, email);
+  const rows = await db
+    .select({ id: members.id })
+    .from(members)
+    .where(where)
+    .limit(1);
+  return rows.length > 0;
+}
+
+export async function memberUsernameExists(
+  username: string,
+  excludeId?: number,
+) {
+  const where =
+    excludeId != null
+      ? and(eq(members.username, username), ne(members.id, excludeId))
+      : eq(members.username, username);
   const rows = await db
     .select({ id: members.id })
     .from(members)

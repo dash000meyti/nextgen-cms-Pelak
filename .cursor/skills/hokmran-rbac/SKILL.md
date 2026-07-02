@@ -29,9 +29,14 @@ description: راهنمای RBAC، نقش‌ها و مجوزها در پلتفر
 settings.personal  settings.site     settings.theme
 settings.roles     settings.content (topics)
 settings.members   settings.media    settings.modules
+settings.database
 ```
 
-`settings.topics` منسوخ است — CRUD موضوعات با `settings.content`؛ migration additive نگه می‌دارد.
+`settings.topics` منسوخ است — CRUD موضوعات با `settings.content`؛ migration additive نگه می‌دارد. در UI نقش‌ها قابل تیک زدن نیست (`deprecatedPermissions` در contract).
+
+`settings.database` — export/import پایگاه داده؛ فقط `super_admin` (migration `0015` + backfill `0016`).
+
+`modules.newsletter.manage` — رزرو برای آینده؛ فعلاً enable/disable خبرنامه با `settings.modules` است.
 
 ## مجوزهای modules
 
@@ -78,8 +83,8 @@ await requirePermission("modules.contentGroup.view");
 
 - `AdminMemberProvider` + `useAdminMember().permissions` + `enabledModules`
 - `SettingsNav` — تب‌ها از `packages/studio/src/admin/settings-tabs.ts`
-- Sidebar: لینک اعضا با `members.*`؛ contentGroup/videos با `modules.*.view` + enabled؛ تنظیمات همیشه visible ولی layout بدون مجوز `forbidden()`
-- `RolesSettingsPanel` — گروه checkbox «ماژول‌ها» با label فارسی
+- Sidebar: لینک محتوا با `content.*`؛ اعضا با `members.*`؛ مدیا با `media.*`؛ تنظیمات با هر `settings.*`؛ contentGroup/videos با `modules.*.view` + enabled
+- `RolesSettingsPanel` — checkboxها از `assignablePermissionValues`؛ برچسب‌ها از `permissionActionLabels`
 
 ## Media settings vs media.*
 
@@ -88,8 +93,8 @@ await requirePermission("modules.contentGroup.view");
 
 ## Checklist مجوز جدید
 
-1. افزودن به `permissionActions` در `permissions.ts`
-2. seed/migration نقش‌های پیش‌فرض در `roles.ts` + migration SQL additive
-3. `requirePermissionMutation` در mutation
-4. gate UI (sidebar/tab/button)
+1. افزودن به `permissionActions` در `permissions.ts` (+ `permissionActionLabels` اگر action جدید)
+2. seed/migration نقش‌های پیش‌فرض در `roles.ts` + migration SQL additive (الگو: `0015_settings_database_permission.sql` برای super_admin؛ `0016_rbac_permission_backfill.sql` برای همه مجوزهای super_admin)
+3. `requirePermissionMutation` در mutation؛ `requirePermission` در صفحه
+4. gate UI (sidebar/tab/button) + داشبورد در صورت آمار مرتبط
 5. `docs/STUDIO.md` + این skill

@@ -1,4 +1,8 @@
-import { getMemberSession } from "@nextgen-cms/studio/admin/session";
+import {
+  SESSION_COOKIE,
+  verifyAdminSessionToken,
+} from "@nextgen-cms/studio/admin/session-token";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminLoginForm } from "@/components/admin/AdminLoginForm";
@@ -10,7 +14,9 @@ type AdminLoginPageProps = {
 export default async function AdminLoginPage({
   searchParams,
 }: AdminLoginPageProps) {
-  const session = await getMemberSession();
+  const cookieStore = await cookies();
+  const signed = cookieStore.get(SESSION_COOKIE)?.value;
+  const session = signed ? await verifyAdminSessionToken(signed) : null;
   if (session) {
     redirect("/admin");
   }
@@ -24,7 +30,7 @@ export default async function AdminLoginPage({
       <div className="w-full max-w-sm rounded-lg border border-rule bg-surface p-8">
         <h1 className="font-heading text-xl text-ink">ورود به پنل ادمین</h1>
         <p className="mt-2 text-sm text-ink-muted">
-          با ایمیل و رمز عبور حساب خود وارد شوید.
+          با نام کاربری و رمز عبور حساب خود وارد شوید.
         </p>
 
         <AdminLoginForm

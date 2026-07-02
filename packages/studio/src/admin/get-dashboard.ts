@@ -13,9 +13,24 @@ import { countVideos } from "@nextgen-cms/core/db/repositories/videos";
 import { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import type { AdminDashboardData } from "@nextgen-cms/studio/admin/types";
 
+function canSeeMemberStats(permissions: string[]): boolean {
+  return permissions.some(
+    (perm) =>
+      perm === "members.create" ||
+      perm === "members.edit" ||
+      perm === "members.delete",
+  );
+}
+
 export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const session = await requireMember();
   const access = { memberId: session.memberId };
+  const { permissions } = session;
+
+  const canSeeTopics = permissions.includes("settings.content");
+  const canSeeContentGroups = permissions.includes("modules.contentGroup.view");
+  const canSeeVideos = permissions.includes("modules.video.view");
+  const canSeeMembers = canSeeMemberStats(permissions);
 
   let recentArticles: Awaited<ReturnType<typeof findRecentArticlesForAdmin>> =
     [];
@@ -37,10 +52,10 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     countArticlesByStatus(),
     countArticlesSince(7),
     countArticlesSince(30),
-    countAuthors(),
-    countTopics(),
-    countContentGroups(),
-    countVideos(),
+    canSeeMembers ? countAuthors() : Promise.resolve(0),
+    canSeeTopics ? countTopics() : Promise.resolve(0),
+    canSeeContentGroups ? countContentGroups() : Promise.resolve(0),
+    canSeeVideos ? countVideos() : Promise.resolve(0),
   ]);
 
   const editAll = await memberHasEditAllArticles(session.memberId);

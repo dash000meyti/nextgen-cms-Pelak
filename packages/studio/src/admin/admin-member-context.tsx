@@ -13,7 +13,7 @@ export type SectionPageTitles = {
 
 export type AdminMemberContextValue = {
   memberId: number;
-  email: string;
+  username: string;
   role: Role;
   permissions: Permission[];
   enabledModules: {

@@ -25,6 +25,7 @@ export type MemberProfile = {
 
 export type Member = MemberProfile & {
   id: number;
+  username: string;
   email: string | null;
   role: Role;
   isActive: boolean;
@@ -35,6 +36,7 @@ export type Member = MemberProfile & {
 
 export type MemberSession = {
   memberId: number;
+  username: string;
   email: string | null;
   role: Role;
   permissions: Permission[];
@@ -44,6 +46,7 @@ export type MemberListRow = {
   id: number;
   slug: string;
   name: string;
+  username: string;
   email: string | null;
   roleName: string;
   roleSlug: string;

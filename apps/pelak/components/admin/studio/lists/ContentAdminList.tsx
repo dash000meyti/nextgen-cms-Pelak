@@ -40,11 +40,12 @@ export function ContentAdminList({ articles, status }: ContentAdminListProps) {
   const isArchivedTab = status === "archived";
   const { permissions } = useAdminMember();
   const canManageSettings = permissions.includes("settings.content");
+  const canCreate = permissions.includes("content.create");
 
   return (
     <DocumentList
       title="محتوا"
-      newHref="/admin/content/new"
+      newHref={canCreate ? "/admin/content/new" : undefined}
       newLabel="محتوای جدید"
       toolbar={
         <div className="flex flex-wrap items-center gap-2">

@@ -1,8 +1,11 @@
 "use client";
 
 import {
+  assignablePermissionValues,
+  isDeprecatedPermission,
   modulePermissionGroups,
   type Permission,
+  permissionActionLabels,
   permissionActions,
   permissionResources,
 } from "@nextgen-cms/contract/permissions";
@@ -21,29 +24,7 @@ import { TextField } from "@/components/admin/fields/TextField";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
 
-const PERMISSION_LABELS: Record<string, string> = {
-  create: "ایجاد",
-  edit_own: "ویرایش خود",
-  edit_all: "ویرایش همه",
-  publish: "انتشار",
-  edit: "ویرایش",
-  delete: "حذف",
-  upload: "آپلود",
-  delete_own: "حذف خود",
-  delete_all: "حذف همه",
-  manage_all: "مدیریت کامل",
-  manage: "مدیریت",
-  view: "مشاهده",
-  site: "سایت",
-  theme: "رنگ‌ها",
-  modules: "ماژول‌ها",
-  roles: "نقش‌ها",
-  topics: "موضوعات",
-  content: "محتوا",
-  members: "اعضا",
-  media: "مدیا",
-  personal: "شخصی",
-};
+const PERMISSION_LABELS = permissionActionLabels;
 
 const RESOURCE_LABELS: Record<string, string> = {
   content: "محتوا",
@@ -55,6 +36,12 @@ const RESOURCE_LABELS: Record<string, string> = {
 const SETTINGS_RESOURCES = permissionResources.filter(
   (resource) => resource !== "modules",
 );
+
+const ASSIGNABLE = new Set<Permission>(assignablePermissionValues);
+
+function isAssignablePermission(permission: Permission): boolean {
+  return ASSIGNABLE.has(permission);
+}
 
 type RolesSettingsPanelProps = {
   roles: RoleRow[];
@@ -221,6 +208,18 @@ export function RolesSettingsPanel({
 
             <div className="space-y-4">
               <p className="text-sm font-medium text-ink">مجوزها</p>
+              {form.permissions.some(isDeprecatedPermission) ? (
+                <p className="text-xs text-ink-faint">
+                  مجوزهای منسوخ (فقط نمایش):{" "}
+                  {form.permissions
+                    .filter(isDeprecatedPermission)
+                    .map((perm) => {
+                      const action = perm.split(".").pop() ?? perm;
+                      return PERMISSION_LABELS[action] ?? perm;
+                    })
+                    .join("، ")}
+                </p>
+              ) : null}
               {SETTINGS_RESOURCES.map((resource) => (
                 <div key={resource} className="space-y-2">
                   <p className="text-xs font-medium text-ink-muted">
@@ -229,6 +228,7 @@ export function RolesSettingsPanel({
                   <div className="flex flex-wrap gap-3">
                     {permissionActions[resource].map((action) => {
                       const permission = `${resource}.${action}` as Permission;
+                      if (!isAssignablePermission(permission)) return null;
                       return (
                         <label
                           key={permission}
@@ -257,6 +257,7 @@ export function RolesSettingsPanel({
                       {group.actions.map((action) => {
                         const permission =
                           `modules.${group.id}.${action}` as Permission;
+                        if (!isAssignablePermission(permission)) return null;
                         return (
                           <label
                             key={permission}

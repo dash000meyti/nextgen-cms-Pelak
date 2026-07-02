@@ -15,7 +15,7 @@ npm install
 npm run db:setup && npm run dev   # http://localhost:3134
 ```
 
-Admin: `/admin/login` — credentials از seed یا `.env.local`
+Admin: `/admin/login` — ورود با نام کاربری و رمز عبور از seed یا `.env.local`
 
 ## Mental model (فارسی)
 

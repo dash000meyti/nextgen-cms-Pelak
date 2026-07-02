@@ -211,6 +211,19 @@ export const DEFAULT_CONTENT_SETTINGS: ContentSettings = {
   showInMenu: true,
 };
 
+/**
+ * Central registry for defaults used in runtime normalizers and migrations.
+ * Keep this map aligned with SQL backfills when adding new schema fields.
+ */
+export const DEFAULTS_REGISTRY = {
+  moduleSettings: DEFAULT_MODULE_SETTINGS,
+  contentGroupModuleSettings: DEFAULT_CONTENT_GROUP_MODULE_SETTINGS,
+  videoModuleSettings: DEFAULT_VIDEO_MODULE_SETTINGS,
+  mediaSettings: DEFAULT_MEDIA_SETTINGS,
+  memberSettings: DEFAULT_MEMBER_SETTINGS,
+  contentSettings: DEFAULT_CONTENT_SETTINGS,
+} as const;
+
 export function normalizeContentSettings(
   stored: Partial<ContentSettings> | null | undefined,
 ): ContentSettings {

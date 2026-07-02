@@ -7,6 +7,13 @@ export const memberSchema = {
   fields: [
     { key: "name", label: "نام", kind: "text", required: true },
     { key: "slug", label: "نامک", kind: "slug", required: true, unique: true },
+    {
+      key: "username",
+      label: "نام کاربری",
+      kind: "text",
+      required: true,
+      unique: true,
+    },
     { key: "email", label: "ایمیل", kind: "text" },
     { key: "displayRole", label: "سمت", kind: "text" },
     { key: "bio", label: "بیوگرافی", kind: "textarea" },

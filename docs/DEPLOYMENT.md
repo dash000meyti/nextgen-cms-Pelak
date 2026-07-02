@@ -32,8 +32,10 @@ docker compose -f docker-compose.yml <command>
 | متغیر | الزامی | توضیح |
 |-------|--------|--------|
 | `SESSION_SECRET` | بله (prod) | امضای session ادمین |
-| `ADMIN_EMAIL` | فقط first boot | ایمیل admin اولیه |
-| `ADMIN_PASSWORD` | فقط first boot | رمز admin اولیه |
+| `BOOTSTRAP_ADMIN_USERNAME` | فقط first boot | نام کاربری admin اولیه |
+| `BOOTSTRAP_ADMIN_PASSWORD` | فقط first boot | رمز admin اولیه |
+| `BOOTSTRAP_ADMIN_EMAIL` | اختیاری | ایمیل پروفایل admin اولیه |
+| `SEED_MODE` | اختیاری | `auto` \| `seed-if-empty` \| `seed-if-no-platform-meta` \| `never` |
 | `NEXT_PUBLIC_SITE_URL` | بله | مبنای sitemap/robots و URL عمومی |
 | `DATABASE_URL` | خیر | entrypoint آن را به `file:/data/pelak.sqlite` override می‌کند |
 
@@ -74,7 +76,7 @@ Startup خودکار در هر restart:
 ## Post-deploy smoke checks
 
 1. `GET /api/health` باید `200` برگرداند.
-2. ورود ادمین در `/admin/login` موفق باشد.
+2. ورود ادمین در `/admin/login` با نام کاربری موفق باشد.
 3. یک عملیات نوشتنی ساده در admin (مثلاً بروزرسانی تنظیمات) انجام شود.
 4. بارگذاری و دسترسی فایل در `/uploads/...` بررسی شود.
 5. مسیرهای public کلیدی (`/`, `/content`, `/content-group`, `/video`) باز شوند.
@@ -136,6 +138,7 @@ npm run dev
 |-------|--------|
 | `npm run db:migrate` | اعمال migrations |
 | `npm run db:backup` | backup دستی در محیط local |
+| `npm run db:restore -- <path/to/file.sqlite>` | بازیابی دیتابیس از فایل sqlite |
 | `FIRST_BOOT=1 npm run db:seed` | seed اولیه |
 | `npm run db:seed -- --force` | re-seed کامل (خطرناک در prod) |
 | `npm run start:prod` | migrate + start (بدون Docker) |

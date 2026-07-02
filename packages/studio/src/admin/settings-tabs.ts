@@ -1,6 +1,12 @@
 import type { Permission } from "@nextgen-cms/contract/permissions";
 
-export type SettingsTabId = "personal" | "site" | "theme" | "roles" | "modules";
+export type SettingsTabId =
+  | "personal"
+  | "site"
+  | "theme"
+  | "roles"
+  | "modules"
+  | "database";
 
 export type SettingsTab = {
   id: SettingsTabId;
@@ -39,6 +45,12 @@ export const SETTINGS_TABS: SettingsTab[] = [
     label: "ماژول‌ها",
     href: "/admin/settings/modules",
     permission: "settings.modules",
+  },
+  {
+    id: "database",
+    label: "پایگاه داده",
+    href: "/admin/settings/database",
+    permission: "settings.database",
   },
 ];
 

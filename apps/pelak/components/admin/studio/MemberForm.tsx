@@ -123,6 +123,16 @@ export function MemberForm({
 
       <div className="grid gap-6 lg:grid-cols-2">
         <TextField
+          id="username"
+          label="نام کاربری"
+          value={form.username}
+          onChange={(username) => update("username", username)}
+          required
+        />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <TextField
           id="email"
           label="ایمیل"
           value={form.email}

@@ -17,6 +17,7 @@ import {
 import { and, count, eq, inArray } from "drizzle-orm";
 
 export type MemberAdminWriteInput = {
+  username: string;
   email: string | null;
   passwordHash: string | null;
   slug: string;
@@ -36,6 +37,7 @@ export type MemberAdminListRow = {
   id: number;
   slug: string;
   name: string;
+  username: string;
   email: string | null;
   avatarSrc: string;
   avatarAlt: string;
@@ -139,6 +141,7 @@ export async function findAllMembersAdmin(
       id: members.id,
       slug: members.slug,
       name: members.name,
+      username: members.username,
       email: members.email,
       avatarSrc: members.avatarSrc,
       avatarAlt: members.avatarAlt,
@@ -160,6 +163,7 @@ export async function findAllMembersAdmin(
     id: row.id,
     slug: row.slug,
     name: row.name,
+    username: row.username,
     email: row.email,
     avatarSrc: row.avatarSrc,
     avatarAlt: row.avatarAlt,
@@ -180,6 +184,7 @@ export async function findMemberForAdmin(id: number, access: AdminAccess) {
   const rows = await db
     .select({
       id: members.id,
+      username: members.username,
       email: members.email,
       passwordHash: members.passwordHash,
       slug: members.slug,
@@ -224,6 +229,7 @@ export async function insertMemberAdmin(
   const result = await db
     .insert(members)
     .values({
+      username: input.username,
       email: input.email,
       passwordHash: input.passwordHash,
       slug: input.slug,
@@ -277,6 +283,7 @@ export async function updateMemberAdmin(
   await db
     .update(members)
     .set({
+      username: input.username,
       email: input.email,
       ...(input.passwordHash != null
         ? { passwordHash: input.passwordHash }

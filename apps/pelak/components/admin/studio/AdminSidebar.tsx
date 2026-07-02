@@ -1,20 +1,47 @@
 "use client";
 
 import type { Permission } from "@nextgen-cms/contract/permissions";
+import { permissionActions } from "@nextgen-cms/contract/permissions";
 import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+const SETTINGS_NAV_PERMISSIONS = permissionActions.settings.map(
+  (action) => `settings.${action}` as Permission,
+);
+
 const NAV_ITEMS = [
   { href: "/admin", label: "داشبورد", exact: true },
-  { href: "/admin/content", label: "محتوا" },
+  {
+    href: "/admin/content",
+    label: "محتوا",
+    permissions: [
+      "content.create",
+      "content.edit_own",
+      "content.edit_all",
+      "content.publish",
+    ] as const,
+  },
   {
     href: "/admin/members",
     label: "اعضا",
     permissions: ["members.create", "members.edit", "members.delete"] as const,
   },
-  { href: "/admin/media", label: "مدیا" },
-  { href: "/admin/settings", label: "تنظیمات" },
+  {
+    href: "/admin/media",
+    label: "مدیا",
+    permissions: [
+      "media.upload",
+      "media.delete_own",
+      "media.delete_all",
+      "media.manage_all",
+    ] as const,
+  },
+  {
+    href: "/admin/settings",
+    label: "تنظیمات",
+    permissions: SETTINGS_NAV_PERMISSIONS,
+  },
 ] as const;
 
 const MODULE_NAV_ITEMS = [

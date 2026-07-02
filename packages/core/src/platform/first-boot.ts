@@ -5,6 +5,12 @@ import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
 type PlatformDb = BetterSQLite3Database<typeof schema>;
 
+export type SeedMode =
+  | "auto"
+  | "seed-if-empty"
+  | "seed-if-no-platform-meta"
+  | "never";
+
 export function shouldSeedFromEnv(): boolean {
   return (
     process.env.FIRST_BOOT === "1" || process.argv.includes("--first-boot")
@@ -13,6 +19,18 @@ export function shouldSeedFromEnv(): boolean {
 
 export function shouldSeedForce(): boolean {
   return process.argv.includes("--force");
+}
+
+export function getSeedMode(): SeedMode {
+  const raw = process.env.SEED_MODE?.trim().toLowerCase();
+  if (
+    raw === "seed-if-empty" ||
+    raw === "seed-if-no-platform-meta" ||
+    raw === "never"
+  ) {
+    return raw;
+  }
+  return "auto";
 }
 
 export function isFirstBoot(db: PlatformDb): boolean {
@@ -38,7 +56,14 @@ export function shouldRunSeed(
   db: PlatformDb,
   sqlite: Database.Database,
 ): boolean {
-  return (
-    shouldSeedForce() || shouldSeedFromEnv() || needsInitialSeed(db, sqlite)
-  );
+  if (shouldSeedForce() || shouldSeedFromEnv()) {
+    return true;
+  }
+
+  const mode = getSeedMode();
+  if (mode === "never") return false;
+  if (mode === "seed-if-no-platform-meta") return isFirstBoot(db);
+  if (mode === "seed-if-empty") return needsInitialSeed(db, sqlite);
+
+  return needsInitialSeed(db, sqlite);
 }

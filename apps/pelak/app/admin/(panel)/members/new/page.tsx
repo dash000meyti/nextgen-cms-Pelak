@@ -1,14 +1,17 @@
+import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
 import type { MemberFormData } from "@nextgen-cms/studio/cms/mutations/member";
 import { listSystemRoles } from "@nextgen-cms/studio/cms/queries";
 import { MemberForm } from "@/components/admin/studio/MemberForm";
 
 export default async function NewMemberPage() {
+  await requirePermission("members.create");
   const roles = await listSystemRoles();
   const writerRole = roles.find((role) => role.slug === "writer") ?? roles[0];
 
   const initial: MemberFormData = {
     slug: "",
     name: "",
+    username: "",
     displayRole: "",
     bio: "",
     avatarSrc: "",

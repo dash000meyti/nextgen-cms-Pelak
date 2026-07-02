@@ -29,6 +29,7 @@ export default async function EditMemberPage({ params }: PageProps) {
   const initial: MemberFormData = {
     slug: member.slug,
     name: member.name,
+    username: member.username,
     displayRole: member.displayRole,
     bio: member.bio,
     avatarSrc: member.avatar.src,

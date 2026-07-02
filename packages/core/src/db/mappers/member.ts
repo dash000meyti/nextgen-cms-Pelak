@@ -2,6 +2,7 @@ import type { Member } from "@nextgen-cms/contract/types/member";
 
 export type MemberRowWithRole = {
   id: number;
+  username: string;
   email: string | null;
   passwordHash: string | null;
   slug: string;
@@ -32,6 +33,7 @@ export function mapMemberRow(row: MemberRowWithRole): Member {
 
   return {
     id: row.id,
+    username: row.username,
     email: row.email,
     slug: row.slug,
     name: row.name,

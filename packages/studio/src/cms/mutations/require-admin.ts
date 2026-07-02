@@ -6,7 +6,7 @@ export async function requireAdmin() {
   const session = await requireMember();
   return {
     userId: session.memberId,
-    email: session.email ?? "",
+    username: session.username,
   };
 }
 

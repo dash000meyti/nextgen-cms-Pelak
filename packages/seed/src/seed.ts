@@ -50,11 +50,11 @@ if (!shouldRunSeed(db, sqlite) && !force) {
   process.exit(0);
 }
 
-const existingAuthors = sqlite
-  .prepare("SELECT COUNT(*) as count FROM authors")
+const existingMembers = sqlite
+  .prepare("SELECT COUNT(*) as count FROM members")
   .get() as { count: number };
 
-if (existingAuthors.count > 0 && !force) {
+if (existingMembers.count > 0 && !force) {
   if (!isPlatformInstalled(db)) {
     setPlatformMeta(db, {
       core_version: CORE_VERSION,
@@ -145,21 +145,22 @@ const memberIdBySlug = new Map<string, number>();
 const writerPassword = process.env.WRITER_PASSWORD ?? "writer123";
 const writerPasswordHash = bcrypt.hashSync(writerPassword, 12);
 const writerTestAccounts: Record<string, string> = {
-  "mohammad-shirkound": "writer1@hokmran.example",
-  "yaser-jebraeili": "writer2@hokmran.example",
+  "mohammad-shirkound": "writer1",
+  "yaser-jebraeili": "writer2",
 };
 
 for (const author of mockAuthors) {
   const authorId = authorIdBySlug.get(author.slug);
   if (!authorId) continue;
 
-  const testEmail = writerTestAccounts[author.slug];
+  const testUsername = writerTestAccounts[author.slug];
 
   const result = db
     .insert(schema.members)
     .values({
-      email: testEmail ?? null,
-      passwordHash: testEmail ? writerPasswordHash : null,
+      username: testUsername ?? author.slug,
+      email: null,
+      passwordHash: testUsername ? writerPasswordHash : null,
       slug: author.slug,
       name: author.name,
       displayRole: author.role,
@@ -350,20 +351,27 @@ sqlite
     JSON.stringify(themeTokensFixture.dark),
   );
 
-const adminEmail = process.env.ADMIN_EMAIL ?? "admin@hokmran.example";
-const adminPassword = process.env.ADMIN_PASSWORD ?? "changeme123";
+const adminUsernameRaw =
+  process.env.BOOTSTRAP_ADMIN_USERNAME ?? process.env.ADMIN_USERNAME ?? "admin";
+const adminEmail =
+  process.env.BOOTSTRAP_ADMIN_EMAIL ?? process.env.ADMIN_EMAIL ?? null;
+const adminPassword =
+  process.env.BOOTSTRAP_ADMIN_PASSWORD ??
+  process.env.ADMIN_PASSWORD ??
+  "changeme123";
+const adminUsername = adminUsernameRaw.trim();
+if (!adminUsername || !adminPassword.trim()) {
+  throw new Error(
+    "Bootstrap admin credentials are required. Set BOOTSTRAP_ADMIN_USERNAME and BOOTSTRAP_ADMIN_PASSWORD.",
+  );
+}
 const passwordHash = bcrypt.hashSync(adminPassword, 12);
 const superAdminRoleId = roleIdBySlug.get("super_admin");
 if (!superAdminRoleId) {
   throw new Error("Super admin role not seeded");
 }
 
-const adminSlug = adminEmail.includes("@")
-  ? adminEmail
-      .slice(0, adminEmail.indexOf("@"))
-      .toLowerCase()
-      .replace(/\./g, "-")
-  : "admin";
+const adminSlug = adminUsername.trim().toLowerCase().replace(/\s+/g, "-");
 const adminMemberSlug = memberIdBySlug.has(adminSlug)
   ? `admin-${adminSlug}`
   : adminSlug;
@@ -387,6 +395,7 @@ if (!adminAuthorId) {
 
 db.insert(schema.members)
   .values({
+    username: adminUsername,
     email: adminEmail,
     passwordHash,
     slug: adminMemberSlug,
@@ -410,9 +419,9 @@ setPlatformMeta(db, {
 });
 
 console.log(`Seeded database at ${sqlitePath}`);
-console.log(`Admin user: ${adminEmail}`);
+console.log(`Admin user: ${adminUsername}`);
 console.log("Writer test accounts:");
-console.log("  writer1@hokmran.example /", writerPassword);
-console.log("  writer2@hokmran.example /", writerPassword);
+console.log("  writer1 /", writerPassword);
+console.log("  writer2 /", writerPassword);
 
 sqlite.close();

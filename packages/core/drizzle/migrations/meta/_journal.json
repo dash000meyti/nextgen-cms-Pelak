@@ -99,6 +99,27 @@
       "when": 1783664000000,
       "tag": "0013_content_groups_pdf_src",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1783764000000,
+      "tag": "0014_members_username",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "6",
+      "when": 1783765000000,
+      "tag": "0015_settings_database_permission",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1783766000000,
+      "tag": "0016_rbac_permission_backfill",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { copyFileSync, existsSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 function formatTimestamp(date: Date): string {
   const pad = (value: number) => String(value).padStart(2, "0");
@@ -18,4 +18,12 @@ export function backupDatabase(
   const destPath = join(destDir, `pelak-${formatTimestamp(new Date())}.sqlite`);
   copyFileSync(srcPath, destPath);
   return destPath;
+}
+
+export function restoreDatabase(srcPath: string, destPath: string): void {
+  if (!existsSync(srcPath)) {
+    throw new Error(`Restore source does not exist: ${srcPath}`);
+  }
+  mkdirSync(dirname(destPath), { recursive: true });
+  copyFileSync(srcPath, destPath);
 }

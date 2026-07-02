@@ -39,7 +39,7 @@ export default async function AdminPanelLayout({
 
   const contextValue = {
     memberId: session.memberId,
-    email: session.email ?? "",
+    username: session.username,
     role: session.role,
     permissions: session.permissions,
     enabledModules: {
@@ -67,7 +67,7 @@ export default async function AdminPanelLayout({
             <div className="flex items-center gap-4 text-sm">
               <span className="text-ink-muted">
                 {session.role.name}
-                {session.email ? ` · ${session.email}` : ""}
+                {session.username ? ` · ${session.username}` : ""}
               </span>
               <form action={logoutAdmin}>
                 <button

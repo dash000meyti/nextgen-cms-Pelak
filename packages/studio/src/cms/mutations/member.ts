@@ -5,8 +5,10 @@ import { PermissionDeniedError } from "@nextgen-cms/core/db/access/permission-de
 import {
   findMemberById,
   memberEmailExists,
+  memberUsernameExists,
   setMemberPassword,
   updateMemberEmail,
+  updateMemberUsername,
   updateMemberPersonal,
 } from "@nextgen-cms/core/db/repositories/members";
 import type { MemberAdminWriteInput } from "@nextgen-cms/core/db/repositories/members-admin";
@@ -37,12 +39,14 @@ import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
 export type MemberCredentialsInput = {
+  username?: string;
   email?: string;
   password?: string;
 };
 
 export type PersonalSettingsInput = {
   name: string;
+  username?: string;
   email?: string;
   password?: string;
   bio: string;
@@ -53,6 +57,7 @@ export type PersonalSettingsInput = {
 export type MemberFormData = {
   slug: string;
   name: string;
+  username: string;
   displayRole: string;
   bio: string;
   avatarSrc: string;
@@ -85,6 +90,7 @@ function parseFormData(
   return {
     slug: data.slug.trim(),
     name: data.name.trim(),
+    username: data.username.trim(),
     displayRole: data.displayRole.trim(),
     bio: data.bio.trim(),
     avatarSrc: data.avatarSrc.trim(),
@@ -105,6 +111,12 @@ async function validateMemberInput(
 ): Promise<string | undefined> {
   const nameError = validateRequired(input.name, "نام");
   if (nameError) return nameError;
+
+  const usernameError = validateRequired(input.username, "نام کاربری");
+  if (usernameError) return usernameError;
+  if (await memberUsernameExists(input.username, options.excludeId)) {
+    return "این نام کاربری قبلاً ثبت شده است.";
+  }
 
   const slugError = validateSlug(input.slug);
   if (slugError) return slugError;
@@ -156,6 +168,7 @@ async function buildWriteInput(
   }
 
   return {
+    username: parsed.username,
     email: parsed.email,
     passwordHash,
     slug: parsed.slug,
@@ -180,14 +193,18 @@ export async function updateMemberCredentials(
   const isSuperAdmin = session.role.slug === "super_admin";
   const isSelf = session.memberId === memberId;
 
+  const username = input.username?.trim();
   const email = input.email?.trim();
   const password = input.password;
 
-  if (!email && !password) {
-    return { ok: false, error: "حداقل یکی از ایمیل یا رمز عبور را وارد کنید." };
+  if (!username && !email && !password) {
+    return {
+      ok: false,
+      error: "حداقل یکی از نام کاربری، ایمیل یا رمز عبور را وارد کنید.",
+    };
   }
 
-  if (email && !isSuperAdmin && !isSelf) {
+  if ((username || email) && !isSuperAdmin && !isSelf) {
     return permissionDeniedResult();
   }
 
@@ -198,6 +215,13 @@ export async function updateMemberCredentials(
   const member = await findMemberById(memberId);
   if (!member) {
     return { ok: false, error: "عضو یافت نشد." };
+  }
+
+  if (username) {
+    if (await memberUsernameExists(username, memberId)) {
+      return { ok: false, error: "این نام کاربری قبلاً ثبت شده است." };
+    }
+    await updateMemberUsername(memberId, username);
   }
 
   if (email) {
@@ -229,6 +253,7 @@ export async function savePersonalSettings(
   const session = sessionOrDenied as Awaited<ReturnType<typeof requireMember>>;
 
   const name = input.name.trim();
+  const username = input.username?.trim();
   const email = input.email?.trim();
   const password = input.password;
   const bio = input.bio.trim();
@@ -244,6 +269,13 @@ export async function savePersonalSettings(
   const member = await findMemberById(session.memberId);
   if (!member) {
     return { ok: false, error: "عضو یافت نشد." };
+  }
+
+  if (username && username !== member.username) {
+    if (await memberUsernameExists(username, session.memberId)) {
+      return { ok: false, error: "این نام کاربری قبلاً ثبت شده است." };
+    }
+    await updateMemberUsername(session.memberId, username);
   }
 
   if (email && email !== member.email) {
@@ -344,6 +376,12 @@ export async function saveMember(
 
   const selfRoleDenied = assertCanChangeOwnRole(session, id, role.slug);
   if (selfRoleDenied) return selfRoleDenied;
+
+  if (parsed.username !== existing.username) {
+    if (await memberUsernameExists(parsed.username, id)) {
+      return { ok: false, error: "این نام کاربری قبلاً ثبت شده است." };
+    }
+  }
 
   if (parsed.email && parsed.email !== existing.email) {
     if (await memberEmailExists(parsed.email, id)) {

@@ -26,4 +26,31 @@ export async function requirePermissionMutation(
   return session;
 }
 
+export function sessionHasPermission(
+  session: MemberSession,
+  permission: Permission,
+): boolean {
+  return session.permissions.includes(permission);
+}
+
+export function assertSessionPermission(
+  session: MemberSession,
+  permission: Permission,
+): Response | null {
+  if (!sessionHasPermission(session, permission)) {
+    return new Response("Forbidden", { status: 403 });
+  }
+  return null;
+}
+
+export function assertSessionPermissionJson(
+  session: MemberSession,
+  permission: Permission,
+): Response | null {
+  if (!sessionHasPermission(session, permission)) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+  return null;
+}
+
 export { PERMISSION_DENIED };

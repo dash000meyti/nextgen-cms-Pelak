@@ -18,8 +18,17 @@ Release: `npm run release [patch|minor|major]` + به‌روز `CHANGELOG.md`
 
 - ✅ افزودن جدول، ستون nullable، index
 - ✅ مقدار پیش‌فرض برای ستون جدید required
+- ✅ الگوی امن تکاملی: add column → backfill → add index/constraint
 - ❌ حذف ستون/جدول در همان release
 - ❌ rename ستون بدون migration bridge
+
+### defaults registry و backfill
+
+- مرجع پیش‌فرض‌های runtime در `packages/config/src/theme/defaults.ts` (کلید `DEFAULTS_REGISTRY`) نگه‌داری می‌شود.
+- هر فیلد/تنظیم جدید باید هم در migration SQL (برای دیتای قدیمی) و هم در normalizer runtime (برای ورودی جدید/ناقص) پوشش داده شود.
+- برای permissionهای جدید، migration backfill روی `role_permissions` اضافه کنید تا نصب‌های قدیمی با release جدید همگام بمانند.
+  - مجوز مخصوص یک نقش: `0015_settings_database_permission.sql` (فقط `super_admin`)
+  - backfill کامل super_admin + gapهای نقش‌های دیگر: `0016_rbac_permission_backfill.sql`
 
 ### workflow
 

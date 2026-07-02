@@ -1,7 +1,10 @@
 "use server";
 
 import type { Permission } from "@nextgen-cms/contract/permissions";
-import { permissionValues } from "@nextgen-cms/contract/permissions";
+import {
+  isDeprecatedPermission,
+  permissionValues,
+} from "@nextgen-cms/contract/permissions";
 import { PermissionDeniedError } from "@nextgen-cms/core/db/access/permission-denied-error";
 import {
   deleteRole,
@@ -43,6 +46,25 @@ function handleMutationError(error: unknown): MutationResult {
   throw error;
 }
 
+function sanitizeAssignablePermissions(
+  permissions: Permission[],
+): Permission[] {
+  return permissions.filter((perm) => !isDeprecatedPermission(perm));
+}
+
+function mergePreservedDeprecatedPermissions(
+  submitted: Permission[],
+  existing: Permission[],
+): Permission[] {
+  const deprecatedKept = existing.filter(isDeprecatedPermission);
+  return [
+    ...new Set([
+      ...sanitizeAssignablePermissions(submitted),
+      ...deprecatedKept,
+    ]),
+  ];
+}
+
 function enforceSystemRolePermissions(
   roleSlug: string,
   permissions: Permission[],
@@ -69,6 +91,9 @@ async function validateRoleForm(
   }
 
   for (const perm of data.permissions) {
+    if (isDeprecatedPermission(perm)) {
+      return `مجوز منسوخ قابل اختصاص نیست: ${perm}`;
+    }
     if (!permissionValues.includes(perm)) {
       return `مجوز نامعتبر: ${perm}`;
     }
@@ -91,7 +116,10 @@ export async function createRole(data: RoleFormData): Promise<MutationResult> {
       description: data.description.trim(),
       isSystem: false,
     });
-    await insertRolePermissions(id, data.permissions);
+    await insertRolePermissions(
+      id,
+      sanitizeAssignablePermissions(data.permissions),
+    );
     return { ok: true, id };
   } catch (err) {
     return handleMutationError(err);
@@ -109,9 +137,10 @@ export async function saveRole(
   if (!existing) return { ok: false, error: "نقش یافت نشد." };
 
   if (existing.isSystem) {
+    const existingPerms = await getPermissionsForRole(id);
     const permissions = enforceSystemRolePermissions(
       existing.slug,
-      data.permissions,
+      mergePreservedDeprecatedPermissions(data.permissions, existingPerms),
     );
     try {
       await replaceRolePermissions(id, permissions);
@@ -125,11 +154,15 @@ export async function saveRole(
   if (error) return { ok: false, error };
 
   try {
+    const existingPerms = await getPermissionsForRole(id);
     await updateRole(id, {
       name: data.name.trim(),
       description: data.description.trim(),
     });
-    await replaceRolePermissions(id, data.permissions);
+    await replaceRolePermissions(
+      id,
+      mergePreservedDeprecatedPermissions(data.permissions, existingPerms),
+    );
     return { ok: true, id };
   } catch (err) {
     return handleMutationError(err);
@@ -157,6 +190,9 @@ export async function removeRole(id: number): Promise<MutationResult> {
 export async function getRoleFormData(
   id: number,
 ): Promise<RoleFormData | null> {
+  const sessionOrDenied = await requirePermissionMutation("settings.roles");
+  if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return null;
+
   const role = await findRoleById(id);
   if (!role) return null;
   const permissions = await getPermissionsForRole(id);

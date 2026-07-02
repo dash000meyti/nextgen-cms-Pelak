@@ -48,6 +48,7 @@ export const permissionActions = {
     "content",
     "members",
     "media",
+    "database",
     "personal",
   ],
   modules: modulePermissionGroups.flatMap((group) =>
@@ -75,6 +76,44 @@ function buildPermissionValues(): Permission[] {
 }
 
 export const permissionValues = buildPermissionValues();
+
+/** Permissions kept in DB for additive migration but not assignable in roles UI */
+export const deprecatedPermissions = [
+  "settings.topics",
+] as const satisfies readonly Permission[];
+
+export function isDeprecatedPermission(perm: Permission): boolean {
+  return (deprecatedPermissions as readonly Permission[]).includes(perm);
+}
+
+export const assignablePermissionValues = permissionValues.filter(
+  (perm) => !isDeprecatedPermission(perm),
+);
+
+export const permissionActionLabels: Record<string, string> = {
+  create: "ایجاد",
+  edit_own: "ویرایش خود",
+  edit_all: "ویرایش همه",
+  publish: "انتشار",
+  edit: "ویرایش",
+  delete: "حذف",
+  upload: "آپلود",
+  delete_own: "حذف خود",
+  delete_all: "حذف همه",
+  manage_all: "مدیریت کامل",
+  manage: "مدیریت",
+  view: "مشاهده",
+  site: "سایت",
+  theme: "رنگ‌ها",
+  modules: "ماژول‌ها",
+  roles: "نقش‌ها",
+  topics: "موضوعات",
+  content: "محتوا",
+  members: "اعضا",
+  media: "مدیا",
+  personal: "شخصی",
+  database: "پایگاه داده",
+};
 
 /** Module permissions granted when a role had legacy `settings.content` access */
 export const settingsContentModuleBackfillPermissions = modulePermissionGroups

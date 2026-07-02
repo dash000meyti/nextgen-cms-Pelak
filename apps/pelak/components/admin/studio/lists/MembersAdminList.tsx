@@ -9,6 +9,7 @@ export type MembersAdminListRow = {
   id: number;
   slug: string;
   name: string;
+  username: string;
   email: string | null;
   avatarSrc: string | null;
   avatarAlt: string | null;
@@ -37,11 +38,12 @@ type MembersAdminListProps = {
 export function MembersAdminList({ members, canEdit }: MembersAdminListProps) {
   const { permissions } = useAdminMember();
   const canManageSettings = permissions.includes("settings.members");
+  const canCreate = permissions.includes("members.create");
 
   return (
     <DocumentList
       title="اعضا"
-      newHref="/admin/members/new"
+      newHref={canCreate ? "/admin/members/new" : undefined}
       newLabel="عضؤ جدید"
       toolbar={
         canManageSettings ? (
@@ -90,14 +92,14 @@ export function MembersAdminList({ members, canEdit }: MembersAdminListProps) {
           ),
         },
         {
-          key: "email",
-          header: "ایمیل",
+          key: "username",
+          header: "نام کاربری",
           sortable: true,
-          sortValue: (row) => row.email ?? "",
-          searchText: (row) => row.email ?? "",
+          sortValue: (row) => row.username,
+          searchText: (row) => row.username,
           render: (row) => (
             <span dir="ltr" className="text-sm text-ink-muted">
-              {row.email || "—"}
+              {row.username}
             </span>
           ),
         },

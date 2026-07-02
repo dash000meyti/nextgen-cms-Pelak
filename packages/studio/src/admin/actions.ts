@@ -1,6 +1,6 @@
 "use server";
 
-import { findMemberAuthByEmail } from "@nextgen-cms/core/db/repositories/members";
+import { findMemberAuthByUsername } from "@nextgen-cms/core/db/repositories/members";
 import {
   createMemberSession,
   destroyMemberSession,
@@ -16,25 +16,25 @@ export async function loginAdmin(
   _prevState: LoginState,
   formData: FormData,
 ): Promise<LoginState> {
-  const email = String(formData.get("email") ?? "").trim();
+  const username = String(formData.get("username") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const next = String(formData.get("next") ?? "/admin");
 
-  if (!email || !password) {
-    return { error: "ایمیل و رمز عبور الزامی است." };
+  if (!username || !password) {
+    return { error: "نام کاربری و رمز عبور الزامی است." };
   }
 
-  const member = await findMemberAuthByEmail(email);
+  const member = await findMemberAuthByUsername(username);
   if (!member || !member.passwordHash || !member.isActive) {
-    return { error: "ایمیل یا رمز عبور نادرست است." };
+    return { error: "نام کاربری یا رمز عبور نادرست است." };
   }
 
   const valid = await bcrypt.compare(password, member.passwordHash);
   if (!valid) {
-    return { error: "ایمیل یا رمز عبور نادرست است." };
+    return { error: "نام کاربری یا رمز عبور نادرست است." };
   }
 
-  await createMemberSession(member.id, member.email);
+  await createMemberSession(member.id, member.username, member.email);
   redirect(next.startsWith("/admin") ? next : "/admin");
 }
 

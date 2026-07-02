@@ -21,7 +21,7 @@ alwaysApply: false
 
 ## Docker
 
-- `docker/Dockerfile` — multi-stage standalone
+- `Dockerfile` (ریشه repo) — multi-stage standalone
 - Entrypoint: `docker/docker-entrypoint.sh`
 - Server: `node apps/pelak/server.js`
 - Volume: `/data` · Health: `GET /api/health`

@@ -53,7 +53,7 @@ docs/             مستندات فنی و عملیاتی
 
 ## استقرار Docker
 
-- تصویر production در `docker/Dockerfile`
+- تصویر production در `Dockerfile` (ریشه repo)
 - entrypoint در `docker/docker-entrypoint.sh`
 - volume داده: `/data` (شامل `/data/pelak.sqlite` و `/data/uploads`)
 

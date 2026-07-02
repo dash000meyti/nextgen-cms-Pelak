@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Historical note: `apps/site` and `apps/studio-app` appeared in early repo history and are now removed.
 - Package boundaries: contract, core, config, site-data, studio, seed
 - Root `lib/*` deprecation shims for one release cycle
-- `docker/Dockerfile` and package-aware entrypoint
+- `Dockerfile` (ریشه repo) and package-aware entrypoint
 - Developer onboarding and migration policy docs
 
 [0.1.0]: https://github.com/example/nextgen-cms/releases/tag/v0.1.0

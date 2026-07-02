@@ -5,6 +5,8 @@
 ## Compose canonical
 
 - فایل canonical: `docker-compose.yml` در ریشه repo
+- Dockerfile canonical: `Dockerfile` در ریشه repo (آروان و `docker compose` از همین مسیر build می‌گیرند)
+- entrypoint: `docker/docker-entrypoint.sh`
 - همه دستورات با فرم زیر اجرا شوند:
 
 ```bash

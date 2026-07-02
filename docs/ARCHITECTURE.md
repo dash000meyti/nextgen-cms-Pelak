@@ -2,7 +2,7 @@
 
 ## نمای کلی
 
-هر مشتری یک **container** و یک **volume** (`/data`). Image مشترک از `docker/Dockerfile`؛ تنها اپ deploy = `apps/pelak` (site عمومی + `/admin`).
+هر مشتری یک **container** و یک **volume** (`/data`). Image مشترک از `Dockerfile` (ریشه repo)؛ تنها اپ deploy = `apps/pelak` (site عمومی + `/admin`).
 
 ```mermaid
 flowchart TB

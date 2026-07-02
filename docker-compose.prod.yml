@@ -1,0 +1,25 @@
+# Production: pull pre-built image from Arvan HamDocker registry.
+# Usage:
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Override image tag:
+#   PELAK_IMAGE=registry.hamdocker.ir/syaser/pelak:0.1.0 docker compose -f docker-compose.prod.yml up -d
+
+services:
+  pelak:
+    image: ${PELAK_IMAGE:-registry.hamdocker.ir/syaser/pelak:latest}
+    ports:
+      - "3000:3000"
+    volumes:
+      - pelak-data:/data
+    environment:
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
+      BOOTSTRAP_ADMIN_USERNAME: ${BOOTSTRAP_ADMIN_USERNAME:-admin}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-changeme123}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-admin@example.com}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL is required}
+      SEED_MODE: ${SEED_MODE:-auto}
+    restart: unless-stopped
+
+volumes:
+  pelak-data:

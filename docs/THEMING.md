@@ -40,7 +40,7 @@ Hokmran theme colors and layout tokens live in SQLite, not on disk. At request t
 | `wideMax` | `--wide-max` | `76rem` |
 | `radius` | `--radius` | `6px` |
 
-Defaults: `lib/theme/defaults.ts`.
+Defaults: `packages/config/src/theme/defaults.ts`.
 
 ## Read path (public)
 
@@ -53,12 +53,12 @@ app/layout.tsx
   → applyFeatureModules()
 ```
 
-Accessors: `lib/data/get-content.ts`  
-CSS mapping: `lib/data/get-theme-css.ts`
+Accessors: `packages/site-data/src/get-content.ts`  
+CSS mapping: `packages/site-data/src/get-theme-css.ts`
 
 ## Write path (admin)
 
-Server actions in `lib/admin/config-actions.ts`:
+Server actions in `packages/studio/src/admin/config-actions.ts`:
 
 | Action | Invalidates |
 |--------|-------------|
@@ -72,16 +72,16 @@ Requires admin session (`getAdminSession`).
 
 ## Cache
 
-- Wrapper: `lib/platform/cache.ts` (`unstable_cache`)
-- Tags: `lib/platform/constants.ts` — `site-config`, `theme`
+- Wrapper: `packages/config/src/cache.ts` (`unstable_cache`)
+- Tags: `packages/config/src/constants.ts` — `site-config`, `theme`
 - No TTL; only tag invalidation via `updateTag` (from Server Actions)
 - Never write CSS files to disk
 
 ## Extending tokens
 
-1. Add field to `ThemePalette` in `lib/types/theme.ts`
-2. Add default in `lib/theme/defaults.ts` and `app/globals.css`
-3. Map to CSS in `lib/data/get-theme-css.ts` (`PALETTE_TO_CSS`)
+1. Add field to `ThemePalette` in `packages/contract/src/types/theme.ts`
+2. Add default in `packages/config/src/theme/defaults.ts` and `apps/pelak/app/globals.css`
+3. Map to CSS in `packages/site-data/src/get-theme-css.ts` (`PALETTE_TO_CSS`)
 4. Additive migration if needed (or update JSON defaults in migration seed row)
 5. Wire into `@theme inline` in `globals.css` if Tailwind utility needed
 
@@ -90,3 +90,15 @@ Requires admin session (`getAdminSession`).
 - Migration `0002_theme_tokens` creates table, seeds defaults, adds `feature_modules`
 - First-boot seed: `packages/seed/src/fixtures/theme-tokens.ts`
 - Existing installs get defaults from migration SQL
+
+## Legacy to current path map
+
+| Legacy path | Current path |
+|-------------|--------------|
+| `lib/theme/defaults.ts` | `packages/config/src/theme/defaults.ts` |
+| `lib/data/get-content.ts` | `packages/site-data/src/get-content.ts` |
+| `lib/data/get-theme-css.ts` | `packages/site-data/src/get-theme-css.ts` |
+| `lib/admin/config-actions.ts` | `packages/studio/src/admin/config-actions.ts` |
+| `lib/platform/cache.ts` | `packages/config/src/cache.ts` |
+| `lib/platform/constants.ts` | `packages/config/src/constants.ts` |
+| `lib/types/theme.ts` | `packages/contract/src/types/theme.ts` |

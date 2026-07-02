@@ -10,7 +10,7 @@
 
 ```bash
 git clone <repo>
-cd nextgen-cms
+cd <repo-dir>
 npm install
 npm run db:setup && npm run dev   # http://localhost:3134
 ```

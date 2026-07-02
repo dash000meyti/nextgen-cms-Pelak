@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **BREAKING:** Renamed `issues` module to `contentGroup` across DB, API, routes (`/content-group`), RBAC (`modules.contentGroup.*`), and uploads (`content-group/`).
+- Clarified deployment model as single deploy app: `apps/pelak` (site + `/admin`).
 
 ## [0.1.0] - 2026-06-28
 
@@ -17,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Monorepo split with npm workspaces (`@nextgen-cms/*` packages)
 - `apps/pelak` unified deploy app (public site + Studio admin)
-- `apps/site` and `apps/studio-app` for independent CI builds
+- Historical note: `apps/site` and `apps/studio-app` appeared in early repo history and are now removed.
 - Package boundaries: contract, core, config, site-data, studio, seed
 - Root `lib/*` deprecation shims for one release cycle
 - `docker/Dockerfile` and package-aware entrypoint

@@ -1,72 +1,111 @@
 # راهنمای استقرار (Vendor)
 
-این سند برای تیم استقرار است که image جدید را روی volume موجود مشتری deploy می‌کند.
+این سند مسیر canonical استقرار `apps/pelak` در حالت single-container را مشخص می‌کند.
+
+## Compose canonical
+
+- فایل canonical: `docker-compose.yml` در ریشه repo
+- همه دستورات با فرم زیر اجرا شوند:
+
+```bash
+docker compose -f docker-compose.yml <command>
+```
+
+> فایل `docker/docker-compose.yml` فقط برای سازگاری نگه داشته شده و مرجع اصلی عملیات نیست.
 
 ## پیش‌نیازها
 
-- Docker / Docker Compose
-- Volume پایدار برای `/data`
-- متغیرهای محیطی (حداقل `SESSION_SECRET`)
+- Docker Engine + Docker Compose v2
+- volume پایدار برای `/data`
+- تنظیم environmentهای production (حداقل `SESSION_SECRET`)
 
-## استقرار اولیه
+## Pre-flight checklist (قبل از deploy)
 
-```bash
-docker compose up -d --build
-```
-
-اولین startup:
-1. پوشهٔ `/data/backups` ساخته می‌شود
-2. migrations اعمال می‌شود
-3. seed اولیه (محتوا + admin + `platform_meta`)
-4. Next.js روی پورت 3000
-
-پس از first boot، رمز admin را از `ADMIN_PASSWORD` عوض کنید.
+1. `SESSION_SECRET` مقدار امن و بلند داشته باشد.
+2. `NEXT_PUBLIC_SITE_URL` با دامنه واقعی تولید یکی باشد.
+3. mount پایدار `/data` فعال باشد.
+4. از دیتابیس فعلی backup خارج از هاست نیز نگه‌داری شود.
+5. روی commit/tag مقصد، `npm run ci:check` پاس شده باشد.
 
 ## متغیرهای محیطی
 
 | متغیر | الزامی | توضیح |
 |-------|--------|--------|
 | `SESSION_SECRET` | بله (prod) | امضای session ادمین |
-| `ADMIN_EMAIL` | first boot | ایمیل admin (پیش‌فرض در seed) |
-| `ADMIN_PASSWORD` | first boot | رمز admin اولیه |
-| `NEXT_PUBLIC_SITE_URL` | توصیه‌شده | sitemap و robots |
-| `DATABASE_URL` | خیر | entrypoint همیشه `file:/data/pelak.sqlite` set می‌کند |
+| `ADMIN_EMAIL` | فقط first boot | ایمیل admin اولیه |
+| `ADMIN_PASSWORD` | فقط first boot | رمز admin اولیه |
+| `NEXT_PUBLIC_SITE_URL` | بله | مبنای sitemap/robots و URL عمومی |
+| `DATABASE_URL` | خیر | entrypoint آن را به `file:/data/pelak.sqlite` override می‌کند |
 
-## Upgrade به tag جدید
+## استقرار اولیه
 
 ```bash
-# 1. (اختیاری) backup دستی
-docker compose exec pelak npm run db:backup
-
-# 2. pull/build image جدید
-docker compose pull   # یا: docker build -f docker/Dockerfile -t nextgen-cms:local .
-docker compose up -d
-
-# 3. بررسی health
-curl -s http://localhost:3000/api/health
+docker compose -f docker-compose.yml up -d --build
 ```
 
-Startup خودکار:
-- backup timestamped قبل از migrate
-- migrate (بدون seed، مگر first boot)
-- `ensure-platform-meta` برای نصب‌های قدیمی
+در startup نخست:
+1. `/data/backups` و `/data/uploads` ساخته می‌شود.
+2. migrate اجرا می‌شود.
+3. در first boot، seed اولیه (از جمله admin و `platform_meta`) اجرا می‌شود.
+4. سرویس روی پورت 3000 بالا می‌آید.
 
-## Rollback
+پس از first boot، رمز admin را فوراً تغییر دهید.
 
-1. container را متوقف کنید
-2. آخرین backup را از `/data/backups/` روی `/data/pelak.sqlite` کپی کنید
-3. image قبلی را اجرا کنید
+## Upgrade (build-from-source flow)
 
 ```bash
-docker compose down
+# 1) backup دستی داخل کانتینر (پیش از restart)
+docker compose -f docker-compose.yml exec pelak \
+  node ./node_modules/tsx/dist/cli.mjs packages/core/scripts/backup-db.ts
+
+# 2) rebuild + restart
+docker compose -f docker-compose.yml up -d --build
+
+# 3) بررسی health
+curl -sSf http://localhost:3000/api/health
+```
+
+Startup خودکار در هر restart:
+- backup timestamped قبل از migrate (اگر DB موجود باشد)
+- migrate additive
+- seed فقط در first boot
+- اجرای `ensure-platform-meta` برای نصب‌های موجود
+
+## Post-deploy smoke checks
+
+1. `GET /api/health` باید `200` برگرداند.
+2. ورود ادمین در `/admin/login` موفق باشد.
+3. یک عملیات نوشتنی ساده در admin (مثلاً بروزرسانی تنظیمات) انجام شود.
+4. بارگذاری و دسترسی فایل در `/uploads/...` بررسی شود.
+5. مسیرهای public کلیدی (`/`, `/content`, `/content-group`, `/video`) باز شوند.
+
+## Backup retention و بازیابی
+
+- حداقل 7 نسخه روزانه + 4 نسخه هفتگی نگه‌داری شود.
+- backupهای داخلی `/data/backups` باید به storage خارجی نیز کپی شوند.
+
+### Rollback / Restore
+
+1. سرویس را متوقف کنید.
+2. فایل backup معتبر را روی `/data/pelak.sqlite` برگردانید.
+3. سرویس را با image هدف بالا بیاورید.
+4. health + login + مسیرهای کلیدی را verify کنید.
+
+```bash
+docker compose -f docker-compose.yml down
 cp /data/backups/pelak-YYYYMMDD-HHmmss.sqlite /data/pelak.sqlite
-docker compose up -d
-# با image/tag قبلی
+docker compose -f docker-compose.yml up -d
 ```
 
-**توجه:** rollback schema فقط وقتی ایمن است که migration جدید اجرا نشده یا backup قبل از migrate گرفته شده باشد.
+> rollback schema فقط وقتی ایمن است که backup قبل از migration ناسازگار گرفته شده باشد.
 
-## Health check
+## Secret rotation policy
+
+- `SESSION_SECRET` در بازه‌های منظم (مثلاً هر 90 روز) rotate شود.
+- بعد از rotate، ری‌استارت کنترل‌شده انجام و login مجدد بررسی شود.
+- credentialهای first-boot (`ADMIN_PASSWORD`) موقت هستند و باید بلافاصله تعویض شوند.
+
+## Health check response
 
 `GET /api/health` → `200`:
 
@@ -79,7 +118,7 @@ docker compose up -d
 }
 ```
 
-`503` یعنی DB در دسترس نیست.
+`503` به معنی عدم دسترسی DB است.
 
 ## توسعه محلی
 
@@ -89,14 +128,14 @@ npm run db:setup
 npm run dev
 ```
 
-`npm run build` به DB نیاز ندارد (صفحات `force-dynamic`).
+`npm run build` به DB نیاز ندارد.
 
 ## دستورات مفید
 
 | دستور | کاربرد |
 |-------|--------|
 | `npm run db:migrate` | اعمال migrations |
-| `npm run db:backup` | backup دستی |
+| `npm run db:backup` | backup دستی در محیط local |
 | `FIRST_BOOT=1 npm run db:seed` | seed اولیه |
 | `npm run db:seed -- --force` | re-seed کامل (خطرناک در prod) |
 | `npm run start:prod` | migrate + start (بدون Docker) |

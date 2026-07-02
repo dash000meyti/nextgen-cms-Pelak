@@ -1,60 +1,64 @@
-# حکمران — هفته‌نامه سیاسی-اقتصادی
+# حکمران (Nextgen CMS / Pelak)
 
-سایت هفته‌نامهٔ فارسی «حکمران» با چیدمان ویرایشی مشابه [Foreign Affairs](https://www.foreignaffairs.com/)، برند قرمز، فونت IRANSans، حالت روشن/تیره، و دادهٔ ماک.
+پلتفرم CMS فارسی (RTL) با Next.js 16، SQLite و Drizzle در ساختار monorepo.  
+تنها اپ قابل استقرار `apps/pelak` است (سایت عمومی + استودیو در `/admin`).
 
-> این نسخه فقط لایهٔ UI است. داده‌ها ماک‌اند و بک‌اند بعداً به accessorهای `lib/data/get-content.ts` وصل می‌شود.
-
-## اجرا
-
-```bash
-npm run dev      # http://localhost:3134
-npm run build    # build تولیدی
-npm run lint     # biome check
-npm run format   # biome format --write
-```
-
-## مسیرها
-
-- `/` — صفحهٔ اصلی (گروه محتوای جاری، مقالات اصلی، پرخواننده‌ترین‌ها، موضوعات، انتخاب سردبیر، ویدیوها، خبرنامه)
-- `/articles` — فهرست مقالات با فیلتر موضوع
-- `/articles/[slug]` — صفحهٔ خواندن مقاله
-- `/topics/[slug]` — مقالات هر موضوع
-- `/authors/[slug]` — صفحهٔ نویسنده
-- `/content-group` — آرشیو هفته‌نامه
-- `/content-group/[number]` — جزئیات هر گروه محتوا
-- `/video` — ویدیوها
-- `/about` — درباره ما
-- `/contact` — تماس با ما
-
-## ساختار
-
-```
-app/            مسیرها (Server Components پیش‌فرض)
-components/      layout, article, home, content-group, video, contact, ui, theme
-lib/types/       قرارداد داده (article, content-group, site)
-lib/data/        ماک + accessorها (get-content.ts تنها منبع)
-public/images/   placeholderهای SVG
-scripts/         generate-placeholders.mjs
-.cursor/         rules + skills
-```
-
-## قراردادها
-
-- کامپوننت‌ها فقط `props` می‌گیرند؛ داده از `lib/data/get-content.ts`.
-- بدون لایبرری UI؛ همه‌چیز دست‌ساز با Tailwind v4.
-- RTL، فونت IRANSans، رنگ برند قرمز `#8b0016`.
-- تم روشن/تیره با `ThemeProvider` + FOUC script.
-
-جزئیات در [AGENTS.md](AGENTS.md)، قوانین در `.cursor/rules/`، و اسکیل در `.cursor/skills/`.
-
-## نقشهٔ راه بک‌اند
-
-1. پیاده‌سازی API مطابق تایپ‌های `lib/types/*`.
-2. جایگزینی accessorهای `lib/data/get-content.ts` با fetch/API (تایپ‌ها و کامپوننت‌ها ثابت می‌مانند).
-3. حذف ماک‌های `lib/data/` پس از اتصال.
-
-## تصاویر placeholder
+## شروع سریع
 
 ```bash
-node scripts/generate-placeholders.mjs
+npm install
+npm run db:setup
+npm run dev
 ```
+
+- وب‌سایت: `http://localhost:3134`
+- ادمین: `http://localhost:3134/admin/login`
+
+## دستورات اصلی
+
+```bash
+npm run dev
+npm run build
+npm run build:pelak
+npm run ci:check
+npm run start:prod
+```
+
+## معماری مخزن
+
+```text
+apps/pelak        اپ deploy (site + /admin)
+packages/contract تایپ‌ها، مجوزها، schema contract
+packages/core     DB, migrations, repos, platform paths
+packages/config   theme defaults + cache tags
+packages/site-data accessorهای public
+packages/studio   query/mutationهای admin + session
+packages/seed     first-boot seed
+docker/           Dockerfile + entrypoint
+docs/             مستندات فنی و عملیاتی
+```
+
+## مسیرهای کلیدی
+
+- Public: `/`, `/content`, `/content/[slug]`, `/members/[slug]`, `/topics/[slug]`, `/content-group`, `/video`, `/about`, `/contact`
+- Admin: `/admin/login`, `/admin`, `/admin/content`, `/admin/members`, `/admin/media`, `/admin/settings`
+- Aliasهای قدیمی مثل `/articles/*` و `/authors/*` با redirect دائمی به مسیرهای canonical هدایت می‌شوند.
+
+## اصول اجرایی
+
+- public data فقط از `@nextgen-cms/site-data`
+- admin mutation/query فقط از `@nextgen-cms/studio`
+- migrationها additive-only و دیتابیس canonical: `pelak.sqlite`
+- build نباید migrate/seed اجرا کند
+
+## استقرار Docker
+
+- تصویر production در `docker/Dockerfile`
+- entrypoint در `docker/docker-entrypoint.sh`
+- volume داده: `/data` (شامل `/data/pelak.sqlite` و `/data/uploads`)
+
+راهنمای کامل:
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [docs/MIGRATION-POLICY.md](docs/MIGRATION-POLICY.md)
+- [docs/ONBOARDING.md](docs/ONBOARDING.md)

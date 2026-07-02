@@ -5,8 +5,6 @@ RUN apk add --no-cache python3 make g++
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/pelak/package.json ./apps/pelak/
-COPY apps/site/package.json ./apps/site/
-COPY apps/studio/package.json ./apps/studio/
 COPY packages/contract/package.json ./packages/contract/
 COPY packages/core/package.json ./packages/core/
 COPY packages/config/package.json ./packages/config/

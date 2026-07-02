@@ -79,7 +79,7 @@ sequenceDiagram
   EP->>Img: node apps/pelak/server.js
 ```
 
-1. image جدید pull/deploy
+1. image جدید build/deploy (canonical: `docker compose -f docker-compose.yml up -d --build`)
 2. startup: backup → `npm run db:migrate` (additive-only)
 3. seed فقط first-boot — دادهٔ موجود دست‌نخورده
 4. health: `GET /api/health`

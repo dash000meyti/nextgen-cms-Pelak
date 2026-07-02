@@ -73,7 +73,15 @@ export function TableHeaderIcon({
   );
 }
 
-function ActionIcon({ name }: { name: TableActionLinkProps["icon"] | TableActionButtonProps["icon"] | "id" | "actions" }) {
+function ActionIcon({
+  name,
+}: {
+  name:
+    | TableActionLinkProps["icon"]
+    | TableActionButtonProps["icon"]
+    | "id"
+    | "actions";
+}) {
   const icons: Record<string, ReactNode> = {
     view: (
       <svg

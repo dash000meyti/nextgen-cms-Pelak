@@ -17,7 +17,8 @@ import { ShareBar } from "@/components/ui/ShareBar";
 
 type ArticleDetailViewProps = {
   article: Article;
-  slug: string;
+  shareUrl: string;
+  pdfDownloadUrl?: string;
   related: ArticlePreview[];
   currentContentGroup: ContentGroup;
   siteConfig: SiteConfig;
@@ -25,7 +26,8 @@ type ArticleDetailViewProps = {
 
 export function ArticleDetailView({
   article,
-  slug,
+  shareUrl,
+  pdfDownloadUrl,
   related,
   currentContentGroup,
   siteConfig,
@@ -57,7 +59,11 @@ export function ArticleDetailView({
 
       <Container variant="wide" className="pb-16">
         <div className="mx-auto max-w-content space-y-12 lg:hidden">
-          <ShareBar title={article.title} shareUrl={`/content/${slug}`} />
+          <ShareBar
+            title={article.title}
+            shareUrl={shareUrl}
+            pdfDownloadUrl={pdfDownloadUrl}
+          />
           <ArticleBody blocks={article.body} />
           <AuthorList
             authors={article.authors}
@@ -72,7 +78,8 @@ export function ArticleDetailView({
             <div className="sticky top-[40dvh] z-10 ">
               <ShareBar
                 title={article.title}
-                shareUrl={`/content/${slug}`}
+                shareUrl={shareUrl}
+                pdfDownloadUrl={pdfDownloadUrl}
                 variant="sidebar"
               />
             </div>

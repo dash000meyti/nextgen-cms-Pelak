@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 import { type ReactNode, useMemo, useState } from "react";
-import {
-  TableActionLink,
-  TableHeaderIcon,
-} from "./TableActionButton";
+import { TableActionLink, TableHeaderIcon } from "./TableActionButton";
 import {
   type DocumentListSort,
   filterRows,

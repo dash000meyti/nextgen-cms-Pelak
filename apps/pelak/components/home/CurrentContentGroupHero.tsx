@@ -25,7 +25,10 @@ export function CurrentContentGroupHero({
             <SectionTitle
               title={group.label}
               action={
-                <Button href={`/content-group/${group.number}`} variant="outline">
+                <Button
+                  href={`/content-group/${group.number}`}
+                  variant="outline"
+                >
                   {`مشاهده محتوای شماره ${group.number.toLocaleString("fa-IR")}`}
                 </Button>
               }

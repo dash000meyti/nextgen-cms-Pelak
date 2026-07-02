@@ -13,6 +13,12 @@ const BASE_FIELDS: DocumentField[] = [
   { key: "coverSrc", label: "جلد", kind: "image", required: true },
   { key: "coverAlt", label: "متن جایگزین", kind: "text" },
   {
+    key: "pdfSrc",
+    label: "فایل PDF",
+    kind: "text",
+    hint: "اختیاری - برای نمایش دکمه دانلود PDF در صفحه عمومی",
+  },
+  {
     key: "publishedAt",
     label: "تاریخ انتشار",
     kind: "date",

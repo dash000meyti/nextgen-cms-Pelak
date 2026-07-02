@@ -127,6 +127,29 @@ export async function findArticleBySlug(slug: string) {
   return article ? mapArticleRowToArticle(article) : undefined;
 }
 
+export async function findPublishedArticleById(id: number) {
+  const rows = await findPublishedArticles(eq(articles.id, id));
+  const article = rows[0];
+  if (!article) return undefined;
+  return {
+    id: article.id,
+    slug: article.slug,
+    article: mapArticleRowToArticle(article),
+  };
+}
+
+export async function findPublishedArticleShareMetaBySlug(slug: string) {
+  const rows = await db
+    .select({ id: articles.id, slug: articles.slug })
+    .from(articles)
+    .where(and(eq(articles.slug, slug), published))
+    .limit(1);
+
+  const row = rows[0];
+  if (!row) return undefined;
+  return { id: row.id, slug: row.slug };
+}
+
 export async function findArticlesByTopicSlug(topicSlug: string) {
   const topicRow = await db
     .select({ id: topics.id })

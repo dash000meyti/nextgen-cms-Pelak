@@ -3,7 +3,10 @@ type DocumentListThumbnailProps = {
   alt: string;
 };
 
-export function DocumentListThumbnail({ src, alt }: DocumentListThumbnailProps) {
+export function DocumentListThumbnail({
+  src,
+  alt,
+}: DocumentListThumbnailProps) {
   return (
     <div className="relative size-12 overflow-hidden bg-surface-2">
       {src ? (

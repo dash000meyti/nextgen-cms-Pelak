@@ -1,3 +1,5 @@
+import { buildContentGroupPdfPath } from "@nextgen-cms/contract/short-links";
+
 function DownloadIcon() {
   return (
     <svg
@@ -17,17 +19,22 @@ function DownloadIcon() {
   );
 }
 
-export function ContentGroupPdfDownload() {
+type ContentGroupPdfDownloadProps = {
+  number: number;
+};
+
+export function ContentGroupPdfDownload({
+  number,
+}: ContentGroupPdfDownloadProps) {
   return (
-    <button
-      type="button"
-      disabled
-      aria-disabled="true"
-      aria-label="دانلود PDF — به‌زودی"
-      className="inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-full border border-accent px-5 py-2 text-sm font-medium text-accent opacity-50"
+    <a
+      href={buildContentGroupPdfPath(number)}
+      download
+      aria-label="دانلود PDF گروه محتوا"
+      className="inline-flex items-center justify-center gap-2 rounded-full border border-accent px-5 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent-soft"
     >
       <DownloadIcon />
       دانلود PDF
-    </button>
+    </a>
   );
 }

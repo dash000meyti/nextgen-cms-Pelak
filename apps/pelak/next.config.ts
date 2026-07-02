@@ -93,10 +93,17 @@ const routeRedirects = [
 const nextConfig: NextConfig = {
   reactCompiler: true,
   output: "standalone",
-  serverExternalPackages: ["better-sqlite3"],
+  serverExternalPackages: ["better-sqlite3", "playwright-core"],
+  outputFileTracingIncludes: {
+    "/api/pdf/content/[id]": ["./lib/pdf/fonts/**/*", "./public/images/**/*"],
+    "/api/pdf/content-group/[number]": [
+      "./lib/pdf/fonts/**/*",
+      "./public/images/**/*",
+    ],
+  },
   experimental: {
     serverActions: {
-      bodySizeLimit: "5mb",
+      bodySizeLimit: "12mb",
     },
   },
   transpilePackages: [

@@ -11,8 +11,6 @@ export function idColumn<T extends { id: number }>(): DocumentListColumn<T> {
     sortValue: (row) => row.id,
     searchText: (row) => String(row.id),
     className: "w-20",
-    render: (row) => (
-      <span dir="ltr">{row.id.toLocaleString("fa-IR")}</span>
-    ),
+    render: (row) => <span dir="ltr">{row.id.toLocaleString("fa-IR")}</span>,
   };
 }

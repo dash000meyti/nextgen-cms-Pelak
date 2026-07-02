@@ -6,6 +6,7 @@ export type ContentGroupSummary = {
   year: number;
   label: string;
   cover: ImageMeta;
+  pdfSrc?: string | null;
   publishedAt: string;
   articleCount: number;
 };

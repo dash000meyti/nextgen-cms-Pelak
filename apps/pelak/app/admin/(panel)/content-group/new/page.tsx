@@ -21,6 +21,7 @@ export default async function NewContentGroupPage() {
     label: "",
     coverSrc: "",
     coverAlt: "",
+    pdfSrc: "",
     publishedAt: todayIsoIran(),
   };
 

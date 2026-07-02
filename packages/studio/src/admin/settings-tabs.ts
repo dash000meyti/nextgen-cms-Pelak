@@ -1,11 +1,6 @@
 import type { Permission } from "@nextgen-cms/contract/permissions";
 
-export type SettingsTabId =
-  | "personal"
-  | "site"
-  | "theme"
-  | "roles"
-  | "modules";
+export type SettingsTabId = "personal" | "site" | "theme" | "roles" | "modules";
 
 export type SettingsTab = {
   id: SettingsTabId;

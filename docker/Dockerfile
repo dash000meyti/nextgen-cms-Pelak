@@ -23,7 +23,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build -w @nextgen-cms/pelak
 
 FROM node:22-alpine AS runner
-RUN apk add --no-cache wget su-exec
+RUN apk add --no-cache wget su-exec chromium nss freetype harfbuzz ca-certificates ttf-freefont
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -32,11 +32,13 @@ ENV DATABASE_URL=file:/data/pelak.sqlite
 ENV MIGRATIONS_DIR=/app/packages/core/drizzle/migrations
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 COPY --from=build /app/apps/pelak/public ./apps/pelak/public
+COPY --from=build /app/apps/pelak/lib/pdf/fonts ./apps/pelak/lib/pdf/fonts
 COPY --from=build --chown=nextjs:nodejs /app/apps/pelak/.next/standalone ./
 COPY --from=build --chown=nextjs:nodejs /app/apps/pelak/.next/static ./apps/pelak/.next/static
 COPY --from=build /app/packages/core/drizzle ./packages/core/drizzle

@@ -1,3 +1,4 @@
+import { buildContentGroupShortPath } from "@nextgen-cms/contract/short-links";
 import {
   getAllContentGroupNumbers,
   getContentGroupByNumber,
@@ -9,7 +10,6 @@ import { notFound } from "next/navigation";
 import { ArticleListItem } from "@/components/article/ArticleListItem";
 import { SectionTitle } from "@/components/article/SectionHeader";
 import { ContentGroupEditionNav } from "@/components/content-group/ContentGroupEditionNav";
-import { ContentGroupPdfDownload } from "@/components/content-group/ContentGroupPdfDownload";
 import { contentGroupCoverFrameClass } from "@/components/content-group/content-group-cover-aspect";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Container } from "@/components/layout/Container";
@@ -94,10 +94,10 @@ export default async function ContentGroupPage({
             منتشر شده در <JalaliDate value={group.publishedAt} /> —{" "}
             {group.articleCount.toLocaleString("fa-IR")} محتوا
           </p>
-          <ContentGroupPdfDownload />
           <ShareBar
             title={group.label}
-            shareUrl={`/content-group/${number}`}
+            shareUrl={buildContentGroupShortPath(number)}
+            pdfDownloadUrl={group.pdfSrc ?? undefined}
           />
         </div>
       </div>

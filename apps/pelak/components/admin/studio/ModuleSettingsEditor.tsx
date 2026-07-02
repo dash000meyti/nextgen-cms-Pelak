@@ -29,10 +29,7 @@ export function ModuleSettingsEditor({ value }: ModuleSettingsEditorProps) {
   return (
     <div className="max-w-lg space-y-6">
       {MODULE_IDS.map((moduleId) => (
-        <section
-          key={moduleId}
-          className="rounded border border-rule p-4"
-        >
+        <section key={moduleId} className="rounded border border-rule p-4">
           <label className="flex items-center gap-3 text-sm text-ink">
             <input
               type="checkbox"

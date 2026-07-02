@@ -1,4 +1,8 @@
 import {
+  buildContentPdfPath,
+  buildContentShortPath,
+} from "@nextgen-cms/contract/short-links";
+import {
   getCurrentContentGroup,
   getRelatedArticles,
   getSiteConfig,
@@ -6,8 +10,8 @@ import {
 import { getArticleForAdmin } from "@nextgen-cms/studio/cms/queries";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArticleDetailView } from "@/components/article/ArticleDetailView";
 import { ContentPreviewBanner } from "@/components/admin/studio/ContentPreviewBanner";
+import { ArticleDetailView } from "@/components/article/ArticleDetailView";
 
 type PreviewPageProps = {
   params: Promise<{ id: string }>;
@@ -44,12 +48,17 @@ export default async function ContentPreviewPage({ params }: PreviewPageProps) {
     getSiteConfig(),
   ]);
 
+  const shareUrl = buildContentShortPath(articleId);
+  const pdfDownloadUrl =
+    status === "published" ? buildContentPdfPath(articleId) : undefined;
+
   return (
     <>
       <ContentPreviewBanner articleId={articleId} status={status} />
       <ArticleDetailView
         article={article}
-        slug={slug}
+        shareUrl={shareUrl}
+        pdfDownloadUrl={pdfDownloadUrl}
         related={related}
         currentContentGroup={currentContentGroup}
         siteConfig={siteConfig}

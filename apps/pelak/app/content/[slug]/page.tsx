@@ -1,5 +1,10 @@
 import {
+  buildContentPdfPath,
+  buildContentShortPath,
+} from "@nextgen-cms/contract/short-links";
+import {
   getArticleBySlug,
+  getArticleShareMetaBySlug,
   getCurrentContentGroup,
   getRelatedArticles,
   getSiteConfig,
@@ -43,15 +48,24 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   if (!article) notFound();
 
   const related = await getRelatedArticles(slug, 4);
-  const [currentContentGroup, siteConfig] = await Promise.all([
+  const [currentContentGroup, siteConfig, shareMeta] = await Promise.all([
     getCurrentContentGroup(),
     getSiteConfig(),
+    getArticleShareMetaBySlug(slug),
   ]);
+
+  const shareUrl = shareMeta
+    ? buildContentShortPath(shareMeta.id)
+    : `/content/${slug}`;
+  const pdfDownloadUrl = shareMeta
+    ? buildContentPdfPath(shareMeta.id)
+    : undefined;
 
   return (
     <ArticleDetailView
       article={article}
-      slug={slug}
+      shareUrl={shareUrl}
+      pdfDownloadUrl={pdfDownloadUrl}
       related={related}
       currentContentGroup={currentContentGroup}
       siteConfig={siteConfig}

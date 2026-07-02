@@ -8,6 +8,7 @@ export const contentGroups = sqliteTable("content_groups", {
   label: text("label").notNull(),
   coverSrc: text("cover_src").notNull(),
   coverAlt: text("cover_alt").notNull().default(""),
+  pdfSrc: text("pdf_src"),
   publishedAt: text("published_at").notNull(),
 });
 

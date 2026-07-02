@@ -139,24 +139,26 @@ export function ImageField({
         />
       ) : null}
 
-      {src ? previewAspectClass ? (
-        <div
-          className={`relative overflow-hidden rounded border border-rule ${previewAspectClass}`}
-        >
-          {/* biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs */}
+      {src ? (
+        previewAspectClass ? (
+          <div
+            className={`relative overflow-hidden rounded border border-rule ${previewAspectClass}`}
+          >
+            {/* biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs */}
+            <img
+              src={src}
+              alt={alt || label}
+              className="h-full w-full object-cover"
+            />
+          </div>
+        ) : (
+          // biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs
           <img
             src={src}
             alt={alt || label}
-            className="h-full w-full object-cover"
+            className="max-h-40 rounded border border-rule"
           />
-        </div>
-      ) : (
-        // biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs
-        <img
-          src={src}
-          alt={alt || label}
-          className="max-h-40 rounded border border-rule"
-        />
+        )
       ) : null}
     </div>
   );

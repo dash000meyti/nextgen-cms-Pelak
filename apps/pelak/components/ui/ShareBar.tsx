@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 type ShareBarProps = {
   title: string;
   shareUrl: string;
+  pdfDownloadUrl?: string;
   variant?: "inline" | "sidebar";
 };
 
@@ -32,7 +33,7 @@ function LinkIcon({ size = 14 }: { size?: number }) {
   );
 }
 
-function EmailIcon({ size = 14 }: { size?: number }) {
+function DownloadIcon({ size = 14 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -45,19 +46,15 @@ function EmailIcon({ size = 14 }: { size?: number }) {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <rect width="20" height="16" x="2" y="4" rx="2" />
-      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+      <path d="M12 4v10m0 0 3.5-3.5M12 14l-3.5-3.5M5 18h14" />
     </svg>
   );
-}
-
-function buildMailtoHref(title: string, absoluteShareUrl: string) {
-  return `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(absoluteShareUrl)}`;
 }
 
 export function ShareBar({
   title,
   shareUrl,
+  pdfDownloadUrl,
   variant = "inline",
 }: ShareBarProps) {
   const [copied, setCopied] = useState(false);
@@ -80,6 +77,30 @@ export function ShareBar({
   const buttonClass =
     "rounded-full border border-rule text-xs text-ink-muted transition-colors hover:border-accent hover:text-accent";
 
+  const pdfButton = pdfDownloadUrl ? (
+    <a
+      href={pdfDownloadUrl}
+      download
+      aria-label={`دانلود PDF: ${title}`}
+      className={`${buttonClass} flex flex-col items-center gap-1 px-3 py-2 text-center`}
+    >
+      <DownloadIcon />
+      PDF
+    </a>
+  ) : null;
+
+  const pdfButtonInline = pdfDownloadUrl ? (
+    <a
+      href={pdfDownloadUrl}
+      download
+      aria-label={`دانلود PDF: ${title}`}
+      className={`${buttonClass} inline-flex items-center gap-1.5 px-4 py-1.5`}
+    >
+      <DownloadIcon />
+      دانلود PDF
+    </a>
+  ) : null;
+
   if (variant === "sidebar") {
     return (
       <nav
@@ -98,13 +119,7 @@ export function ShareBar({
             <LinkIcon />
             {copied ? "کپی" : "لینک"}
           </button>
-          <a
-            href={buildMailtoHref(title, absoluteShareUrl)}
-            className={`${buttonClass} flex flex-col items-center gap-1 px-3 py-2 text-center`}
-          >
-            <EmailIcon />
-            ایمیل
-          </a>
+          {pdfButton}
         </div>
       </nav>
     );
@@ -124,13 +139,7 @@ export function ShareBar({
           <LinkIcon />
           {copied ? "کپی شد" : "کپی لینک"}
         </button>
-        <a
-          href={buildMailtoHref(title, absoluteShareUrl)}
-          className={`${buttonClass} inline-flex items-center gap-1.5 px-4 py-1.5`}
-        >
-          <EmailIcon />
-          ایمیل
-        </a>
+        {pdfButtonInline}
       </div>
     </div>
   );

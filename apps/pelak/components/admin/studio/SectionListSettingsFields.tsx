@@ -89,9 +89,7 @@ export function SectionListSettingsFields({
         <input
           type="checkbox"
           checked={value.showInMenu}
-          onChange={(e) =>
-            onChange({ ...value, showInMenu: e.target.checked })
-          }
+          onChange={(e) => onChange({ ...value, showInMenu: e.target.checked })}
           className="accent-accent"
         />
         <span>نمایش در منو</span>

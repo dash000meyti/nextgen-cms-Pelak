@@ -20,7 +20,9 @@ export function SurveyForm() {
     <form onSubmit={handleSubmit} className="space-y-4 text-start">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-ink">شماره موبایل (اختیاری)</span>
+          <span className="text-sm font-medium text-ink">
+            شماره موبایل (اختیاری)
+          </span>
           <input
             name="phone"
             type="tel"

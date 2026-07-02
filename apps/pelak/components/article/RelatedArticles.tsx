@@ -13,11 +13,7 @@ export function RelatedArticles({ articles }: RelatedArticlesProps) {
   return (
     <section aria-label="پیشنهادهای مرتبط" className="bg-surface">
       <Container className="border-b border-rule py-25">
-        <SectionTitle
-          title="پیشنهادهای مرتبط"
-          titleWeight="normal"
-          bordered
-        />
+        <SectionTitle title="پیشنهادهای مرتبط" titleWeight="normal" bordered />
         <ul className="grid gap-x-8 md:grid-cols-2 md:gap-x-14">
           {articles.map((article, index) => (
             <ArticleListItem

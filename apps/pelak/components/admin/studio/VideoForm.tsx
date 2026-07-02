@@ -28,9 +28,7 @@ export function VideoForm({ mode, videoId, initial }: VideoFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [form, setForm] = useState(initial);
-  const uploadContext = videoId
-    ? { videoId }
-    : { memberId: session.memberId };
+  const uploadContext = videoId ? { videoId } : { memberId: session.memberId };
 
   function update<K extends keyof VideoFormData>(
     key: K,

@@ -15,6 +15,7 @@ const MIME_TYPES: Record<string, string> = {
   ".png": "image/png",
   ".webp": "image/webp",
   ".svg": "image/svg+xml",
+  ".pdf": "application/pdf",
 };
 
 function isSafeRelativePath(relativePath: string): boolean {

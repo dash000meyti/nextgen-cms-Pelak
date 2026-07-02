@@ -17,6 +17,8 @@ import {
   findArticlesByTopicSlug,
   findEditorsPicks,
   findFeaturedArticles,
+  findPublishedArticleById,
+  findPublishedArticleShareMetaBySlug,
 } from "@nextgen-cms/core/db/repositories/articles";
 import {
   findAllContentGroupNumbers,
@@ -125,6 +127,22 @@ export async function getArticleBySlug(
     ["article", slug],
     [CACHE_TAGS.articles, CACHE_TAGS.article(slug)],
     () => findArticleBySlug(slug),
+  )();
+}
+
+export async function getPublishedArticleById(id: number) {
+  return platformCache(
+    ["article-by-id", String(id)],
+    [CACHE_TAGS.articles],
+    () => findPublishedArticleById(id),
+  )();
+}
+
+export async function getArticleShareMetaBySlug(slug: string) {
+  return platformCache(
+    ["article-share-meta", slug],
+    [CACHE_TAGS.articles, CACHE_TAGS.article(slug)],
+    () => findPublishedArticleShareMetaBySlug(slug),
   )();
 }
 

@@ -26,12 +26,20 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteConfig = await getSiteConfig();
+  const logoUrl = siteConfig.logo?.trim();
+  const iconVersion = logoUrl ? encodeURIComponent(logoUrl) : "default";
+  const iconUrl = `/icon?v=${iconVersion}`;
   return {
     title: {
       default: `${siteConfig.name} | ${siteConfig.tagline}`,
       template: `%s | ${siteConfig.name}`,
     },
     description: siteConfig.description,
+    icons: {
+      icon: [{ url: iconUrl }],
+      shortcut: [{ url: iconUrl }],
+      apple: [{ url: iconUrl }],
+    },
   };
 }
 

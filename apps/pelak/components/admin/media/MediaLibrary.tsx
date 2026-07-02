@@ -102,7 +102,7 @@ export function MediaLibrary({
             <input
               ref={fileRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/svg+xml"
+              accept="image/jpeg,image/png,image/webp,image/svg+xml,application/pdf"
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];

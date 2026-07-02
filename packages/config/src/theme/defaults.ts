@@ -158,8 +158,14 @@ export function normalizeVideoModuleSettings(
 }
 
 export const DEFAULT_MEDIA_SETTINGS: MediaSettings = {
-  maxBytes: 5 * 1024 * 1024,
-  allowedMime: ["image/jpeg", "image/png", "image/webp", "image/svg+xml"],
+  maxBytes: 10 * 1024 * 1024,
+  allowedMime: [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/svg+xml",
+    "application/pdf",
+  ],
   pipeline: { stripMetadata: false, generateWebp: false },
 };
 
@@ -208,10 +214,7 @@ export const DEFAULT_CONTENT_SETTINGS: ContentSettings = {
 export function normalizeContentSettings(
   stored: Partial<ContentSettings> | null | undefined,
 ): ContentSettings {
-  const list = normalizeSectionListSettings(
-    stored,
-    DEFAULT_CONTENT_SETTINGS,
-  );
+  const list = normalizeSectionListSettings(stored, DEFAULT_CONTENT_SETTINGS);
   return {
     defaultArticleStatus:
       stored?.defaultArticleStatus ??

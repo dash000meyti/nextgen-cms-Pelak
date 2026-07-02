@@ -32,6 +32,7 @@ export type ContentGroupFormData = {
   label: string;
   coverSrc: string;
   coverAlt: string;
+  pdfSrc: string;
   publishedAt: string;
 };
 
@@ -61,6 +62,7 @@ function parseFormData(data: ContentGroupFormData): ContentGroupWriteInput {
     label: data.label.trim(),
     coverSrc: data.coverSrc.trim(),
     coverAlt: data.coverAlt.trim(),
+    pdfSrc: data.pdfSrc.trim() || null,
     publishedAt,
   };
 }
@@ -73,6 +75,9 @@ async function validate(input: ContentGroupWriteInput, excludeId?: number) {
   if (labelError) return labelError;
   const coverError = validateImageMeta(input.coverSrc, input.coverAlt, "جلد");
   if (coverError) return coverError;
+  if (input.pdfSrc && !input.pdfSrc.toLowerCase().endsWith(".pdf")) {
+    return "فایل PDF نامعتبر است.";
+  }
   const exists = await contentGroupNumberExistsAdmin(input.number, excludeId);
   if (exists) return "این شماره قبلاً استفاده شده است.";
   return undefined;
@@ -84,6 +89,14 @@ async function resolveContentGroupCoverSrc(
 ): Promise<string> {
   if (!coverSrc.trim()) return coverSrc;
   return promoteMediaToFolder(coverSrc, contentGroupPath(contentGroupId));
+}
+
+async function resolveContentGroupPdfSrc(
+  contentGroupId: number,
+  pdfSrc: string | null | undefined,
+): Promise<string | null> {
+  if (!pdfSrc?.trim()) return null;
+  return promoteMediaToFolder(pdfSrc, contentGroupPath(contentGroupId));
 }
 
 export async function createContentGroup(
@@ -102,10 +115,11 @@ export async function createContentGroup(
   try {
     const id = await insertContentGroup(input, access(session.memberId));
     const coverSrc = await resolveContentGroupCoverSrc(id, input.coverSrc);
-    if (coverSrc !== input.coverSrc) {
+    const pdfSrc = await resolveContentGroupPdfSrc(id, input.pdfSrc);
+    if (coverSrc !== input.coverSrc || pdfSrc !== input.pdfSrc) {
       await updateContentGroup(
         id,
-        { ...input, coverSrc },
+        { ...input, coverSrc, pdfSrc },
         access(session.memberId),
       );
     }
@@ -136,9 +150,10 @@ export async function saveContentGroup(
 
   try {
     const coverSrc = await resolveContentGroupCoverSrc(id, input.coverSrc);
+    const pdfSrc = await resolveContentGroupPdfSrc(id, input.pdfSrc);
     await updateContentGroup(
       id,
-      { ...input, coverSrc },
+      { ...input, coverSrc, pdfSrc },
       access(session.memberId),
     );
     invalidateContentGroups();

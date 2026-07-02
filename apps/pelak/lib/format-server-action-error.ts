@@ -4,8 +4,7 @@ function isBodySizeLimitError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
   const err = error as ErrorWithStatus;
   return (
-    err.statusCode === 413 ||
-    /body exceeded|bodysizelimit/i.test(err.message)
+    err.statusCode === 413 || /body exceeded|bodysizelimit/i.test(err.message)
   );
 }
 

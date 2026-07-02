@@ -27,7 +27,10 @@ export function TopContentGroup({ group }: TopContentGroupProps) {
               priority
             />
           </Link>
-          <Link href={`/content-group/${group.number}`} className="min-w-0 flex-1">
+          <Link
+            href={`/content-group/${group.number}`}
+            className="min-w-0 flex-1"
+          >
             <p className="text-start font-heading text-sm text-ink sm:text-center sm:text-base md:text-lg">
               <span className="block px-1 text-ink-muted sm:inline">
                 جدیدترین گروه محتوا:{" "}

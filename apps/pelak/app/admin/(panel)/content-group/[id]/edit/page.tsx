@@ -29,6 +29,7 @@ export default async function EditContentGroupPage({ params }: PageProps) {
     label: group.label,
     coverSrc: group.coverSrc,
     coverAlt: group.coverAlt,
+    pdfSrc: group.pdfSrc ?? "",
     publishedAt: group.publishedAt,
   };
 

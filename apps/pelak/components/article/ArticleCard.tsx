@@ -141,10 +141,11 @@ export function ArticleCard({
 
     const contentBlock = (
       <div className="flex flex-col justify-center gap-2 md:col-span-7">
-        {sectionTitle ? (
-          <SectionTitle title={sectionTitle} bordered />
-        ) : null}
-        <Link href={`/content/${article.slug}`} className="group space-y-3 pt-6">
+        {sectionTitle ? <SectionTitle title={sectionTitle} bordered /> : null}
+        <Link
+          href={`/content/${article.slug}`}
+          className="group space-y-3 pt-6"
+        >
           <h2 className="mb-0 pb-3 text-card-title transition-colors group-hover:text-accent">
             {article.title}
           </h2>

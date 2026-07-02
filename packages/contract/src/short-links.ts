@@ -1,0 +1,35 @@
+export type ShortLinkTarget =
+  | { kind: "content"; id: number }
+  | { kind: "contentGroup"; number: number };
+
+export function buildContentShortPath(id: number): string {
+  return `/p/c${id}`;
+}
+
+export function buildContentGroupShortPath(number: number): string {
+  return `/p/m${number}`;
+}
+
+export function buildContentPdfPath(id: number): string {
+  return `/api/pdf/content/${id}`;
+}
+
+export function buildContentGroupPdfPath(number: number): string {
+  return `/api/pdf/content-group/${number}`;
+}
+
+export function parseShortLinkCode(code: string): ShortLinkTarget | null {
+  const contentMatch = /^c(\d+)$/.exec(code);
+  if (contentMatch) {
+    const id = Number.parseInt(contentMatch[1] ?? "", 10);
+    if (id > 0) return { kind: "content", id };
+  }
+
+  const groupMatch = /^m(\d+)$/.exec(code);
+  if (groupMatch) {
+    const number = Number.parseInt(groupMatch[1] ?? "", 10);
+    if (number > 0) return { kind: "contentGroup", number };
+  }
+
+  return null;
+}

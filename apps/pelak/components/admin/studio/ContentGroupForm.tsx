@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { ImageField } from "@/components/admin/fields/ImageField";
 import { JalaliDateField } from "@/components/admin/fields/JalaliDateField";
+import { PdfField } from "@/components/admin/fields/PdfField";
 import { TextField } from "@/components/admin/fields/TextField";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
 
@@ -187,6 +188,13 @@ export function ContentGroupForm({
         uploadContext={uploadContext}
         previewAspectClass="aspect-2/3 w-full max-w-[160px]"
         required
+      />
+      <PdfField
+        id="pdf"
+        label="فایل PDF"
+        src={form.pdfSrc}
+        onSrcChange={(pdfSrc) => update("pdfSrc", pdfSrc)}
+        uploadContext={uploadContext}
       />
       <button
         type="button"

@@ -27,7 +27,10 @@ export function ContentPreviewBanner({
           >
             بازگشت به ویرایش
           </Link>
-          <Link href="/admin/content" className="text-ink-muted hover:text-accent">
+          <Link
+            href="/admin/content"
+            className="text-ink-muted hover:text-accent"
+          >
             فهرست محتوا
           </Link>
         </div>

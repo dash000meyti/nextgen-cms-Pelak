@@ -92,6 +92,13 @@
       "when": 1782664000000,
       "tag": "0012_topics_show_on_homepage",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1783664000000,
+      "tag": "0013_content_groups_pdf_src",
+      "breakpoints": true
     }
   ]
 }

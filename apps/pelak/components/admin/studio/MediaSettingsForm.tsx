@@ -12,6 +12,7 @@ const MIME_OPTIONS = [
   { value: "image/png", label: "PNG" },
   { value: "image/webp", label: "WebP" },
   { value: "image/svg+xml", label: "SVG" },
+  { value: "application/pdf", label: "PDF" },
 ];
 
 type MediaSettingsFormProps = {

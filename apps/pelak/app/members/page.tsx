@@ -48,11 +48,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
           </li>
         ))}
       </ul>
-      <ListPagination
-        page={page}
-        totalPages={totalPages}
-        basePath="/members"
-      />
+      <ListPagination page={page} totalPages={totalPages} basePath="/members" />
     </Container>
   );
 }

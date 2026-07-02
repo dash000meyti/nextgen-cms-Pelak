@@ -72,9 +72,7 @@ export default async function ContentGroupsPage({
 
     return (
       <Container className="py-8 md:py-14">
-        <Breadcrumbs
-          items={[{ label: "خانه", href: "/" }, { label: title }]}
-        />
+        <Breadcrumbs items={[{ label: "خانه", href: "/" }, { label: title }]} />
         <div className="mt-6">
           <SectionHeader
             title={title}

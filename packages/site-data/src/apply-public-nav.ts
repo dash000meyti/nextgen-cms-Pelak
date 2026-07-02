@@ -38,10 +38,7 @@ function removeNavSection(sections: NavSection[], id: string): NavSection[] {
   return sections.filter((section) => section.id !== id);
 }
 
-function upsertMembersNav(
-  sections: NavSection[],
-  label: string,
-): NavSection[] {
+function upsertMembersNav(sections: NavSection[], label: string): NavSection[] {
   const existing = sections.find(
     (section) => section.id === SECTION_NAV_IDS.members,
   );

@@ -137,16 +137,20 @@ export async function updateSiteSettings(data: Partial<SiteConfig>) {
   if (data.defaultDirection !== undefined) {
     payload.defaultDirection = data.defaultDirection;
   }
-  if (data.typography !== undefined) payload.typography = jsonColumn(data.typography);
-  if (data.navSections !== undefined) payload.navSections = jsonColumn(data.navSections);
+  if (data.typography !== undefined)
+    payload.typography = jsonColumn(data.typography);
+  if (data.navSections !== undefined)
+    payload.navSections = jsonColumn(data.navSections);
   if (data.utilityLinks !== undefined) {
     payload.utilityLinks = jsonColumn(data.utilityLinks);
   }
   if (data.footerColumns !== undefined) {
     payload.footerColumns = jsonColumn(data.footerColumns);
   }
-  if (data.socialLinks !== undefined) payload.socialLinks = jsonColumn(data.socialLinks);
-  if (data.hotTopics !== undefined) payload.hotTopics = jsonColumn(data.hotTopics);
+  if (data.socialLinks !== undefined)
+    payload.socialLinks = jsonColumn(data.socialLinks);
+  if (data.hotTopics !== undefined)
+    payload.hotTopics = jsonColumn(data.hotTopics);
   if (data.contactEmail !== undefined) payload.contactEmail = data.contactEmail;
 
   if (Object.keys(payload).length === 0) return;

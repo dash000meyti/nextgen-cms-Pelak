@@ -98,5 +98,7 @@ export function mapMemberSettingsRow(row: SiteSettingsRow): MemberSettings {
 }
 
 export function mapContentSettingsRow(row: SiteSettingsRow): ContentSettings {
-  return normalizeContentSettings(parseJson<ContentSettings>(row.contentSettings));
+  return normalizeContentSettings(
+    parseJson<ContentSettings>(row.contentSettings),
+  );
 }

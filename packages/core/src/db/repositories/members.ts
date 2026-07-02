@@ -227,7 +227,9 @@ function authorProfileFromMember(row: MemberAuthorProfileRow) {
   };
 }
 
-export async function ensureMemberAuthorProfile(memberId: number): Promise<number> {
+export async function ensureMemberAuthorProfile(
+  memberId: number,
+): Promise<number> {
   const rows = await db
     .select({
       slug: members.slug,

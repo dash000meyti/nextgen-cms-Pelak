@@ -15,6 +15,7 @@ export function mapContentGroupSummaryRow(
     year: row.year,
     label: row.label,
     cover: { src: row.coverSrc, alt: row.coverAlt },
+    pdfSrc: row.pdfSrc,
     publishedAt: row.publishedAt,
     articleCount,
   };

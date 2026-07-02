@@ -14,6 +14,7 @@ export type ContentGroupWriteInput = {
   label: string;
   coverSrc: string;
   coverAlt: string;
+  pdfSrc?: string | null;
   publishedAt: string;
 };
 
@@ -73,6 +74,7 @@ export async function insertContentGroup(
       label: input.label,
       coverSrc: input.coverSrc,
       coverAlt: input.coverAlt,
+      pdfSrc: input.pdfSrc ?? null,
       publishedAt: input.publishedAt,
     })
     .returning({ id: contentGroups.id });
@@ -104,6 +106,7 @@ export async function updateContentGroup(
       label: input.label,
       coverSrc: input.coverSrc,
       coverAlt: input.coverAlt,
+      pdfSrc: input.pdfSrc ?? null,
       publishedAt: input.publishedAt,
     })
     .where(eq(contentGroups.id, id));

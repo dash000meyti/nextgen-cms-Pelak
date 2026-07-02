@@ -4,6 +4,7 @@ export * from "./media/folder-path";
 export * from "./media/no-op-processor";
 export * from "./permissions";
 export * from "./roles";
+export * from "./short-links";
 export * from "./types/article";
 export * from "./types/content-group";
 export * from "./types/media";

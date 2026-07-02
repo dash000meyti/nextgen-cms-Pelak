@@ -36,6 +36,11 @@ export async function countMediaReferences(publicUrl: string): Promise<number> {
     .from(contentGroups)
     .where(eq(contentGroups.coverSrc, publicUrl));
 
+  const [contentGroupPdf] = await db
+    .select({ total: count() })
+    .from(contentGroups)
+    .where(eq(contentGroups.pdfSrc, publicUrl));
+
   const [videoThumb] = await db
     .select({ total: count() })
     .from(videos)
@@ -47,6 +52,7 @@ export async function countMediaReferences(publicUrl: string): Promise<number> {
     (memberAvatar?.total ?? 0) +
     (authorAvatar?.total ?? 0) +
     (contentGroupCover?.total ?? 0) +
+    (contentGroupPdf?.total ?? 0) +
     (videoThumb?.total ?? 0)
   );
 }
@@ -91,6 +97,13 @@ export async function mediaReferenceSummary(
     .where(eq(contentGroups.coverSrc, publicUrl))
     .limit(1);
   if (contentGroupHits.length > 0) refs.push("جلد گروه محتوا");
+
+  const contentGroupPdfHits = await db
+    .select({ id: contentGroups.id })
+    .from(contentGroups)
+    .where(eq(contentGroups.pdfSrc, publicUrl))
+    .limit(1);
+  if (contentGroupPdfHits.length > 0) refs.push("PDF گروه محتوا");
 
   const videoHits = await db
     .select({ id: videos.id })

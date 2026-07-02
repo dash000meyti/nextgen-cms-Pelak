@@ -8,6 +8,7 @@ import {
   insertTopic,
   type TopicWriteInput,
   updateTopic,
+  updateTopicShowOnHomepage as updateTopicShowOnHomepageRepo,
 } from "@nextgen-cms/core/db/repositories/topics-admin";
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";
@@ -24,6 +25,7 @@ export type TopicFormData = {
   slug: string;
   name: string;
   description: string;
+  showOnHomepage: boolean;
 };
 
 function access(memberId: number) {
@@ -42,6 +44,7 @@ function parseFormData(data: TopicFormData): TopicWriteInput {
     slug: data.slug.trim(),
     name: data.name.trim(),
     description: data.description.trim(),
+    showOnHomepage: data.showOnHomepage,
   };
 }
 
@@ -112,6 +115,31 @@ export async function deleteTopic(id: number): Promise<MutationResult> {
     await deleteTopicRepo(id, access(session.memberId));
     invalidateTopics();
     invalidateTopic(existing.slug);
+    return { ok: true, id };
+  } catch (error) {
+    return handleMutationError(error);
+  }
+}
+
+export async function setTopicShowOnHomepage(
+  id: number,
+  showOnHomepage: boolean,
+): Promise<MutationResult> {
+  const sessionOrDenied = await requirePermissionMutation("settings.content");
+  if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
+  const session = sessionOrDenied as Awaited<ReturnType<typeof requireMember>>;
+
+  const existing = await findTopicById(id, access(session.memberId));
+  if (!existing) return { ok: false, error: "موضوع یافت نشد." };
+
+  try {
+    const slug = await updateTopicShowOnHomepageRepo(
+      id,
+      showOnHomepage,
+      access(session.memberId),
+    );
+    invalidateTopics();
+    invalidateTopic(slug);
     return { ok: true, id };
   } catch (error) {
     return handleMutationError(error);

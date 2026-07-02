@@ -1,11 +1,16 @@
 "use client";
 
-import type { SettingsTab } from "@nextgen-cms/studio/admin/settings-tabs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+export type NavTab = {
+  id: string;
+  label: string;
+  href: string;
+};
+
 type SettingsNavProps = {
-  tabs: SettingsTab[];
+  tabs: NavTab[];
 };
 
 export function SettingsNav({ tabs }: SettingsNavProps) {

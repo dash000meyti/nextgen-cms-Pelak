@@ -4,7 +4,6 @@ import type { ContentSettings } from "@nextgen-cms/contract/types/modules";
 import { saveContentSettings } from "@nextgen-cms/studio/cms/mutations/settings";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { TextField } from "@/components/admin/fields/TextField";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { SectionListSettingsFields } from "@/components/admin/studio/SectionListSettingsFields";
 
@@ -57,40 +56,6 @@ export function ContentSettingsForm({ value }: ContentSettingsFormProps) {
           <option value="draft">پیش‌نویس</option>
           <option value="published">منتشرشده</option>
         </select>
-      </label>
-      <label className="flex items-center gap-3 text-sm text-ink">
-        <input
-          type="checkbox"
-          checked={settings.slugAutoGenerate}
-          onChange={(e) =>
-            setSettings({ ...settings, slugAutoGenerate: e.target.checked })
-          }
-          className="accent-accent"
-        />
-        <span>تولید خودکار slug از عنوان</span>
-      </label>
-      <TextField
-        id="homepage-count"
-        label="تعداد مقالات صفحهٔ اصلی"
-        type="number"
-        value={String(settings.homepageArticleCount)}
-        onChange={(raw) =>
-          setSettings({
-            ...settings,
-            homepageArticleCount: Number.parseInt(raw, 10) || 6,
-          })
-        }
-      />
-      <label className="flex items-center gap-3 text-sm text-ink">
-        <input
-          type="checkbox"
-          checked={settings.showAuthorOnCards}
-          onChange={(e) =>
-            setSettings({ ...settings, showAuthorOnCards: e.target.checked })
-          }
-          className="accent-accent"
-        />
-        <span>نمایش نویسنده در کارت مقالات</span>
       </label>
       <button
         type="button"

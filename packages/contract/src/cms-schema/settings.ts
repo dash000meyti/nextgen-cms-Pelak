@@ -118,17 +118,6 @@ export const contentSettingsSchema = {
         { value: "published", label: "منتشرشده" },
       ],
     },
-    { key: "slugAutoGenerate", label: "slug خودکار", kind: "boolean" },
-    {
-      key: "homepageArticleCount",
-      label: "تعداد مقالات صفحهٔ اصلی",
-      kind: "number",
-    },
-    {
-      key: "showAuthorOnCards",
-      label: "نمایش نویسنده در کارت",
-      kind: "boolean",
-    },
     { key: "pageTitle", label: "عنوان صفحه", kind: "text", required: true },
     {
       key: "itemsPerPage",

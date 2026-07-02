@@ -30,12 +30,14 @@
 
 | بخش | مسیر | مجوز |
 |-----|------|------|
-| محتوا | `/admin/content/settings` | `settings.content` |
-| موضوعات | `/admin/content/topics` | `settings.content` |
+| محتوا | `/admin/content/settings/content` | `settings.content` |
+| موضوعات (تب) | `/admin/content/settings/topics` | `settings.content` |
 | اعضا | `/admin/members/settings` | `settings.members` |
 | مدیا | تب «تنظیمات» در `/admin/media` | `settings.media` |
 | گروه محتوا | `/admin/content-group/settings` | `modules.contentGroup.edit` |
 | ویدیو | `/admin/videos/settings` | `modules.video.edit` |
+
+تنظیمات محتوا **۲ تب** دارد (`packages/studio/src/admin/content-settings-tabs.ts`): «محتوا» و «موضوعات». `/admin/content/settings` به تب محتوا redirect می‌شود. CRUD موضوع (`/admin/content/topics/new`, `.../edit`) جدا از تب‌هاست.
 
 مسیرهای قدیم (`/admin/settings/content`, `/admin/settings/topics`, …) → redirect.
 

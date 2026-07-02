@@ -6,5 +6,6 @@ export function mapTopicRow(row: TopicRow): Topic {
     slug: row.slug,
     name: row.name,
     description: row.description,
+    showOnHomepage: row.showOnHomepage === 1,
   };
 }

@@ -29,7 +29,7 @@ const routeRedirects = [
   },
   {
     source: "/admin/settings/topics",
-    destination: "/admin/content/topics",
+    destination: "/admin/content/settings/topics",
     permanent: true,
   },
   {
@@ -39,7 +39,7 @@ const routeRedirects = [
   },
   {
     source: "/admin/topics",
-    destination: "/admin/content/topics",
+    destination: "/admin/content/settings/topics",
     permanent: true,
   },
   {
@@ -49,7 +49,7 @@ const routeRedirects = [
   },
   {
     source: "/admin/settings/content",
-    destination: "/admin/content/settings",
+    destination: "/admin/content/settings/content",
     permanent: true,
   },
   {

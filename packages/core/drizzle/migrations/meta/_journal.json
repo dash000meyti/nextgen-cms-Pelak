@@ -85,6 +85,13 @@
       "when": 1782663000000,
       "tag": "0011_module_section_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1782664000000,
+      "tag": "0012_topics_show_on_homepage",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,7 @@
+import { paginateItems, parsePageParam } from "@nextgen-cms/config/pagination";
 import {
   getArticlesByTopic,
+  getContentSettings,
   getTopicBySlug,
 } from "@nextgen-cms/site-data/get-content";
 import type { Metadata } from "next";
@@ -9,9 +11,11 @@ import { ArticleCardGrid } from "@/components/article/ArticleCardGrid";
 import { SectionHeader } from "@/components/article/SectionHeader";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Container } from "@/components/layout/Container";
+import { ListPagination } from "@/components/ui/ListPagination";
 
 type TopicPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
 export async function generateMetadata({
@@ -27,12 +31,24 @@ export async function generateMetadata({
   };
 }
 
-export default async function TopicPage({ params }: TopicPageProps) {
-  const { slug } = await params;
+export default async function TopicPage({
+  params,
+  searchParams,
+}: TopicPageProps) {
+  const [{ slug }, query, settings] = await Promise.all([
+    params,
+    searchParams,
+    getContentSettings(),
+  ]);
   const topic = await getTopicBySlug(slug);
   if (!topic) notFound();
 
   const articles = await getArticlesByTopic(slug);
+  const page = parsePageParam(query.page);
+  const { items: pageArticles, totalPages } = paginateItems(articles, {
+    page,
+    perPage: settings.itemsPerPage,
+  });
 
   return (
     <Container className="py-8 md:py-14">
@@ -43,7 +59,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
         <SectionHeader title={topic.name} description={topic.description} />
       </div>
       <ArticleCardGrid columns={3}>
-        {articles.map((article, index) => (
+        {pageArticles.map((article, index) => (
           <ArticleCard
             key={article.slug}
             article={article}
@@ -51,6 +67,11 @@ export default async function TopicPage({ params }: TopicPageProps) {
           />
         ))}
       </ArticleCardGrid>
+      <ListPagination
+        page={page}
+        totalPages={totalPages}
+        basePath={`/topics/${slug}`}
+      />
     </Container>
   );
 }

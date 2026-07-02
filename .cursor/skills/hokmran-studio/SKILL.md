@@ -29,7 +29,7 @@ description: راهنمای Studio CMS و افزودن document type در پلت
 
 - هاب ۵ تب: `/admin/settings/<tab>` — `packages/studio/src/admin/settings-tabs.ts`
 - تنظیمات بخش: `/admin/content/settings`, `/admin/members/settings`, تب مدیا، `/admin/content-group/settings`, `/admin/videos/settings`
-- موضوعات: `/admin/content/topics` — (`settings.content`)
+- موضوعات: `/admin/content/settings/topics` — (`settings.content`)
 - ماژول‌ها: `settings.modules` = نام + toggle · `modules.*` = CRUD — `ModuleSettingsEditor`
 
 ## Publish

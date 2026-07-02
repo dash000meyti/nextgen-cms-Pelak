@@ -28,6 +28,7 @@ export default async function EditContentTopicPage({ params }: PageProps) {
     slug: topic.slug,
     name: topic.name,
     description: topic.description,
+    showOnHomepage: topic.showOnHomepage === 1,
   };
 
   return (
@@ -35,7 +36,7 @@ export default async function EditContentTopicPage({ params }: PageProps) {
       <div className="flex items-center justify-between gap-4">
         <h2 className="font-heading text-xl text-ink">ویرایش موضوع</h2>
         <Link
-          href="/admin/content/topics"
+          href="/admin/content/settings/topics"
           className="text-sm text-ink-muted hover:text-accent"
         >
           بازگشت به موضوعات

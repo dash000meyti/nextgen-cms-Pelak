@@ -69,7 +69,7 @@ export function TopicForm({ mode, topicId, initial }: TopicFormProps) {
         setError(result.error);
         return;
       }
-      router.push("/admin/content/topics");
+      router.push("/admin/content/settings/topics");
       router.refresh();
     });
   }
@@ -102,6 +102,15 @@ export function TopicForm({ mode, topicId, initial }: TopicFormProps) {
         onChange={(description) => update("description", description)}
         rows={4}
       />
+      <label className="flex items-center gap-3 text-sm text-ink">
+        <input
+          type="checkbox"
+          checked={form.showOnHomepage}
+          onChange={(e) => update("showOnHomepage", e.target.checked)}
+          className="accent-accent"
+        />
+        <span>نمایش در صفحه اول</span>
+      </label>
       <button
         type="button"
         onClick={handleSave}

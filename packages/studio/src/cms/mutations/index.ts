@@ -61,6 +61,7 @@ export {
   createTopicAndRedirect,
   deleteTopic,
   saveTopic,
+  setTopicShowOnHomepage,
   type TopicFormData,
 } from "@nextgen-cms/studio/cms/mutations/topic";
 export {

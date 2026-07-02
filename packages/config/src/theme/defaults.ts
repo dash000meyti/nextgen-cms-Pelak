@@ -196,9 +196,6 @@ export function normalizeMemberSettings(
 
 export const DEFAULT_CONTENT_SETTINGS: ContentSettings = {
   defaultArticleStatus: "draft",
-  slugAutoGenerate: true,
-  homepageArticleCount: 6,
-  showAuthorOnCards: true,
   pageTitle: "محتوا",
   itemsPerPage: 12,
   showInMenu: true,
@@ -215,13 +212,6 @@ export function normalizeContentSettings(
     defaultArticleStatus:
       stored?.defaultArticleStatus ??
       DEFAULT_CONTENT_SETTINGS.defaultArticleStatus,
-    slugAutoGenerate:
-      stored?.slugAutoGenerate ?? DEFAULT_CONTENT_SETTINGS.slugAutoGenerate,
-    homepageArticleCount:
-      stored?.homepageArticleCount ??
-      DEFAULT_CONTENT_SETTINGS.homepageArticleCount,
-    showAuthorOnCards:
-      stored?.showAuthorOnCards ?? DEFAULT_CONTENT_SETTINGS.showAuthorOnCards,
     ...list,
   };
 }

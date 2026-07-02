@@ -5,6 +5,7 @@ export const topics = sqliteTable("topics", {
   slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
   description: text("description").notNull().default(""),
+  showOnHomepage: integer("show_on_homepage").notNull().default(1),
 });
 
 export type TopicRow = typeof topics.$inferSelect;

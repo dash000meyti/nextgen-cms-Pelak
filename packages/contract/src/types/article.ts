@@ -29,6 +29,7 @@ export type Topic = {
   slug: string;
   name: string;
   description: string;
+  showOnHomepage: boolean;
 };
 
 export type ArticlePreview = {

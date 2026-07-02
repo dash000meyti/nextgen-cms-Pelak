@@ -52,9 +52,6 @@ export type MemberSettings = SectionListSettings & {
 
 export type ContentSettings = SectionListSettings & {
   defaultArticleStatus: "draft" | "published";
-  slugAutoGenerate: boolean;
-  homepageArticleCount: number;
-  showAuthorOnCards: boolean;
 };
 
 /** @deprecated Use ModuleSettings.contentGroup.enabled etc. */

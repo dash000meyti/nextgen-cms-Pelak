@@ -138,7 +138,7 @@ sequenceDiagram
 
 ## Settings hub
 
-`/admin/settings` — ۸ تب مجوزمحور (personal, site, theme, roles, content, members, media, modules). موضوعات زیر `/admin/settings/content/topics` — نه تب جدا. داده در `site_settings` با ستون‌های JSON additive.
+`/admin/settings` — ۵ تب مجوزمحور (personal, site, theme, roles, modules). تنظیمات بخش‌ها خارج از هاب: محتوا (`/admin/content/settings` با تب‌های «محتوا» و «موضوعات»)، اعضا، مدیا، گروه محتوا، ویدیو. دادهٔ تنظیمات در `site_settings` با ستون‌های JSON additive؛ پرچم `show_on_homepage` روی جدول `topics`.
 
 ## Route aliases
 

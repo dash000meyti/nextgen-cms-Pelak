@@ -24,7 +24,7 @@ export default async function NewArticlePage() {
     title: "",
     subtitle: "",
     excerpt: "",
-    status: "draft",
+    status: contentSettings.defaultArticleStatus,
     publishedAt: null,
     readingMinutes: 5,
     heroSrc: "",

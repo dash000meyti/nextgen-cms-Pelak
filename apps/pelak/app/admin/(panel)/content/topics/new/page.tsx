@@ -13,6 +13,7 @@ const EMPTY_FORM: TopicFormData = {
   slug: "",
   name: "",
   description: "",
+  showOnHomepage: false,
 };
 
 export default async function NewContentTopicPage() {
@@ -23,7 +24,7 @@ export default async function NewContentTopicPage() {
       <div className="flex items-center justify-between gap-4">
         <h2 className="font-heading text-xl text-ink">موضوع جدید</h2>
         <Link
-          href="/admin/content/topics"
+          href="/admin/content/settings/topics"
           className="text-sm text-ink-muted hover:text-accent"
         >
           بازگشت به موضوعات

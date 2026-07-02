@@ -193,6 +193,7 @@ for (const topic of mockTopics) {
       slug: topic.slug,
       name: topic.name,
       description: topic.description,
+      showOnHomepage: topic.showOnHomepage ? 1 : 0,
     })
     .returning({ id: schema.topics.id })
     .all();

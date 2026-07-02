@@ -9,6 +9,7 @@ export type TopicWriteInput = {
   slug: string;
   name: string;
   description: string;
+  showOnHomepage: boolean;
 };
 
 export async function findTopicById(id: number, access?: AdminAccess) {
@@ -51,6 +52,7 @@ export async function insertTopic(input: TopicWriteInput, access: AdminAccess) {
       slug: input.slug,
       name: input.name,
       description: input.description,
+      showOnHomepage: input.showOnHomepage ? 1 : 0,
     })
     .returning({ id: topics.id });
   const id = result[0]?.id;
@@ -78,8 +80,31 @@ export async function updateTopic(
       slug: input.slug,
       name: input.name,
       description: input.description,
+      showOnHomepage: input.showOnHomepage ? 1 : 0,
     })
     .where(eq(topics.id, id));
+}
+
+export async function updateTopicShowOnHomepage(
+  id: number,
+  showOnHomepage: boolean,
+  access: AdminAccess,
+) {
+  await assertMemberPermission(access.memberId, "settings.content");
+
+  const existing = await db
+    .select({ id: topics.id, slug: topics.slug })
+    .from(topics)
+    .where(eq(topics.id, id))
+    .limit(1);
+  if (!existing[0]) throw new PermissionDeniedError();
+
+  await db
+    .update(topics)
+    .set({ showOnHomepage: showOnHomepage ? 1 : 0 })
+    .where(eq(topics.id, id));
+
+  return existing[0].slug;
 }
 
 export async function deleteTopic(id: number, access: AdminAccess) {

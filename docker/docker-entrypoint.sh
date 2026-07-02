@@ -20,7 +20,7 @@ su-exec nextjs:nodejs node ./node_modules/tsx/dist/cli.mjs packages/core/scripts
 if su-exec nextjs:nodejs node ./node_modules/tsx/dist/cli.mjs packages/core/scripts/is-first-boot.ts; then
   export FIRST_BOOT=1
   echo "First boot detected; seeding database..."
-  su-exec nextjs:nodejs env FIRST_BOOT=1 node ./node_modules/tsx/dist/cli.mjs packages/seed/src/seed.ts --first-boot
+  su-exec nextjs:nodejs env FIRST_BOOT=1 node ./node_modules/tsx/dist/cli.mjs packages/seed/src/seed.ts --first-boot --force
 else
   echo "Existing installation; seed skipped."
   su-exec nextjs:nodejs node ./node_modules/tsx/dist/cli.mjs packages/seed/src/ensure-platform-meta.ts

@@ -13,7 +13,7 @@
 docker compose -f docker-compose.yml <command>
 ```
 
-> فایل `docker/docker-compose.yml` فقط برای سازگاری نگه داشته شده و مرجع اصلی عملیات نیست.
+> entrypoint در `docker/docker-entrypoint.sh` است.
 
 ## پیش‌نیازها
 

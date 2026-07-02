@@ -39,11 +39,17 @@ COPY --from=build /app/apps/pelak/public ./apps/pelak/public
 COPY --from=build /app/apps/pelak/lib/pdf/fonts ./apps/pelak/lib/pdf/fonts
 COPY --from=build --chown=nextjs:nodejs /app/apps/pelak/.next/standalone ./
 COPY --from=build --chown=nextjs:nodejs /app/apps/pelak/.next/static ./apps/pelak/.next/static
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/packages/core/package.json ./packages/core/package.json
 COPY --from=build /app/packages/core/drizzle ./packages/core/drizzle
 COPY --from=build /app/packages/core/scripts ./packages/core/scripts
 COPY --from=build /app/packages/core/src ./packages/core/src
-COPY --from=build /app/packages/seed/src ./packages/seed/src
+COPY --from=build /app/packages/config/package.json ./packages/config/package.json
+COPY --from=build /app/packages/config/src ./packages/config/src
+COPY --from=build /app/packages/contract/package.json ./packages/contract/package.json
 COPY --from=build /app/packages/contract/src ./packages/contract/src
+COPY --from=build /app/packages/seed/package.json ./packages/seed/package.json
+COPY --from=build /app/packages/seed/src ./packages/seed/src
 COPY --from=build /app/tsconfig.base.json ./tsconfig.base.json
 COPY --from=deps /app/node_modules ./node_modules
 COPY docker/docker-entrypoint.sh ./docker-entrypoint.sh

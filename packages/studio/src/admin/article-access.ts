@@ -4,15 +4,17 @@ import type { MemberSession } from "@nextgen-cms/contract/types/member";
 import { PERMISSION_DENIED } from "@nextgen-cms/core/db/access/permission-messages";
 import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
 
+export type PermissionBearer = Pick<MemberSession, "memberId" | "permissions">;
+
 export function hasPermission(
-  session: MemberSession,
+  session: PermissionBearer,
   permission: Permission,
 ): boolean {
   return session.permissions.includes(permission);
 }
 
 export function canEditArticle(
-  session: MemberSession,
+  session: PermissionBearer,
   article: { createdByMemberId: number | null },
 ): boolean {
   if (hasPermission(session, "content.edit_all")) return true;
@@ -21,13 +23,13 @@ export function canEditArticle(
 }
 
 export function canDeleteArticle(
-  session: MemberSession,
+  session: PermissionBearer,
   article: { createdByMemberId: number | null },
 ): boolean {
   return canEditArticle(session, article);
 }
 
-export function canPublishContent(session: MemberSession): boolean {
+export function canPublishContent(session: PermissionBearer): boolean {
   return hasPermission(session, "content.publish");
 }
 

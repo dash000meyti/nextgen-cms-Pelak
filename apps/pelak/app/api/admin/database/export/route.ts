@@ -1,10 +1,8 @@
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 import { resolveSqlitePath } from "@nextgen-cms/core/platform/paths";
-import {
-  assertSessionPermission,
-  requireMember,
-} from "@nextgen-cms/studio/admin/require-permission";
+import { assertSessionPermission } from "@nextgen-cms/studio/admin/require-permission";
+import { requireMember } from "@nextgen-cms/studio/admin/require-member";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

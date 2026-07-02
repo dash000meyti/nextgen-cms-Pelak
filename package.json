@@ -24,8 +24,7 @@
     "db:promote-article-media": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:promote-article-media -w @nextgen-cms/core",
     "db:setup": "npm run db:migrate && FIRST_BOOT=1 npm run db:seed",
     "ci:check": "bash scripts/ci-check.sh",
-    "release": "node scripts/release.mjs",
-    "docker:publish:arvan": "bash scripts/docker-publish-arvan.sh"
+    "release": "node scripts/release.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",

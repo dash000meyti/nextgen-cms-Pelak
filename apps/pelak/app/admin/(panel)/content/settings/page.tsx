@@ -1,3 +1,4 @@
+import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
 import { getContentSettings } from "@nextgen-cms/site-data/get-content";
 import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
 import type { Metadata } from "next";
@@ -12,16 +13,17 @@ export const metadata: Metadata = {
 export default async function ContentSectionSettingsPage() {
   await requirePermission("settings.content");
   const contentSettings = await getContentSettings();
+  const labels = sectionAdminLabels(contentSettings.pageTitle);
 
   return (
     <div className="space-y-10">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="font-heading text-2xl text-ink">تنظیمات محتوا</h1>
+        <h1 className="font-heading text-2xl text-ink">{labels.settings}</h1>
         <Link
           href="/admin/content"
           className="text-sm text-ink-muted hover:text-accent"
         >
-          بازگشت به محتوا
+          {labels.backToList}
         </Link>
       </div>
       <ContentSettingsForm value={contentSettings} />

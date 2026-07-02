@@ -1,3 +1,5 @@
+import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
+import { getVideoModuleSettings } from "@nextgen-cms/site-data/get-content";
 import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
 import type { VideoFormData } from "@nextgen-cms/studio/cms/mutations/video";
 import { getVideoForAdmin } from "@nextgen-cms/studio/cms/queries";
@@ -14,8 +16,12 @@ export default async function EditVideoPage({ params }: PageProps) {
   const videoId = Number.parseInt(id, 10);
   if (Number.isNaN(videoId)) notFound();
 
-  const video = await getVideoForAdmin(videoId);
+  const [video, settings] = await Promise.all([
+    getVideoForAdmin(videoId),
+    getVideoModuleSettings(),
+  ]);
   if (!video) notFound();
+  const labels = sectionAdminLabels(settings.pageTitle);
 
   const initial: VideoFormData = {
     slug: video.slug,
@@ -29,7 +35,7 @@ export default async function EditVideoPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-heading text-2xl text-ink">ویرایش ویدیو</h1>
+      <h1 className="font-heading text-2xl text-ink">{labels.editItem}</h1>
       <VideoForm mode="edit" videoId={videoId} initial={initial} />
     </div>
   );

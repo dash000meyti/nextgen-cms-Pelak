@@ -1,12 +1,10 @@
 import {
-  DEFAULT_CONTENT_GROUP_MODULE_SETTINGS,
-  DEFAULT_CONTENT_SETTINGS,
   DEFAULT_MEDIA_SETTINGS,
   DEFAULT_MODULE_SETTINGS,
-  DEFAULT_VIDEO_MODULE_SETTINGS,
   featureModulesToModuleSettings,
   moduleSettingsToFeatureModules,
   normalizeContentGroupModuleSettings,
+  normalizeContentSettings,
   normalizeMemberSettings,
   normalizeModuleSettings,
   normalizeVideoModuleSettings,
@@ -100,7 +98,5 @@ export function mapMemberSettingsRow(row: SiteSettingsRow): MemberSettings {
 }
 
 export function mapContentSettingsRow(row: SiteSettingsRow): ContentSettings {
-  return (
-    parseJson<ContentSettings>(row.contentSettings) ?? DEFAULT_CONTENT_SETTINGS
-  );
+  return normalizeContentSettings(parseJson<ContentSettings>(row.contentSettings));
 }

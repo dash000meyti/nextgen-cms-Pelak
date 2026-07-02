@@ -1,5 +1,10 @@
-import { getModuleAdminLabel } from "@nextgen-cms/contract/modules/labels";
-import { getModuleSettings } from "@nextgen-cms/site-data/get-content";
+import {
+  getContentGroupModuleSettings,
+  getContentSettings,
+  getMemberSettings,
+  getModuleSettings,
+  getVideoModuleSettings,
+} from "@nextgen-cms/site-data/get-content";
 import { logoutAdmin } from "@nextgen-cms/studio/admin/actions";
 import { AdminMemberProvider } from "@nextgen-cms/studio/admin/admin-member-context";
 import { getMemberSession } from "@nextgen-cms/studio/admin/session";
@@ -18,7 +23,19 @@ export default async function AdminPanelLayout({
     redirect("/admin/login");
   }
 
-  const moduleSettings = await getModuleSettings();
+  const [
+    moduleSettings,
+    contentSettings,
+    memberSettings,
+    contentGroupSettings,
+    videoSettings,
+  ] = await Promise.all([
+    getModuleSettings(),
+    getContentSettings(),
+    getMemberSettings(),
+    getContentGroupModuleSettings(),
+    getVideoModuleSettings(),
+  ]);
 
   const contextValue = {
     memberId: session.memberId,
@@ -29,9 +46,11 @@ export default async function AdminPanelLayout({
       contentGroup: moduleSettings.contentGroup.enabled,
       video: moduleSettings.video.enabled,
     },
-    moduleLabels: {
-      contentGroup: getModuleAdminLabel("contentGroup", moduleSettings),
-      video: getModuleAdminLabel("video", moduleSettings),
+    sectionPageTitles: {
+      content: contentSettings.pageTitle,
+      members: memberSettings.pageTitle,
+      contentGroup: contentGroupSettings.pageTitle,
+      video: videoSettings.pageTitle,
     },
   };
 

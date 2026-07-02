@@ -1,4 +1,3 @@
-import { modulePermissionGroups } from "@nextgen-cms/contract/permissions";
 import type {
   ContentGroupModuleSettings,
   ContentSettings,
@@ -6,6 +5,7 @@ import type {
   MediaSettings,
   MemberSettings,
   ModuleSettings,
+  SectionListSettings,
   VideoModuleSettings,
 } from "@nextgen-cms/contract/types/modules";
 import type {
@@ -56,25 +56,25 @@ export const DEFAULT_FEATURE_MODULES: LegacyFeatureModules = {
 };
 
 export const DEFAULT_MODULE_SETTINGS: ModuleSettings = {
-  contentGroup: { enabled: true, label: "" },
-  video: { enabled: true, label: "" },
-  newsletter: { enabled: false, label: "" },
+  contentGroup: { enabled: true },
+  video: { enabled: true },
+  newsletter: { enabled: false },
 };
 
 export const DEFAULT_CONTENT_GROUP_MODULE_SETTINGS: ContentGroupModuleSettings =
   {
     period: "seasonal",
+    pageTitle: "هفته‌نامه",
+    itemsPerPage: 12,
+    showInMenu: true,
+    groupByYear: false,
   };
 
 export const DEFAULT_VIDEO_MODULE_SETTINGS: VideoModuleSettings = {
   pageTitle: "ویدیو",
   itemsPerPage: 12,
+  showInMenu: true,
 };
-
-function defaultModuleLabel(moduleId: keyof ModuleSettings): string {
-  const group = modulePermissionGroups.find((g) => g.id === moduleId);
-  return group?.label ?? moduleId;
-}
 
 export function normalizeModuleSettings(
   stored: ModuleSettings | LegacyModuleSettings | null | undefined,
@@ -88,43 +88,69 @@ export function normalizeModuleSettings(
   return {
     contentGroup: {
       enabled: contentGroup.enabled ?? false,
-      label:
-        contentGroup.label?.trim() || defaultModuleLabel("contentGroup"),
     },
     video: {
       enabled: video.enabled ?? false,
-      label: video.label?.trim() || defaultModuleLabel("video"),
     },
     newsletter: {
       enabled: newsletter.enabled ?? false,
-      label:
-        newsletter.label?.trim() || defaultModuleLabel("newsletter"),
     },
+  };
+}
+
+function normalizeSectionListSettings(
+  stored: Partial<SectionListSettings> | null | undefined,
+  defaults: SectionListSettings,
+): SectionListSettings {
+  const pageTitle = stored?.pageTitle?.trim();
+  const itemsPerPage = stored?.itemsPerPage;
+  return {
+    pageTitle: pageTitle || defaults.pageTitle,
+    itemsPerPage:
+      typeof itemsPerPage === "number" && itemsPerPage > 0
+        ? itemsPerPage
+        : defaults.itemsPerPage,
+    showInMenu: stored?.showInMenu ?? defaults.showInMenu,
   };
 }
 
 export function normalizeContentGroupModuleSettings(
-  stored: ContentGroupModuleSettings | null | undefined,
+  stored: Partial<ContentGroupModuleSettings> | null | undefined,
   legacyModuleSettings?: LegacyModuleSettings | null,
 ): ContentGroupModuleSettings {
-  if (stored?.period) return stored;
-  if (legacyModuleSettings?.contentGroup?.period) {
-    return { period: legacyModuleSettings.contentGroup.period };
-  }
-  return DEFAULT_CONTENT_GROUP_MODULE_SETTINGS;
+  const period =
+    stored?.period ??
+    legacyModuleSettings?.contentGroup?.period ??
+    DEFAULT_CONTENT_GROUP_MODULE_SETTINGS.period;
+  const legacyLabel = legacyModuleSettings?.contentGroup?.label?.trim();
+  const defaults: ContentGroupModuleSettings = {
+    ...DEFAULT_CONTENT_GROUP_MODULE_SETTINGS,
+    pageTitle: legacyLabel || DEFAULT_CONTENT_GROUP_MODULE_SETTINGS.pageTitle,
+  };
+
+  return {
+    period,
+    ...normalizeSectionListSettings(stored, defaults),
+    groupByYear: stored?.groupByYear ?? defaults.groupByYear,
+  };
 }
 
 export function normalizeVideoModuleSettings(
-  stored: VideoModuleSettings | null | undefined,
+  stored: Partial<VideoModuleSettings> | null | undefined,
   legacyModuleSettings?: LegacyModuleSettings | null,
 ): VideoModuleSettings {
-  if (stored) return stored;
   const legacy = legacyModuleSettings?.video;
-  return {
-    pageTitle: legacy?.pageTitle ?? DEFAULT_VIDEO_MODULE_SETTINGS.pageTitle,
+  const defaults: VideoModuleSettings = {
+    pageTitle:
+      legacy?.pageTitle?.trim() ||
+      legacy?.label?.trim() ||
+      DEFAULT_VIDEO_MODULE_SETTINGS.pageTitle,
     itemsPerPage:
       legacy?.itemsPerPage ?? DEFAULT_VIDEO_MODULE_SETTINGS.itemsPerPage,
+    showInMenu: DEFAULT_VIDEO_MODULE_SETTINGS.showInMenu,
   };
+
+  return normalizeSectionListSettings(stored, defaults);
 }
 
 export const DEFAULT_MEDIA_SETTINGS: MediaSettings = {
@@ -137,6 +163,9 @@ export const DEFAULT_MEMBER_SETTINGS: MemberSettings = {
   defaultRoleId: 3,
   memberLabel: "نویسنده",
   membersLabel: "نویسنده‌ها",
+  pageTitle: "نویسنده‌ها",
+  itemsPerPage: 12,
+  showInMenu: false,
 };
 
 export function normalizeMemberSettings(
@@ -144,11 +173,24 @@ export function normalizeMemberSettings(
 ): MemberSettings {
   const memberLabel = stored?.memberLabel?.trim();
   const membersLabel = stored?.membersLabel?.trim();
+  const listDefaults: SectionListSettings = {
+    pageTitle: membersLabel || DEFAULT_MEMBER_SETTINGS.pageTitle,
+    itemsPerPage: DEFAULT_MEMBER_SETTINGS.itemsPerPage,
+    showInMenu: DEFAULT_MEMBER_SETTINGS.showInMenu,
+  };
+
   return {
     defaultRoleId:
       stored?.defaultRoleId ?? DEFAULT_MEMBER_SETTINGS.defaultRoleId,
     memberLabel: memberLabel || DEFAULT_MEMBER_SETTINGS.memberLabel,
     membersLabel: membersLabel || DEFAULT_MEMBER_SETTINGS.membersLabel,
+    ...normalizeSectionListSettings(stored, {
+      ...listDefaults,
+      pageTitle:
+        stored?.pageTitle?.trim() ||
+        membersLabel ||
+        DEFAULT_MEMBER_SETTINGS.pageTitle,
+    }),
   };
 }
 
@@ -157,7 +199,32 @@ export const DEFAULT_CONTENT_SETTINGS: ContentSettings = {
   slugAutoGenerate: true,
   homepageArticleCount: 6,
   showAuthorOnCards: true,
+  pageTitle: "محتوا",
+  itemsPerPage: 12,
+  showInMenu: true,
 };
+
+export function normalizeContentSettings(
+  stored: Partial<ContentSettings> | null | undefined,
+): ContentSettings {
+  const list = normalizeSectionListSettings(
+    stored,
+    DEFAULT_CONTENT_SETTINGS,
+  );
+  return {
+    defaultArticleStatus:
+      stored?.defaultArticleStatus ??
+      DEFAULT_CONTENT_SETTINGS.defaultArticleStatus,
+    slugAutoGenerate:
+      stored?.slugAutoGenerate ?? DEFAULT_CONTENT_SETTINGS.slugAutoGenerate,
+    homepageArticleCount:
+      stored?.homepageArticleCount ??
+      DEFAULT_CONTENT_SETTINGS.homepageArticleCount,
+    showAuthorOnCards:
+      stored?.showAuthorOnCards ?? DEFAULT_CONTENT_SETTINGS.showAuthorOnCards,
+    ...list,
+  };
+}
 
 export function featureModulesToModuleSettings(
   legacy: LegacyFeatureModules | ModuleSettings | LegacyModuleSettings,

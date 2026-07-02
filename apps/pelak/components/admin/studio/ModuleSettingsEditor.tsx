@@ -1,10 +1,9 @@
 "use client";
 
-import { getModuleAdminLabelPlaceholder } from "@nextgen-cms/contract/modules/labels";
 import type { ModuleId } from "@nextgen-cms/contract/permissions";
 import type { ModuleSettings } from "@nextgen-cms/contract/types/modules";
+import { getModuleAdminLabelPlaceholder } from "@nextgen-cms/contract/modules/labels";
 import { saveModuleSettings } from "@nextgen-cms/studio/cms/mutations/settings";
-import { TextField } from "@/components/admin/fields/TextField";
 import { SettingsSaveBar } from "@/components/admin/studio/SettingsSaveBar";
 import { useSingletonSettingsForm } from "@/components/admin/studio/useSingletonSettingsForm";
 
@@ -32,7 +31,7 @@ export function ModuleSettingsEditor({ value }: ModuleSettingsEditorProps) {
       {MODULE_IDS.map((moduleId) => (
         <section
           key={moduleId}
-          className="space-y-3 rounded border border-rule p-4"
+          className="rounded border border-rule p-4"
         >
           <label className="flex items-center gap-3 text-sm text-ink">
             <input
@@ -53,20 +52,6 @@ export function ModuleSettingsEditor({ value }: ModuleSettingsEditorProps) {
               {getModuleAdminLabelPlaceholder(moduleId)}
             </span>
           </label>
-          {modules[moduleId].enabled ? (
-            <TextField
-              id={`${moduleId}-label`}
-              label="نام نمایشی در منو"
-              placeholder={getModuleAdminLabelPlaceholder(moduleId)}
-              value={modules[moduleId].label}
-              onChange={(label) =>
-                setValue({
-                  ...modules,
-                  [moduleId]: { ...modules[moduleId], label },
-                })
-              }
-            />
-          ) : null}
         </section>
       ))}
 

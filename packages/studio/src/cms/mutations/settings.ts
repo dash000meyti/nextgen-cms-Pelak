@@ -5,7 +5,13 @@ import {
   invalidateSiteConfig,
   invalidateThemeConfig,
 } from "@nextgen-cms/config/cache";
-import { normalizeMemberSettings } from "@nextgen-cms/config/theme/defaults";
+import {
+  normalizeContentGroupModuleSettings,
+  normalizeContentSettings,
+  normalizeMemberSettings,
+  normalizeModuleSettings,
+  normalizeVideoModuleSettings,
+} from "@nextgen-cms/config/theme/defaults";
 import type {
   ContentGroupModuleSettings,
   ContentSettings,
@@ -56,7 +62,7 @@ export async function saveModuleSettings(data: ModuleSettings) {
   if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
 
   try {
-    await updateModuleSettings(data);
+    await updateModuleSettings(normalizeModuleSettings(data));
     invalidateSiteConfig();
   } catch (error) {
     return handleMutationError(error);
@@ -72,7 +78,9 @@ export async function saveContentGroupModuleSettings(
   if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
 
   try {
-    await updateContentGroupModuleSettings(data);
+    await updateContentGroupModuleSettings(
+      normalizeContentGroupModuleSettings(data),
+    );
     invalidateSiteConfig();
   } catch (error) {
     return handleMutationError(error);
@@ -84,7 +92,7 @@ export async function saveVideoModuleSettings(data: VideoModuleSettings) {
   if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
 
   try {
-    await updateVideoModuleSettings(data);
+    await updateVideoModuleSettings(normalizeVideoModuleSettings(data));
     invalidateSiteConfig();
   } catch (error) {
     return handleMutationError(error);
@@ -121,7 +129,7 @@ export async function saveContentSettings(data: ContentSettings) {
   if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
 
   try {
-    await updateContentSettings(data);
+    await updateContentSettings(normalizeContentSettings(data));
     invalidateSiteConfig();
   } catch (error) {
     return handleMutationError(error);

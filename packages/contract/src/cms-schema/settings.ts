@@ -92,6 +92,14 @@ export const memberSettingsSchema = {
       kind: "text",
       required: true,
     },
+    { key: "pageTitle", label: "عنوان صفحه", kind: "text", required: true },
+    {
+      key: "itemsPerPage",
+      label: "تعداد در صفحه",
+      kind: "number",
+      required: true,
+    },
+    { key: "showInMenu", label: "نمایش در منو", kind: "boolean" },
   ],
 } satisfies DocumentSchema;
 
@@ -121,5 +129,13 @@ export const contentSettingsSchema = {
       label: "نمایش نویسنده در کارت",
       kind: "boolean",
     },
+    { key: "pageTitle", label: "عنوان صفحه", kind: "text", required: true },
+    {
+      key: "itemsPerPage",
+      label: "تعداد در صفحه",
+      kind: "number",
+      required: true,
+    },
+    { key: "showInMenu", label: "نمایش در منو", kind: "boolean" },
   ],
 } satisfies DocumentSchema;

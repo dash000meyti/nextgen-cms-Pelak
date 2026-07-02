@@ -1,11 +1,16 @@
 import { THEME_STORAGE_KEY } from "@nextgen-cms/config/theme/constants";
-import { applyFeatureModules } from "@nextgen-cms/site-data/apply-feature-modules";
+import { applyPublicNav } from "@nextgen-cms/site-data/apply-public-nav";
 import {
   getArticles,
+  getContentGroupModuleSettings,
+  getContentSettings,
   getCurrentContentGroup,
   getFeatureModules,
+  getMemberSettings,
+  getModuleSettings,
   getSiteConfig,
   getThemeTokens,
+  getVideoModuleSettings,
 } from "@nextgen-cms/site-data/get-content";
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -35,18 +40,38 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [rawSiteConfig, themeTokens, featureModules, searchArticles] =
-    await Promise.all([
-      getSiteConfig(),
-      getThemeTokens(),
-      getFeatureModules(),
-      getArticles(),
-    ]);
+  const [
+    rawSiteConfig,
+    themeTokens,
+    featureModules,
+    searchArticles,
+    contentSettings,
+    memberSettings,
+    contentGroupSettings,
+    videoSettings,
+    moduleSettings,
+  ] = await Promise.all([
+    getSiteConfig(),
+    getThemeTokens(),
+    getFeatureModules(),
+    getArticles(),
+    getContentSettings(),
+    getMemberSettings(),
+    getContentGroupModuleSettings(),
+    getVideoModuleSettings(),
+    getModuleSettings(),
+  ]);
 
   const currentContentGroup = featureModules.contentGroup
     ? await getCurrentContentGroup()
     : null;
-  const siteConfig = applyFeatureModules(rawSiteConfig, featureModules);
+  const siteConfig = applyPublicNav(rawSiteConfig, {
+    content: contentSettings,
+    members: memberSettings,
+    contentGroup: contentGroupSettings,
+    video: videoSettings,
+    modules: moduleSettings,
+  });
 
   return (
     <html

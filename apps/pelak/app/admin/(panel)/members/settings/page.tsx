@@ -1,3 +1,4 @@
+import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
 import { getMemberSettings } from "@nextgen-cms/site-data/get-content";
 import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
 import { listAllRolesForPicker } from "@nextgen-cms/studio/cms/queries/admin";
@@ -16,11 +17,12 @@ export default async function MemberSectionSettingsPage() {
     getMemberSettings(),
     listAllRolesForPicker(),
   ]);
+  const labels = sectionAdminLabels(memberSettings.pageTitle);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="font-heading text-2xl text-ink">تنظیمات اعضا</h1>
+        <h1 className="font-heading text-2xl text-ink">{labels.settings}</h1>
         <Link
           href="/admin/members"
           className="text-sm text-ink-muted hover:text-accent"

@@ -2,7 +2,7 @@
 
 import type { VideoModuleSettings } from "@nextgen-cms/contract/types/modules";
 import { saveVideoModuleSettings } from "@nextgen-cms/studio/cms/mutations/settings";
-import { TextField } from "@/components/admin/fields/TextField";
+import { SectionListSettingsFields } from "@/components/admin/studio/SectionListSettingsFields";
 import { SettingsSaveBar } from "@/components/admin/studio/SettingsSaveBar";
 import { useSingletonSettingsForm } from "@/components/admin/studio/useSingletonSettingsForm";
 
@@ -27,23 +27,10 @@ export function VideoModuleSettingsForm({
 
   return (
     <div className="max-w-lg space-y-6">
-      <TextField
-        id="video-title"
-        label="عنوان صفحه"
-        value={settings.pageTitle}
-        onChange={(pageTitle) => setValue({ ...settings, pageTitle })}
-      />
-      <TextField
-        id="video-per-page"
-        label="تعداد در صفحه"
-        type="number"
-        value={String(settings.itemsPerPage)}
-        onChange={(raw) =>
-          setValue({
-            ...settings,
-            itemsPerPage: Number.parseInt(raw, 10) || 12,
-          })
-        }
+      <SectionListSettingsFields
+        idPrefix="video"
+        value={settings}
+        onChange={setValue}
       />
       <SettingsSaveBar
         pending={pending}

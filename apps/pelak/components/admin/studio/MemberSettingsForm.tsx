@@ -7,6 +7,7 @@ import { saveMemberSettings } from "@nextgen-cms/studio/cms/mutations/settings";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { SectionListSettingsFields } from "@/components/admin/studio/SectionListSettingsFields";
 
 type MemberSettingsFormProps = {
   value: MemberSettings;
@@ -80,6 +81,11 @@ export function MemberSettingsForm({ value, roles }: MemberSettingsFormProps) {
           className="w-full rounded border border-rule bg-paper px-3 py-2 text-ink"
         />
       </label>
+      <SectionListSettingsFields
+        idPrefix="members"
+        value={settings}
+        onChange={(list) => setSettings({ ...settings, ...list })}
+      />
       <button
         type="button"
         onClick={save}

@@ -1,3 +1,4 @@
+import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
 import { getContentGroupModuleSettings } from "@nextgen-cms/site-data/get-content";
 import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
 import type { ContentGroupFormData } from "@nextgen-cms/studio/cms/mutations/content-group";
@@ -19,6 +20,7 @@ export default async function EditContentGroupPage({ params }: PageProps) {
   if (!group) notFound();
 
   const settings = await getContentGroupModuleSettings();
+  const labels = sectionAdminLabels(settings.pageTitle);
 
   const initial: ContentGroupFormData = {
     number: group.number,
@@ -32,7 +34,7 @@ export default async function EditContentGroupPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-heading text-2xl text-ink">ویرایش گروه محتوا</h1>
+      <h1 className="font-heading text-2xl text-ink">{labels.editItem}</h1>
       <ContentGroupForm
         mode="edit"
         contentGroupId={contentGroupId}

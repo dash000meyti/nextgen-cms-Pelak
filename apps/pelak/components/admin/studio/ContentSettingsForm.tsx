@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { TextField } from "@/components/admin/fields/TextField";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { SectionListSettingsFields } from "@/components/admin/studio/SectionListSettingsFields";
 
 type ContentSettingsFormProps = {
   value: ContentSettings;
@@ -35,6 +36,11 @@ export function ContentSettingsForm({ value }: ContentSettingsFormProps) {
   return (
     <div className="max-w-lg space-y-6">
       <FormMessage error={error} success={success} />
+      <SectionListSettingsFields
+        idPrefix="content"
+        value={settings}
+        onChange={(list) => setSettings({ ...settings, ...list })}
+      />
       <label className="block space-y-1.5 text-sm">
         <span className="font-medium text-ink">وضعیت پیش‌فرض مقاله</span>
         <select

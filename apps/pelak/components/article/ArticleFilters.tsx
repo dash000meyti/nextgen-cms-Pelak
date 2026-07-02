@@ -4,30 +4,42 @@ import type {
   ArticlePreview,
   Topic,
 } from "@nextgen-cms/contract/types/article";
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import { ArticleCard } from "@/components/article/ArticleCard";
 import { ArticleCardGrid } from "@/components/article/ArticleCardGrid";
+import { ListPagination } from "@/components/ui/ListPagination";
 
 type ArticleFiltersProps = {
   topics: Topic[];
   articles: ArticlePreview[];
+  activeTopic?: string;
+  page: number;
+  totalPages: number;
 };
 
 const ALL = "all";
 
-export function ArticleFilters({ topics, articles }: ArticleFiltersProps) {
-  const [active, setActive] = useState<string>(ALL);
+function topicHref(topic?: string) {
+  if (!topic || topic === ALL) return "/content";
+  return `/content?topic=${encodeURIComponent(topic)}`;
+}
 
-  const filtered = useMemo(() => {
-    if (active === ALL) return articles;
-    return articles.filter((article) =>
-      article.topics.some((topic) => topic.slug === active),
-    );
-  }, [active, articles]);
+export function ArticleFilters({
+  topics,
+  articles,
+  activeTopic,
+  page,
+  totalPages,
+}: ArticleFiltersProps) {
+  const active = activeTopic ?? ALL;
 
-  const chips: Array<{ id: string; label: string }> = [
-    { id: ALL, label: "همه" },
-    ...topics.map((topic) => ({ id: topic.slug, label: topic.name })),
+  const chips: Array<{ id: string; label: string; href: string }> = [
+    { id: ALL, label: "همه", href: topicHref() },
+    ...topics.map((topic) => ({
+      id: topic.slug,
+      label: topic.name,
+      href: topicHref(topic.slug),
+    })),
   ];
 
   return (
@@ -38,9 +50,8 @@ export function ArticleFilters({ topics, articles }: ArticleFiltersProps) {
             const isActive = active === chip.id;
             return (
               <li key={chip.id} className="shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setActive(chip.id)}
+                <Link
+                  href={chip.href}
                   className={`inline-block rounded-full border px-3.5 py-1.5 text-xs transition-colors sm:text-sm ${
                     isActive
                       ? "border-accent bg-accent text-paper"
@@ -48,7 +59,7 @@ export function ArticleFilters({ topics, articles }: ArticleFiltersProps) {
                   }`}
                 >
                   {chip.label}
-                </button>
+                </Link>
               </li>
             );
           })}
@@ -56,7 +67,7 @@ export function ArticleFilters({ topics, articles }: ArticleFiltersProps) {
       </div>
 
       <ArticleCardGrid columns={3}>
-        {filtered.map((article, index) => (
+        {articles.map((article, index) => (
           <ArticleCard
             key={article.slug}
             article={article}
@@ -65,11 +76,18 @@ export function ArticleFilters({ topics, articles }: ArticleFiltersProps) {
         ))}
       </ArticleCardGrid>
 
-      {filtered.length === 0 ? (
+      {articles.length === 0 ? (
         <p className="py-12 text-center text-sm text-ink-muted">
           محتوایی در این موضوع یافت نشد.
         </p>
       ) : null}
+
+      <ListPagination
+        page={page}
+        totalPages={totalPages}
+        basePath="/content"
+        query={activeTopic ? { topic: activeTopic } : undefined}
+      />
     </div>
   );
 }

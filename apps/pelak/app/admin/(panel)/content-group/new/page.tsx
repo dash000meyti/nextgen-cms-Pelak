@@ -1,3 +1,4 @@
+import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
 import {
   currentJalaliYear,
   todayIsoIran,
@@ -11,6 +12,7 @@ export default async function NewContentGroupPage() {
   await requirePermission("modules.contentGroup.create");
   const settings = await getContentGroupModuleSettings();
   const period = settings.period;
+  const labels = sectionAdminLabels(settings.pageTitle);
 
   const EMPTY_FORM: ContentGroupFormData = {
     number: 1,
@@ -24,7 +26,7 @@ export default async function NewContentGroupPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-heading text-2xl text-ink">گروه محتوای جدید</h1>
+      <h1 className="font-heading text-2xl text-ink">{labels.newItem}</h1>
       <ContentGroupForm
         mode="create"
         initial={EMPTY_FORM}

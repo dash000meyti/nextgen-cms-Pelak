@@ -1,3 +1,4 @@
+import { paginateItems, parsePageParam } from "@nextgen-cms/config/pagination";
 import {
   getVideoModuleSettings,
   getVideos,
@@ -7,8 +8,13 @@ import type { Metadata } from "next";
 import { SectionHeader } from "@/components/article/SectionHeader";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Container } from "@/components/layout/Container";
+import { ListPagination } from "@/components/ui/ListPagination";
 import { VideoCard } from "@/components/video/VideoCard";
 import { VideoCardGrid } from "@/components/video/VideoCardGrid";
+
+type VideoPageProps = {
+  searchParams: Promise<{ page?: string }>;
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getVideoModuleSettings();
@@ -18,13 +24,18 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function VideoPage() {
+export default async function VideoPage({ searchParams }: VideoPageProps) {
   await requireFeatureModule("video");
+  const params = await searchParams;
   const [allVideos, settings] = await Promise.all([
     getVideos(),
     getVideoModuleSettings(),
   ]);
-  const videos = allVideos.slice(0, settings.itemsPerPage);
+  const page = parsePageParam(params.page);
+  const { items: videos, totalPages } = paginateItems(allVideos, {
+    page,
+    perPage: settings.itemsPerPage,
+  });
   const title = settings.pageTitle;
 
   return (
@@ -41,6 +52,7 @@ export default async function VideoPage() {
           <VideoCard key={video.slug} video={video} />
         ))}
       </VideoCardGrid>
+      <ListPagination page={page} totalPages={totalPages} basePath="/video" />
     </Container>
   );
 }

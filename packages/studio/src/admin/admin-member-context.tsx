@@ -4,6 +4,13 @@ import type { Permission } from "@nextgen-cms/contract/permissions";
 import type { Role } from "@nextgen-cms/contract/types/member";
 import { createContext, useContext } from "react";
 
+export type SectionPageTitles = {
+  content: string;
+  members: string;
+  contentGroup: string;
+  video: string;
+};
+
 export type AdminMemberContextValue = {
   memberId: number;
   email: string;
@@ -13,10 +20,7 @@ export type AdminMemberContextValue = {
     contentGroup: boolean;
     video: boolean;
   };
-  moduleLabels: {
-    contentGroup: string;
-    video: string;
-  };
+  sectionPageTitles: SectionPageTitles;
 };
 
 const AdminMemberContext = createContext<AdminMemberContextValue | null>(null);

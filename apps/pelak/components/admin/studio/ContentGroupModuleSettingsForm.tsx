@@ -6,6 +6,7 @@ import type {
   ContentGroupPeriod,
 } from "@nextgen-cms/contract/types/modules";
 import { saveContentGroupModuleSettings } from "@nextgen-cms/studio/cms/mutations/settings";
+import { SectionListSettingsFields } from "@/components/admin/studio/SectionListSettingsFields";
 import { SettingsSaveBar } from "@/components/admin/studio/SettingsSaveBar";
 import { useSingletonSettingsForm } from "@/components/admin/studio/useSingletonSettingsForm";
 
@@ -37,6 +38,11 @@ export function ContentGroupModuleSettingsForm({
 
   return (
     <div className="max-w-lg space-y-6">
+      <SectionListSettingsFields
+        idPrefix="content-group"
+        value={settings}
+        onChange={(list) => setValue({ ...settings, ...list })}
+      />
       <label className="block space-y-1.5 text-sm">
         <span className="font-medium text-ink">دوره انتشار</span>
         <select
@@ -55,6 +61,17 @@ export function ContentGroupModuleSettingsForm({
             </option>
           ))}
         </select>
+      </label>
+      <label className="flex items-center gap-3 text-sm text-ink">
+        <input
+          type="checkbox"
+          checked={settings.groupByYear}
+          onChange={(e) =>
+            setValue({ ...settings, groupByYear: e.target.checked })
+          }
+          className="accent-accent"
+        />
+        <span>تفکیک شدن به سال</span>
       </label>
       <SettingsSaveBar
         pending={pending}

@@ -1,3 +1,5 @@
+import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
+import { getContentSettings } from "@nextgen-cms/site-data/get-content";
 import { canDeleteArticle } from "@nextgen-cms/studio/admin/article-access";
 import { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import type { ArticleFormData } from "@nextgen-cms/studio/cms/mutations/article";
@@ -20,14 +22,17 @@ export default async function EditArticlePage({ params }: PageProps) {
   if (Number.isNaN(articleId)) notFound();
 
   const session = await requireMember();
-  const [article, members, topics, contentGroups] = await Promise.all([
-    getArticleForAdmin(articleId),
-    findMembersForArticlePicker(),
-    findTopicsForPicker(),
-    findContentGroupsForPicker(),
-  ]);
+  const [article, members, topics, contentGroups, contentSettings] =
+    await Promise.all([
+      getArticleForAdmin(articleId),
+      findMembersForArticlePicker(),
+      findTopicsForPicker(),
+      findContentGroupsForPicker(),
+      getContentSettings(),
+    ]);
 
   if (!article) notFound();
+  const labels = sectionAdminLabels(contentSettings.pageTitle);
 
   const initial: ArticleFormData = {
     slug: article.slug,
@@ -52,7 +57,7 @@ export default async function EditArticlePage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-heading text-2xl text-ink">ویرایش محتوا</h1>
+      <h1 className="font-heading text-2xl text-ink">{labels.editItem}</h1>
       <ArticleForm
         mode="edit"
         articleId={articleId}

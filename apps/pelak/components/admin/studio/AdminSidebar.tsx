@@ -64,7 +64,7 @@ function canSeeModuleNavItem(
 
 export function AdminSidebar() {
   const pathname = usePathname();
-  const { permissions, enabledModules, moduleLabels } = useAdminMember();
+  const { permissions, enabledModules, sectionPageTitles } = useAdminMember();
 
   const coreItems = NAV_ITEMS.filter((item) =>
     canSeeNavItem(permissions, item),
@@ -73,7 +73,7 @@ export function AdminSidebar() {
     canSeeModuleNavItem(permissions, enabledModules, item),
   ).map((item) => ({
     href: item.href,
-    label: moduleLabels[item.module],
+    label: sectionPageTitles[item.module],
     module: item.module,
   }));
 

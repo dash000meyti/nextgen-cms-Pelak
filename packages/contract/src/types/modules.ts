@@ -1,23 +1,31 @@
 export type ContentGroupPeriod = "yearly" | "seasonal" | "monthly" | "weekly";
 
-export type ModuleSettings = {
-  contentGroup: { enabled: boolean; label: string };
-  video: { enabled: boolean; label: string };
-  newsletter: { enabled: boolean; label: string };
-};
-
-export type ContentGroupModuleSettings = {
-  period: ContentGroupPeriod;
-};
-
-export type VideoModuleSettings = {
+export type SectionListSettings = {
   pageTitle: string;
   itemsPerPage: number;
+  showInMenu: boolean;
 };
+
+export type ModuleSettings = {
+  contentGroup: { enabled: boolean };
+  video: { enabled: boolean };
+  newsletter: { enabled: boolean };
+};
+
+export type ContentGroupModuleSettings = SectionListSettings & {
+  period: ContentGroupPeriod;
+  groupByYear: boolean;
+};
+
+export type VideoModuleSettings = SectionListSettings;
 
 /** Legacy shape stored in module_settings before settings restructure */
 export type LegacyModuleSettings = {
-  contentGroup: { enabled: boolean; period?: ContentGroupPeriod; label?: string };
+  contentGroup: {
+    enabled: boolean;
+    period?: ContentGroupPeriod;
+    label?: string;
+  };
   video: {
     enabled: boolean;
     pageTitle?: string;
@@ -36,13 +44,13 @@ export type MediaSettings = {
   };
 };
 
-export type MemberSettings = {
+export type MemberSettings = SectionListSettings & {
   defaultRoleId: number;
   memberLabel: string;
   membersLabel: string;
 };
 
-export type ContentSettings = {
+export type ContentSettings = SectionListSettings & {
   defaultArticleStatus: "draft" | "published";
   slugAutoGenerate: boolean;
   homepageArticleCount: number;

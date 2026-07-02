@@ -75,11 +75,10 @@ export async function findVideoModuleSettings() {
 
 /** @deprecated Use updateModuleSettings */
 export async function updateFeatureModules(modules: FeatureModules) {
-  const current = await findModuleSettings();
   await updateModuleSettings({
-    contentGroup: { enabled: modules.contentGroup, label: current.contentGroup.label },
-    video: { enabled: modules.video, label: current.video.label },
-    newsletter: { enabled: modules.newsletter, label: current.newsletter.label },
+    contentGroup: { enabled: modules.contentGroup },
+    video: { enabled: modules.video },
+    newsletter: { enabled: modules.newsletter },
   });
 }
 

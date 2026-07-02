@@ -1,5 +1,7 @@
 "use client";
 
+import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
+import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
 import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
 import { idColumn } from "@/components/admin/studio/document-list-columns";
@@ -17,11 +19,14 @@ type ContentGroupAdminListProps = {
 };
 
 export function ContentGroupAdminList({ groups }: ContentGroupAdminListProps) {
+  const { sectionPageTitles } = useAdminMember();
+  const labels = sectionAdminLabels(sectionPageTitles.contentGroup);
+
   return (
     <DocumentList
-      title="گروه‌های محتوا"
+      title={labels.listTitle}
       newHref="/admin/content-group/new"
-      newLabel="گروه محتوای جدید"
+      newLabel={labels.newItem}
       toolbar={<SectionSettingsLink href="/admin/content-group/settings" />}
       rows={groups}
       rowKey={(row) => row.id}

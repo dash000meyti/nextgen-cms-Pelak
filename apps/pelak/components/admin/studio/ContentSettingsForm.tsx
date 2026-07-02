@@ -1,5 +1,6 @@
 "use client";
 
+import { normalizeContentSettings } from "@nextgen-cms/config/theme/defaults";
 import type { ContentSettings } from "@nextgen-cms/contract/types/modules";
 import { saveContentSettings } from "@nextgen-cms/studio/cms/mutations/settings";
 import { useRouter } from "next/navigation";
@@ -21,9 +22,15 @@ export function ContentSettingsForm({ value }: ContentSettingsFormProps) {
   function save() {
     setError(null);
     setSuccess(null);
+    const normalized = normalizeContentSettings(settings);
     startTransition(async () => {
       try {
-        await saveContentSettings(settings);
+        const result = await saveContentSettings(normalized);
+        if (result && "ok" in result && !result.ok) {
+          setError("دسترسی مجاز نیست.");
+          return;
+        }
+        setSettings(normalized);
         setSuccess("ذخیره شد.");
         router.refresh();
       } catch {

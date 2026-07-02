@@ -42,7 +42,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
   if (!article) notFound();
 
-  const related = await getRelatedArticles(slug, 3);
+  const related = await getRelatedArticles(slug, 4);
   const [currentContentGroup, siteConfig] = await Promise.all([
     getCurrentContentGroup(),
     getSiteConfig(),

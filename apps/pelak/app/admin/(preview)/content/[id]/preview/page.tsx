@@ -39,7 +39,7 @@ export default async function ContentPreviewPage({ params }: PreviewPageProps) {
 
   const { article, slug, status } = result;
   const [related, currentContentGroup, siteConfig] = await Promise.all([
-    getRelatedArticles(slug, 3),
+    getRelatedArticles(slug, 4),
     getCurrentContentGroup(),
     getSiteConfig(),
   ]);

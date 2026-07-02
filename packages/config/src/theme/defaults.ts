@@ -103,7 +103,11 @@ function normalizeSectionListSettings(
   defaults: SectionListSettings,
 ): SectionListSettings {
   const pageTitle = stored?.pageTitle?.trim();
-  const itemsPerPage = stored?.itemsPerPage;
+  const rawItemsPerPage = stored?.itemsPerPage;
+  const itemsPerPage =
+    typeof rawItemsPerPage === "string"
+      ? Number.parseInt(rawItemsPerPage, 10)
+      : rawItemsPerPage;
   return {
     pageTitle: pageTitle || defaults.pageTitle,
     itemsPerPage:

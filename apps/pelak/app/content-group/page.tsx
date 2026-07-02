@@ -25,6 +25,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+function sortContentGroups(
+  groups: ContentGroupSummary[],
+): ContentGroupSummary[] {
+  return [...groups].sort((a, b) => b.year - a.year || b.number - a.number);
+}
+
 function groupByYear(
   groups: ContentGroupSummary[],
 ): Array<{ year: number; groups: ContentGroupSummary[] }> {
@@ -54,8 +60,15 @@ export default async function ContentGroupsPage({
   ]);
   const title = settings.pageTitle;
 
+  const page = parsePageParam(params.page);
+  const sortedGroups = sortContentGroups(allGroups);
+  const { items: pageGroups, totalPages } = paginateItems(sortedGroups, {
+    page,
+    perPage: settings.itemsPerPage,
+  });
+
   if (settings.groupByYear) {
-    const sections = groupByYear(allGroups);
+    const sections = groupByYear(pageGroups);
 
     return (
       <Container className="py-8 md:py-14">
@@ -82,15 +95,14 @@ export default async function ContentGroupsPage({
             </section>
           ))}
         </div>
+        <ListPagination
+          page={page}
+          totalPages={totalPages}
+          basePath="/content-group"
+        />
       </Container>
     );
   }
-
-  const page = parsePageParam(params.page);
-  const { items: groups, totalPages } = paginateItems(allGroups, {
-    page,
-    perPage: settings.itemsPerPage,
-  });
 
   return (
     <Container className="py-8 md:py-14">
@@ -102,7 +114,7 @@ export default async function ContentGroupsPage({
         />
       </div>
       <ContentGroupCardGrid>
-        {groups.map((group) => (
+        {pageGroups.map((group) => (
           <ContentGroupCard key={group.number} group={group} />
         ))}
       </ContentGroupCardGrid>

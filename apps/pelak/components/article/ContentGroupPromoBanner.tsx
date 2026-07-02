@@ -16,9 +16,12 @@ export function ContentGroupPromoBanner({
       aria-label="آخرین گروه محتوا"
       className="w-full overflow-hidden rounded border border-rule bg-surface/50"
     >
-      <Link href={`/content-group/${group.number}`} className="group block">
+      <Link
+        href={`/content-group/${group.number}`}
+        className="group m-14 mb-8 block"
+      >
         <div
-          className={`relative ${contentGroupCoverAspectClass} w-full overflow-hidden bg-rule`}
+          className={`relative ${contentGroupCoverAspectClass} w-full overflow-hidden bg-rule rounded-md`}
         >
           <Image
             src={group.cover.src}

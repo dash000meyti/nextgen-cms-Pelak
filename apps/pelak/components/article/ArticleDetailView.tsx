@@ -1,4 +1,7 @@
-import type { Article, ArticlePreview } from "@nextgen-cms/contract/types/article";
+import type {
+  Article,
+  ArticlePreview,
+} from "@nextgen-cms/contract/types/article";
 import type { ContentGroup } from "@nextgen-cms/contract/types/content-group";
 import type { SiteConfig } from "@nextgen-cms/contract/types/site";
 import { ArticleBody } from "@/components/article/ArticleBody";
@@ -33,7 +36,7 @@ export function ArticleDetailView({
 
       <Container variant="wide" className="py-6 md:py-12">
         <div className="flex flex-col lg:flex-row gap-6">
-          <div className="mx-auto w-full max-w-content space-y-5 md:space-y-6 lg:flex lg:w-1/2 lg:max-w-none lg:flex-col lg:self-center">
+          <div className="mx-auto py-12 w-full max-w-content space-y-5 md:space-y-6 lg:my-0 lg:flex lg:w-1/2 lg:max-w-none lg:flex-col lg:self-center">
             <TopicTags topics={article.topics} />
             <ArticleHeader
               title={article.title}
@@ -64,7 +67,7 @@ export function ArticleDetailView({
           />
         </div>
 
-        <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 xl:gap-8">
+        <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 xl:gap-10">
           <aside className="col-span-1">
             <div className="sticky top-[40dvh] z-10 ">
               <ShareBar
@@ -92,9 +95,7 @@ export function ArticleDetailView({
         </div>
       </Container>
 
-      <Container variant="wide" className="pb-16">
-        <RelatedArticles articles={related} />
-      </Container>
+      <RelatedArticles articles={related} />
     </>
   );
 }

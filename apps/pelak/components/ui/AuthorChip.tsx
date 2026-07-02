@@ -54,7 +54,7 @@ export function AuthorChipList({
         <span key={author.slug}>
           <AuthorChip author={author} tone={tone} />
           {index < authors.length - 1 ? (
-            <span className={authorToneClasses[tone]}> و </span>
+            <span className={authorToneClasses[tone]}> - </span>
           ) : null}
         </span>
       ))}

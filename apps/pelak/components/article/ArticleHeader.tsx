@@ -22,7 +22,9 @@ export function ArticleHeader({
 }: ArticleHeaderProps) {
   return (
     <header className="space-y-4 md:space-y-5">
-      <h1 className="text-page-title">{title}</h1>
+      <h1 className="font-heading text-2xl leading-normal text-ink sm:text-2xl md:text-3xl">
+        {title}
+      </h1>
       <p className="text-lead">{subtitle}</p>
 
       <div className="text-meta flex flex-wrap items-center gap-x-3 gap-y-2">

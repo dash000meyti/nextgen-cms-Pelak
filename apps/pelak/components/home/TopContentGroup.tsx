@@ -13,10 +13,10 @@ export function TopContentGroup({ group }: TopContentGroupProps) {
   return (
     <section className="bg-surface">
       <Container className="flex flex-col items-stretch">
-        <div className="w-full flex flex-row items-center justify-between gap-2 py-2">
+        <div className="flex w-full flex-row items-center justify-between gap-2 py-1 sm:py-2">
           <Link
             href={`/content-group/${group.number}`}
-            className={`relative ${contentGroupCoverAspectClass} w-[50px] shrink-0 overflow-hidden rounded-md transition-opacity duration-300 hover:opacity-80`}
+            className={`relative hidden ${contentGroupCoverAspectClass} w-[50px] shrink-0 overflow-hidden rounded-md transition-opacity duration-300 hover:opacity-80 sm:block`}
           >
             <Image
               src={group.cover.src}
@@ -27,15 +27,19 @@ export function TopContentGroup({ group }: TopContentGroupProps) {
               priority
             />
           </Link>
-          <Link href={`/content-group/${group.number}`}>
-            <p className="font-heading text-base text-ink text-center md:text-lg">
-              <span className="text-ink-muted block sm:inline px-1">
+          <Link href={`/content-group/${group.number}`} className="min-w-0 flex-1">
+            <p className="text-start font-heading text-sm text-ink sm:text-center sm:text-base md:text-lg">
+              <span className="block px-1 text-ink-muted sm:inline">
                 جدیدترین گروه محتوا:{" "}
               </span>{" "}
               {group.label}
             </p>
           </Link>
-          <Button href={`/content-group/${group.number}`} variant="outline">
+          <Button
+            href={`/content-group/${group.number}`}
+            variant="outline"
+            className="shrink-0 px-3 py-1 text-xs sm:px-5 sm:py-2 sm:text-sm"
+          >
             مشاهده
           </Button>
         </div>

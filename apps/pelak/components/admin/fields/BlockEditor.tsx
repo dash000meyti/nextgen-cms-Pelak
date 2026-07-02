@@ -114,7 +114,7 @@ export function BlockEditor({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="sticky top-14 z-10 flex flex-wrap items-center justify-between gap-2 border-b border-rule bg-paper py-2">
         <h3 className="text-sm font-medium text-ink">بدنهٔ محتوا</h3>
         <div className="flex flex-wrap gap-2">
           {(Object.keys(BLOCK_LABELS) as ArticleBlock["type"][]).map((type) => (

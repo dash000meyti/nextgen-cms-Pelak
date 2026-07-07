@@ -38,6 +38,11 @@ const NAV_ITEMS = [
     ] as const,
   },
   {
+    href: "/admin/messages",
+    label: "پیام‌ها",
+    permissions: ["messages.view", "messages.edit", "messages.delete"] as const,
+  },
+  {
     href: "/admin/settings",
     label: "تنظیمات",
     permissions: SETTINGS_NAV_PERMISSIONS,

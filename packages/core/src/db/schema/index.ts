@@ -8,6 +8,7 @@ export * from "./content-groups";
 export * from "./media-assets";
 export * from "./member-sessions";
 export * from "./members";
+export * from "./messages";
 export * from "./most-read";
 export * from "./platform-meta";
 export * from "./role-permissions";

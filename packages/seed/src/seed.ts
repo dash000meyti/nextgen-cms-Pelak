@@ -20,6 +20,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { articles as mockArticles } from "./fixtures/articles";
 import { authors as mockAuthors } from "./fixtures/authors";
 import { contentGroups as mockContentGroups } from "./fixtures/content-groups";
+import { messagesSettingsFixture } from "./fixtures/messages-settings";
 import { defaultRolePermissions, systemRoles } from "./fixtures/rbac";
 import { siteConfig as mockSiteConfig } from "./fixtures/site-config";
 import {
@@ -88,6 +89,7 @@ if (force) {
     "roles",
     "admin_sessions",
     "admin_users",
+    "messages",
   ];
   for (const table of tables) {
     sqlite.exec(`DELETE FROM ${table}`);
@@ -318,8 +320,8 @@ sqlite
       id, name, tagline, description, logo, default_theme, default_direction,
       typography, nav_sections, utility_links, footer_columns, social_links,
       hot_topics, contact_email, feature_modules, module_settings,
-      media_settings, member_settings, content_settings
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      media_settings, member_settings, content_settings, messages_settings
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   )
   .run(
     1,
@@ -341,6 +343,7 @@ sqlite
     JSON.stringify(DEFAULT_MEDIA_SETTINGS),
     JSON.stringify(DEFAULT_MEMBER_SETTINGS),
     JSON.stringify(DEFAULT_CONTENT_SETTINGS),
+    JSON.stringify(messagesSettingsFixture),
   );
 
 sqlite

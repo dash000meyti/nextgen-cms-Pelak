@@ -9,9 +9,11 @@ import {
   normalizeContentGroupModuleSettings,
   normalizeContentSettings,
   normalizeMemberSettings,
+  normalizeMessagesSettings,
   normalizeModuleSettings,
   normalizeVideoModuleSettings,
 } from "@nextgen-cms/config/theme/defaults";
+import type { MessagesSettings } from "@nextgen-cms/contract/types/messages";
 import type {
   ContentGroupModuleSettings,
   ContentSettings,
@@ -28,6 +30,7 @@ import {
   updateContentSettings,
   updateMediaSettings,
   updateMemberSettings,
+  updateMessagesSettings,
   updateModuleSettings,
   updateSiteSettings,
   updateVideoModuleSettings,
@@ -130,6 +133,18 @@ export async function saveContentSettings(data: ContentSettings) {
 
   try {
     await updateContentSettings(normalizeContentSettings(data));
+    invalidateSiteConfig();
+  } catch (error) {
+    return handleMutationError(error);
+  }
+}
+
+export async function saveMessagesSettings(data: MessagesSettings) {
+  const sessionOrDenied = await requirePermissionMutation("settings.messages");
+  if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
+
+  try {
+    await updateMessagesSettings(normalizeMessagesSettings(data));
     invalidateSiteConfig();
   } catch (error) {
     return handleMutationError(error);

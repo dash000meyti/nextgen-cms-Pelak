@@ -128,3 +128,18 @@ export const contentSettingsSchema = {
     { key: "showInMenu", label: "نمایش در منو", kind: "boolean" },
   ],
 } satisfies DocumentSchema;
+
+export const messagesSettingsSchema = {
+  type: "settings",
+  label: "پیام‌ها",
+  labelPlural: "پیام‌ها",
+  singleton: true,
+  fields: [
+    {
+      key: "contactMethods",
+      label: "راه‌های ارتباطی",
+      kind: "json",
+      hint: "فهرستی از زوج‌های عنوان/مقدار (مثل ایمیل و آدرس آن) که در صفحهٔ تماس نمایش داده می‌شوند.",
+    },
+  ],
+} satisfies DocumentSchema;

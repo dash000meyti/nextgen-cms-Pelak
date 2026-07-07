@@ -35,6 +35,10 @@ export {
   updateMemberCredentials,
 } from "@nextgen-cms/studio/cms/mutations/member";
 export {
+  removeMessage,
+  saveMessageStatus,
+} from "@nextgen-cms/studio/cms/mutations/message";
+export {
   type MutationResult,
   requireAdmin,
 } from "@nextgen-cms/studio/cms/mutations/require-admin";
@@ -51,6 +55,7 @@ export {
   saveContentSettings,
   saveMediaSettings,
   saveMemberSettings,
+  saveMessagesSettings,
   saveModuleSettings,
   saveSiteSettings,
   saveThemeTokens,

@@ -6,9 +6,11 @@ import {
   normalizeContentGroupModuleSettings,
   normalizeContentSettings,
   normalizeMemberSettings,
+  normalizeMessagesSettings,
   normalizeModuleSettings,
   normalizeVideoModuleSettings,
 } from "@nextgen-cms/config/theme/defaults";
+import type { MessagesSettings } from "@nextgen-cms/contract/types/messages";
 import type {
   ContentGroupModuleSettings,
   ContentSettings,
@@ -100,5 +102,11 @@ export function mapMemberSettingsRow(row: SiteSettingsRow): MemberSettings {
 export function mapContentSettingsRow(row: SiteSettingsRow): ContentSettings {
   return normalizeContentSettings(
     parseJson<ContentSettings>(row.contentSettings),
+  );
+}
+
+export function mapMessagesSettingsRow(row: SiteSettingsRow): MessagesSettings {
+  return normalizeMessagesSettings(
+    parseJson<MessagesSettings>(row.messagesSettings),
   );
 }

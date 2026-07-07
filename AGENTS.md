@@ -14,8 +14,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 |-------|-----|------|
 | پلاک | Pelak | `apps/pelak` |
 | استودیو | Studio | `packages/studio` + `/admin` |
-| بخش هسته | Core Section | content, members, media, settings |
+| بخش هسته | Core Section | content, members, media, messages, settings |
 | ماژول | Feature Module | contentGroup, video, newsletter |
+| پیام | Messages | `messages` table · `/admin/messages` |
 | قرارداد | Contract | `packages/contract` |
 | هسته | Core | `packages/core` |
 | دادهٔ سایت | Site Data | `packages/site-data` |
@@ -57,7 +58,7 @@ flowchart TB
 - کامپوننت فقط props — بدون import مستقیم DB/fixture
 - migration additive-only — DB canonical: `pelak.sqlite`
 - RTL (`lang="fa"`, `dir="rtl"`)، Tailwind v4، بدون UI library خارجی (فعلاً)
-- RBAC: `settings.*` / `content.*` / `members.*` / `media.*` / `modules.*` — skill `hokmran-rbac`
+- RBAC: `settings.*` / `content.*` / `members.*` / `media.*` / `messages.*` / `modules.*` — skill `hokmran-rbac`
 - تقویم: `packages/core/src/platform/datetime.ts` — شمسی، `Asia/Tehran`
 
 ## Import map

@@ -8,6 +8,7 @@ type ButtonProps = {
   className?: string;
   onClick?: () => void;
   ariaLabel?: string;
+  disabled?: boolean;
 };
 
 const variantClasses = {
@@ -24,9 +25,10 @@ export function Button({
   className = "",
   onClick,
   ariaLabel,
+  disabled = false,
 }: ButtonProps) {
   const classes =
-    `inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2 text-sm font-medium transition-colors ${variantClasses[variant]} ${className}`.trim();
+    `inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2 text-sm font-medium transition-colors ${variantClasses[variant]} ${disabled ? "opacity-50" : ""} ${className}`.trim();
 
   if (href) {
     return (
@@ -42,6 +44,7 @@ export function Button({
       onClick={onClick}
       className={classes}
       aria-label={ariaLabel}
+      disabled={disabled}
     >
       {children}
     </button>

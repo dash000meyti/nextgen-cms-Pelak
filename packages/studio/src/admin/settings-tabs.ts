@@ -6,6 +6,7 @@ export type SettingsTabId =
   | "theme"
   | "roles"
   | "modules"
+  | "messages"
   | "database";
 
 export type SettingsTab = {
@@ -45,6 +46,12 @@ export const SETTINGS_TABS: SettingsTab[] = [
     label: "ماژول‌ها",
     href: "/admin/settings/modules",
     permission: "settings.modules",
+  },
+  {
+    id: "messages",
+    label: "پیام‌ها",
+    href: "/admin/settings/messages",
+    permission: "settings.messages",
   },
   {
     id: "database",

@@ -1,3 +1,4 @@
+import type { MessagesSettings } from "@nextgen-cms/contract/types/messages";
 import type {
   ContentGroupModuleSettings,
   ContentSettings,
@@ -44,6 +45,7 @@ export const siteSettings = sqliteTable("site_settings", {
   mediaSettings: text("media_settings").$type<MediaSettings>(),
   memberSettings: text("member_settings").$type<MemberSettings>(),
   contentSettings: text("content_settings").$type<ContentSettings>(),
+  messagesSettings: text("messages_settings").$type<MessagesSettings>(),
 });
 
 export type SiteSettingsRow = typeof siteSettings.$inferSelect;

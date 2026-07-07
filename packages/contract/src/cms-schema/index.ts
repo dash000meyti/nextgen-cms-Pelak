@@ -3,6 +3,7 @@ export { authorSchema } from "./author";
 export { contentGroupSchema } from "./content-group";
 export { memberSchema } from "./member";
 export {
+  messagesSettingsSchema,
   modulesSettingsSchema,
   siteSettingsSchema,
   themeSettingsSchema,

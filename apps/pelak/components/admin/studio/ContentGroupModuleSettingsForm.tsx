@@ -6,9 +6,9 @@ import type {
   ContentGroupPeriod,
 } from "@nextgen-cms/contract/types/modules";
 import { saveContentGroupModuleSettings } from "@nextgen-cms/studio/cms/mutations/settings";
+import { TextField } from "@/components/admin/fields/TextField";
 import { SectionListSettingsFields } from "@/components/admin/studio/SectionListSettingsFields";
 import { SettingsSaveBar } from "@/components/admin/studio/SettingsSaveBar";
-import { TextField } from "@/components/admin/fields/TextField";
 import { useSingletonSettingsForm } from "@/components/admin/studio/useSingletonSettingsForm";
 
 const PERIOD_OPTIONS: ContentGroupPeriod[] = [

@@ -1,4 +1,8 @@
 import type {
+  ContactMethod,
+  MessagesSettings,
+} from "@nextgen-cms/contract/types/messages";
+import type {
   ContentGroupModuleSettings,
   ContentSettings,
   LegacyModuleSettings,
@@ -215,6 +219,10 @@ export const DEFAULT_CONTENT_SETTINGS: ContentSettings = {
   showInMenu: true,
 };
 
+export const DEFAULT_MESSAGES_SETTINGS: MessagesSettings = {
+  contactMethods: [],
+};
+
 /**
  * Central registry for defaults used in runtime normalizers and migrations.
  * Keep this map aligned with SQL backfills when adding new schema fields.
@@ -226,6 +234,7 @@ export const DEFAULTS_REGISTRY = {
   mediaSettings: DEFAULT_MEDIA_SETTINGS,
   memberSettings: DEFAULT_MEMBER_SETTINGS,
   contentSettings: DEFAULT_CONTENT_SETTINGS,
+  messagesSettings: DEFAULT_MESSAGES_SETTINGS,
 } as const;
 
 export function normalizeContentSettings(
@@ -238,6 +247,30 @@ export function normalizeContentSettings(
       DEFAULT_CONTENT_SETTINGS.defaultArticleStatus,
     ...list,
   };
+}
+
+function sanitizeContactMethod(
+  raw: Partial<ContactMethod> | undefined,
+  fallbackId: string,
+): ContactMethod | null {
+  const label = raw?.label?.trim() ?? "";
+  const value = raw?.value?.trim() ?? "";
+  if (!label && !value) return null;
+  const id = raw?.id?.trim() || fallbackId;
+  return { id, label, value };
+}
+
+export function normalizeMessagesSettings(
+  stored: Partial<MessagesSettings> | null | undefined,
+): MessagesSettings {
+  const storedList = stored?.contactMethods;
+  const rawList = Array.isArray(storedList) ? storedList : [];
+  const contactMethods: ContactMethod[] = [];
+  for (const [index, raw] of rawList.entries()) {
+    const method = sanitizeContactMethod(raw, `method-${index + 1}`);
+    if (method) contactMethods.push(method);
+  }
+  return { contactMethods };
 }
 
 export function featureModulesToModuleSettings(

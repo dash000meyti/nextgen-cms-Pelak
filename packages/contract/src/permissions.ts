@@ -2,6 +2,7 @@ export const permissionResources = [
   "content",
   "members",
   "media",
+  "messages",
   "settings",
   "modules",
 ] as const;
@@ -38,6 +39,7 @@ export const permissionActions = {
   content: ["create", "edit_own", "edit_all", "publish"],
   members: ["create", "edit", "delete"],
   media: ["upload", "delete_own", "delete_all", "manage_all"],
+  messages: ["view", "edit", "delete"],
   settings: [
     "site",
     "theme",
@@ -48,6 +50,7 @@ export const permissionActions = {
     "content",
     "members",
     "media",
+    "messages",
     "database",
     "personal",
   ],
@@ -111,6 +114,7 @@ export const permissionActionLabels: Record<string, string> = {
   content: "محتوا",
   members: "اعضا",
   media: "مدیا",
+  messages: "پیام‌ها",
   personal: "شخصی",
   database: "پایگاه داده",
 };

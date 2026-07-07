@@ -17,6 +17,7 @@ import {
   insertMediaAsset,
   softDeleteMediaAsset,
 } from "@nextgen-cms/core/db/repositories/media-assets";
+import { findContentGroupModuleSettings } from "@nextgen-cms/core/db/repositories/site-config";
 import { getExtensionForMimeType } from "@nextgen-cms/core/media/constants";
 import { resolveUploadFolder } from "@nextgen-cms/core/media/folders";
 import {
@@ -32,7 +33,6 @@ import {
   getMaxUploadBytes,
   isMimeAllowed,
 } from "@nextgen-cms/core/media/settings";
-import { findContentGroupModuleSettings } from "@nextgen-cms/core/db/repositories/site-config";
 import {
   removeMediaFile,
   saveMediaFile,

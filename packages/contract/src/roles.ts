@@ -38,6 +38,9 @@ export const defaultRolePermissions: Record<DefaultRoleSlug, Permission[]> = {
     "settings.personal",
     ...settingsContentModuleBackfillPermissions,
     "modules.newsletter.manage",
+    "messages.view",
+    "messages.edit",
+    "settings.messages",
   ],
   writer: [
     "content.create",

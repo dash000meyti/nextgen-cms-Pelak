@@ -123,11 +123,15 @@ export function ArticleCard({
   }
 
   if (variant === "featuredLead") {
-    const imageOrder = imageFirst ? "md:order-1" : "md:order-2";
-    const contentOrder = imageFirst ? "md:order-2" : "md:order-1";
+    const imageSide = imageFirst
+      ? "md:col-start-1 md:col-span-5 md:row-start-1 md:row-span-2"
+      : "md:col-start-8 md:col-span-5 md:row-start-1 md:row-span-2";
+    const contentSide = imageFirst
+      ? "md:col-start-6 md:col-span-7"
+      : "md:col-start-1 md:col-span-7";
 
     const imageLink = (
-      <div className={`order-2 ${imageOrder} md:col-span-5`}>
+      <div className={`order-2 ${imageSide} md:flex md:flex-col md:justify-center`}>
         <Link
           href={`/content/${article.slug}`}
           className="group relative block aspect-square w-full self-center overflow-hidden rounded bg-rule"
@@ -150,7 +154,7 @@ export function ArticleCard({
 
     const leadHeader = (
       <div
-        className={`order-1 flex flex-col justify-center gap-2 ${contentOrder} md:col-span-7`}
+        className={`order-1 flex flex-col justify-center gap-2 ${contentSide} md:row-start-1`}
       >
         {sectionTitle ? <SectionTitle title={sectionTitle} bordered /> : null}
         <Link
@@ -170,7 +174,7 @@ export function ArticleCard({
 
     const leadFooter = (
       <div
-        className={`order-3 flex flex-col justify-center gap-2 ${contentOrder} md:col-span-7`}
+        className={`order-3 flex flex-col justify-center gap-2 ${contentSide} md:row-start-2`}
       >
         <p className="hidden line-clamp-3 text-sm leading-7 text-ink-muted md:block">
           {article.excerpt}
@@ -192,7 +196,7 @@ export function ArticleCard({
     );
 
     return (
-      <article className="grid gap-6 md:grid-cols-12 md:gap-20">
+      <article className="grid gap-6 md:grid-cols-12 md:gap-20 md:gap-y-3">
         {leadHeader}
         {imageLink}
         {leadFooter}

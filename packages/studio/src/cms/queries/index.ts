@@ -26,6 +26,10 @@ export {
 } from "@nextgen-cms/studio/cms/queries/media";
 export { getCurrentMemberProfile } from "@nextgen-cms/studio/cms/queries/member";
 export {
+  getMessageForAdmin,
+  listMessagesAdmin,
+} from "@nextgen-cms/studio/cms/queries/messages";
+export {
   assertUniqueSlug,
   contentGroupNumberExists,
   slugExists,

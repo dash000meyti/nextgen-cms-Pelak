@@ -1,3 +1,4 @@
+import type { MessagesSettings } from "@nextgen-cms/contract/types/messages";
 import type {
   ContentGroupModuleSettings,
   ContentSettings,
@@ -15,6 +16,7 @@ import {
   mapFeatureModulesRow,
   mapMediaSettingsRow,
   mapMemberSettingsRow,
+  mapMessagesSettingsRow,
   mapModuleSettingsRow,
   mapSiteSettingsRow,
   mapVideoModuleSettingsRow,
@@ -63,6 +65,10 @@ export async function findMemberSettings() {
 
 export async function findContentSettings() {
   return mapContentSettingsRow(await getSiteSettingsRow());
+}
+
+export async function findMessagesSettings() {
+  return mapMessagesSettingsRow(await getSiteSettingsRow());
 }
 
 export async function findContentGroupModuleSettings() {
@@ -123,6 +129,13 @@ export async function updateContentSettings(settings: ContentSettings) {
   await db
     .update(siteSettings)
     .set({ contentSettings: jsonColumn(settings) })
+    .where(eq(siteSettings.id, 1));
+}
+
+export async function updateMessagesSettings(settings: MessagesSettings) {
+  await db
+    .update(siteSettings)
+    .set({ messagesSettings: jsonColumn(settings) })
     .where(eq(siteSettings.id, 1));
 }
 

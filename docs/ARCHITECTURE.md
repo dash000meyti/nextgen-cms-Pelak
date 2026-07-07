@@ -43,7 +43,7 @@ flowchart LR
 
 | لایه | UI فارسی | مجوز نمونه | مسیر ادمین |
 |------|----------|------------|------------|
-| هسته | محتوا، اعضا، مدیا | `content.*`, `members.*`, `media.*` | `/admin/content`, `/admin/members`, `/admin/media` |
+| هسته | محتوا، اعضا، مدیا، پیام‌ها | `content.*`, `members.*`, `media.*`, `messages.*` | `/admin/content`, `/admin/members`, `/admin/media`, `/admin/messages` |
 | تنظیمات | تنظیمات | `settings.*` | `/admin/settings/*` |
 | ماژول | گروه محتوا، ویدیو، خبرنامه | `modules.*` | `/admin/content-group`, `/admin/videos` |
 
@@ -56,7 +56,7 @@ flowchart LR
 | `@nextgen-cms/contract` | `packages/contract` | Domain types + CMS field schemas + permissions |
 | `@nextgen-cms/core` | `packages/core` | Drizzle schema, repos, migrations, paths/meta |
 | `@nextgen-cms/config` | `packages/config` | Theme defaults, Next.js cache tags |
-| `@nextgen-cms/site-data` | `packages/site-data` | `get-content` accessors (public) |
+| `@nextgen-cms/site-data` | `packages/site-data` | `get-content` accessors (public) + `submitMessage` (تنها مسیر نوشتنی عمومی) |
 | `@nextgen-cms/studio` | `packages/studio` | CMS mutations, admin session |
 | `@nextgen-cms/seed` | `packages/seed` | Fixtures + seed scripts |
 
@@ -140,7 +140,11 @@ sequenceDiagram
 
 ## Settings hub
 
-`/admin/settings` — ۵ تب مجوزمحور (personal, site, theme, roles, modules). تنظیمات بخش‌ها خارج از هاب: محتوا (`/admin/content/settings` با تب‌های «محتوا» و «موضوعات»)، اعضا، مدیا، گروه محتوا، ویدیو. دادهٔ تنظیمات در `site_settings` با ستون‌های JSON additive؛ پرچم `show_on_homepage` روی جدول `topics`.
+`/admin/settings` — ۷ تب مجوزمحور (personal, site, theme, roles, modules, messages, database). تنظیمات بخش‌ها خارج از هاب: محتوا (`/admin/content/settings` با تب‌های «محتوا» و «موضوعات»)، اعضا، مدیا، گروه محتوا، ویدیو. دادهٔ تنظیمات در `site_settings` با ستون‌های JSON additive؛ پرچم `show_on_homepage` روی جدول `topics`.
+
+## Public writes (فرم‌ها)
+
+`site-data` پیش‌فرض read-only است. تنها استثنا `submitMessage` در `packages/site-data/src/messages-actions.ts` (`"use server"`) است که ارسال‌های فرم‌های عمومی (تماس، نظرسنجی و آینده) را اعتبارسنجی کرده و در جدول `messages` ذخیره می‌کند — بدون RBAC، با honeypot و محدودیت طول. فرم‌ها این تابع را مستقیماً از `onSubmit` (با `useTransition`) فراخوانی می‌کنند تا از فیلدهای مخفی Server Action (`$ACTION_*`) پرهیز شود. مدیریت این پیام‌ها در `/admin/messages` با مجوز `messages.*`.
 
 ## Route aliases
 

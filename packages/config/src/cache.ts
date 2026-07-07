@@ -73,3 +73,12 @@ export function invalidateContentGroup(number: number) {
 export function invalidateVideos() {
   updateTag(CACHE_TAGS.videos);
 }
+
+export function invalidateMessages() {
+  updateTag(CACHE_TAGS.messages);
+}
+
+export function invalidateMessage(id: number) {
+  updateTag(CACHE_TAGS.messages);
+  updateTag(CACHE_TAGS.message(id));
+}

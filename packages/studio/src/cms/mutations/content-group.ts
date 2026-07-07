@@ -12,10 +12,10 @@ import {
   insertContentGroup,
   updateContentGroup,
 } from "@nextgen-cms/core/db/repositories/content-groups-admin";
+import { findContentGroupModuleSettings } from "@nextgen-cms/core/db/repositories/site-config";
+import { finalizeContentGroupPdf } from "@nextgen-cms/core/media/finalize-content-group-pdf";
 import { contentGroupPath } from "@nextgen-cms/core/media/path-policy";
 import { promoteMediaToFolder } from "@nextgen-cms/core/media/promote-media";
-import { finalizeContentGroupPdf } from "@nextgen-cms/core/media/finalize-content-group-pdf";
-import { findContentGroupModuleSettings } from "@nextgen-cms/core/db/repositories/site-config";
 import { parseJalaliInput } from "@nextgen-cms/core/platform/datetime";
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";

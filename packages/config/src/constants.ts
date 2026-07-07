@@ -7,9 +7,11 @@ export const CACHE_TAGS = {
   topics: "topics",
   contentGroups: "content-groups",
   videos: "videos",
+  messages: "messages",
   article: (slug: string) => `article:${slug}`,
   author: (slug: string) => `author:${slug}`,
   member: (slug: string) => `member:${slug}`,
   topic: (slug: string) => `topic:${slug}`,
   contentGroup: (number: number) => `content-group:${number}`,
+  message: (id: number) => `message:${id}`,
 } as const;

@@ -10,11 +10,33 @@
 | محتوا | `/admin/content` | `content.*` |
 | اعضا | `/admin/members` | `members.*` |
 | مدیا | `/admin/media` | `media.*` |
+| پیام‌ها | `/admin/messages` | `messages.view` |
 | تنظیمات | `/admin/settings/*` | `settings.*` |
+
+## پیام‌ها (`/admin/messages`)
+
+صندوق ورودی فرم‌های عمومی (تماس، نظرسنجی و فرم‌های آینده). ارسال‌ها در جدول `messages` ذخیره می‌شوند (یک رکورد با `form` (نوع فرم)، `status`، و `payload` (JSON فیلدهای خاص هر فرم)).
+
+| مسیر | نقش |
+|------|-----|
+| `/admin/messages` | لیست با فیلتر وضعیت/form — `messages.view` |
+| `/admin/messages/[id]` | جزئیات + تغییر وضعیت + حذف — `messages.view` (+ `messages.edit`/`messages.delete`) |
+
+وضعیت‌ها: `unread` (خوانده‌نشده) · `reviewed` (بررسی‌شده) · `pending_followup` (در انتظار پیگیری).
+
+| عمل | مجوز |
+|-----|------|
+| مشاهدهٔ لیست/جزئیات | `messages.view` |
+| تغییر وضعیت | `messages.edit` |
+| حذف | `messages.delete` |
+
+### تنظیمات پیام‌ها
+
+تب «پیام‌ها» در هاب تنظیمات (`/admin/settings/messages`) با مجوز `settings.messages`: ویرایش فهرست راه‌های ارتباطی (`contactMethods`: زوج‌های عنوان/مقدار) که در صفحهٔ `/contact` (بخش «راه‌های دیگر») نمایش داده می‌شوند.
 
 ## تنظیمات (`/admin/settings`)
 
-هاب **۶ تب** مجوزمحور — تعریف در `packages/studio/src/admin/settings-tabs.ts`:
+هاب **۷ تب** مجوزمحور — تعریف در `packages/studio/src/admin/settings-tabs.ts`:
 
 | تب | مسیر | مجوز |
 |----|------|------|
@@ -23,6 +45,7 @@
 | رنگ‌ها | `/admin/settings/theme` | `settings.theme` |
 | نقش‌ها | `/admin/settings/roles` | `settings.roles` |
 | ماژول‌ها | `/admin/settings/modules` | `settings.modules` |
+| پیام‌ها | `/admin/settings/messages` | `settings.messages` |
 | پایگاه داده | `/admin/settings/database` | `settings.database` |
 
 `/admin/settings` به اولین تب مجاز redirect می‌شود.
@@ -75,8 +98,8 @@ packages/core/src/db/repositories/ — نوشتن DB
 
 | لایه | مثال |
 |------|------|
-| هسته | `content.publish`, `members.edit`, `media.upload` |
-| تنظیمات | `settings.content`, `settings.modules`, … |
+| هسته | `content.publish`, `members.edit`, `media.upload`, `messages.view` |
+| تنظیمات | `settings.content`, `settings.modules`, `settings.messages`, … |
 | ماژول | `modules.contentGroup.view`, `modules.video.create`, `modules.newsletter.manage` |
 
 ### مجوزهای ماژول

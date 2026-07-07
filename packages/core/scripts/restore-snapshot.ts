@@ -1,7 +1,7 @@
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { existsSync, rmSync } from "node:fs";
+import { resolve } from "node:path";
 import {
+  createSnapshotImportTempDir,
   extractSnapshotBundleFile,
   restoreSnapshotFromTemp,
 } from "@nextgen-cms/core/platform/snapshot";
@@ -18,7 +18,7 @@ if (!existsSync(srcPath)) {
   process.exit(1);
 }
 
-const tempDir = mkdtempSync(join(tmpdir(), "pelak-snapshot-restore-"));
+const tempDir = createSnapshotImportTempDir();
 
 async function main() {
   const manifest = await extractSnapshotBundleFile(srcPath, tempDir);

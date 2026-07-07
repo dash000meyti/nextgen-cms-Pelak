@@ -1,4 +1,5 @@
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -49,6 +50,30 @@ export interface SnapshotRestoreResult {
 function formatTimestamp(date: Date): string {
   const pad = (value: number) => String(value).padStart(2, "0");
   return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+}
+
+/**
+ * Move a file or directory. Uses rename when src/dest share a device;
+ * falls back to recursive copy + delete on EXDEV (e.g. /tmp → /data volume).
+ */
+function movePath(src: string, dest: string): void {
+  try {
+    renameSync(src, dest);
+  } catch (error) {
+    const err = error as NodeJS.ErrnoException;
+    if (err.code !== "EXDEV") {
+      throw error;
+    }
+    cpSync(src, dest, { recursive: true });
+    rmSync(src, { recursive: true, force: true });
+  }
+}
+
+/** Temp dir for snapshot import — on the data volume when possible so rename works. */
+export function createSnapshotImportTempDir(): string {
+  const backupDir = resolveBackupDir();
+  mkdirSync(backupDir, { recursive: true });
+  return mkdtempSync(join(backupDir, "pelak-snapshot-import-"));
 }
 
 function walkFiles(root: string): string[] {
@@ -278,7 +303,7 @@ export function backupUploadsDir(): string | null {
   const backupDir = resolveBackupDir();
   mkdirSync(backupDir, { recursive: true });
   const dest = join(backupDir, `uploads-${formatTimestamp(new Date())}`);
-  renameSync(uploadsDir, dest);
+  movePath(uploadsDir, dest);
   return dest;
 }
 
@@ -328,7 +353,7 @@ export async function restoreSnapshotFromTemp(
     }
     mkdirSync(dirname(uploadsDir), { recursive: true });
     if (existsSync(tempUploadsPath)) {
-      renameSync(tempUploadsPath, uploadsDir);
+      movePath(tempUploadsPath, uploadsDir);
     } else {
       mkdirSync(uploadsDir, { recursive: true });
     }
@@ -353,7 +378,7 @@ export async function restoreSnapshotFromTemp(
         if (existsSync(uploadsDir)) {
           rmSync(uploadsDir, { recursive: true, force: true });
         }
-        renameSync(backupUploadsPath, uploadsDir);
+        movePath(backupUploadsPath, uploadsDir);
       } catch {
         // best-effort
       }

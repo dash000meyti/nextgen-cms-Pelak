@@ -1,8 +1,7 @@
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { rmSync } from "node:fs";
 import { Readable } from "node:stream";
 import {
+  createSnapshotImportTempDir,
   restoreSnapshotFromTemp,
   streamExtractSnapshotBundle,
 } from "@nextgen-cms/core/platform/snapshot";
@@ -35,7 +34,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "بدنهٔ درخواست خالی است." }, { status: 400 });
   }
 
-  const tempDir = mkdtempSync(join(tmpdir(), "pelak-snapshot-import-"));
+  const tempDir = createSnapshotImportTempDir();
   try {
     const nodeStream = Readable.fromWeb(
       request.body as unknown as Parameters<typeof Readable.fromWeb>[0],

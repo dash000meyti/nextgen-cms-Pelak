@@ -1,3 +1,4 @@
+import { moduleSettingsToFeatureModules } from "@nextgen-cms/config/theme/defaults";
 import type {
   ContentGroupModuleSettings,
   ContentSettings,
@@ -7,7 +8,6 @@ import type {
 } from "@nextgen-cms/contract/types/modules";
 import type { NavSection, SiteConfig } from "@nextgen-cms/contract/types/site";
 import { applyFeatureModules } from "@nextgen-cms/site-data/apply-feature-modules";
-import { moduleSettingsToFeatureModules } from "@nextgen-cms/config/theme/defaults";
 
 export type PublicNavSettings = {
   content: ContentSettings;

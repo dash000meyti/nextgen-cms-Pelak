@@ -10,8 +10,8 @@ import {
   resolveSqlitePath,
 } from "@nextgen-cms/core/platform/paths";
 import { getSchemaRevision } from "@nextgen-cms/core/platform/version";
-import { assertSessionPermissionJson } from "@nextgen-cms/studio/admin/require-permission";
 import { requireMember } from "@nextgen-cms/studio/admin/require-member";
+import { assertSessionPermissionJson } from "@nextgen-cms/studio/admin/require-permission";
 import Database from "better-sqlite3";
 
 export const runtime = "nodejs";

@@ -7,8 +7,8 @@ import { requireFeatureModule } from "@nextgen-cms/site-data/require-feature-mod
 import { notFound } from "next/navigation";
 import { NextResponse } from "next/server";
 import { buildContentGroupPdfHtml } from "@/lib/pdf/html/content-group";
-import { resolveArticleBlocks } from "@/lib/pdf/resolve-blocks";
 import { renderHtmlToPdf } from "@/lib/pdf/render-html-pdf";
+import { resolveArticleBlocks } from "@/lib/pdf/resolve-blocks";
 import { getSiteBaseUrl, resolvePdfImageSrc } from "@/lib/pdf/resolve-image";
 
 export const dynamic = "force-dynamic";

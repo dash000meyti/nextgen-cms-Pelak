@@ -5,7 +5,7 @@ import {
   members,
   videos,
 } from "@nextgen-cms/core/db/schema";
-import { asc, eq, inArray } from "drizzle-orm";
+import { asc, inArray } from "drizzle-orm";
 
 export async function findAllArticleIds(): Promise<number[]> {
   const rows = await db.select({ id: articles.id }).from(articles);

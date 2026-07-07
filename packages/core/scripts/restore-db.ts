@@ -1,6 +1,9 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { backupDatabase, restoreDatabase } from "@nextgen-cms/core/platform/backup";
+import {
+  backupDatabase,
+  restoreDatabase,
+} from "@nextgen-cms/core/platform/backup";
 import {
   resolveBackupDir,
   resolveSqlitePath,

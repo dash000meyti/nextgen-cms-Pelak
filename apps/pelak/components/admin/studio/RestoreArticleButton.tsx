@@ -3,8 +3,8 @@
 import { restoreArticleFromArchiveAndRedirect } from "@nextgen-cms/studio/cms/mutations/article";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useState, useTransition } from "react";
-import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
 import { TableActionButton } from "@/components/admin/studio/TableActionButton";
+import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
 import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type RestoreArticleButtonProps = {

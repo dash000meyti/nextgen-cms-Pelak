@@ -2,8 +2,8 @@
 
 import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
-import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
 import { idColumn } from "@/components/admin/studio/document-list-columns";
+import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
 
 export type MembersAdminListRow = {
   id: number;

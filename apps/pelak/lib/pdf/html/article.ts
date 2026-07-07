@@ -82,7 +82,9 @@ function renderHeaderHtml(input: {
   `.trim();
 }
 
-export async function buildArticlePdfHtml(input: ArticlePdfInput): Promise<string> {
+export async function buildArticlePdfHtml(
+  input: ArticlePdfInput,
+): Promise<string> {
   const fontCss = await getPdfFontCss();
   const meta =
     input.metaLine ??

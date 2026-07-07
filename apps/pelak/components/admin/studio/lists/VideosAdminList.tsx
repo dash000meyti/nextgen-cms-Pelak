@@ -4,8 +4,8 @@ import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
 import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
 import { DocumentListThumbnail } from "@/components/admin/studio/DocumentListThumbnail";
-import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
 import { idColumn } from "@/components/admin/studio/document-list-columns";
+import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
 
 export type VideosAdminListRow = {
   id: number;

@@ -40,7 +40,7 @@ description: راهنمای Studio CMS و افزودن document type در پلت
 
 ## Block editor
 
-`apps/pelak/components/admin/fields/BlockEditor.tsx` — paragraph, heading, quote, image
+ادیتور بدنهٔ مقاله در `apps/pelak/components/admin/blocks/` — مبتنی بر رجیستری بلوک با درگ‌اند‌دراپ native و درج‌گر `+` بین بلوک‌ها. انواع فعلی: paragraph، heading (h2/h3/h4)، quote، image، video (آپارات)، list (bullet/ordered)، question، button. جزئیات و چک‌لیست افزودن نوع جدید: `docs/BLOCK-EDITOR.md`.
 
 ## Media
 

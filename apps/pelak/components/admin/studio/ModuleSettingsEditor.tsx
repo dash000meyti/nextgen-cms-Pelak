@@ -1,8 +1,8 @@
 "use client";
 
+import { getModuleAdminLabelPlaceholder } from "@nextgen-cms/contract/modules/labels";
 import type { ModuleId } from "@nextgen-cms/contract/permissions";
 import type { ModuleSettings } from "@nextgen-cms/contract/types/modules";
-import { getModuleAdminLabelPlaceholder } from "@nextgen-cms/contract/modules/labels";
 import { saveModuleSettings } from "@nextgen-cms/studio/cms/mutations/settings";
 import { SettingsSaveBar } from "@/components/admin/studio/SettingsSaveBar";
 import { useSingletonSettingsForm } from "@/components/admin/studio/useSingletonSettingsForm";

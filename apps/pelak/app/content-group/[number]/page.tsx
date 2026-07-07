@@ -105,7 +105,9 @@ export default async function ContentGroupPage({
       </div>
 
       <div className="mt-10 space-y-4">
-        <SectionTitle title={`فهرست محتوای این ${contentGroupModuleSettings.pageTitle}`} />
+        <SectionTitle
+          title={`فهرست محتوای این ${contentGroupModuleSettings.pageTitle}`}
+        />
         {group.articles.length > 0 ? (
           <ul>
             {group.articles.map((article, index) => (

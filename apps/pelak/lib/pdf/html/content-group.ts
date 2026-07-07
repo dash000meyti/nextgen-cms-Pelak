@@ -1,10 +1,10 @@
 import { formatPdfDate } from "@/lib/pdf/format";
+import type { PdfAuthor } from "@/lib/pdf/html/article";
 import { renderBlocksHtml } from "@/lib/pdf/html/blocks";
 import { escapeHtml } from "@/lib/pdf/html/escape";
 import { getPdfFontCss } from "@/lib/pdf/html/fonts";
 import { pdfBaseStyles } from "@/lib/pdf/html/styles";
 import type { ResolvedBlock } from "@/lib/pdf/resolve-blocks";
-import type { PdfAuthor } from "@/lib/pdf/html/article";
 
 export type ContentGroupArticlePdf = {
   title: string;

@@ -1,3 +1,4 @@
+import { normalizeFolderPath } from "@nextgen-cms/contract/media/folder-path";
 import type { MediaAsset } from "@nextgen-cms/contract/types/media";
 import { db } from "@nextgen-cms/core/db";
 import {
@@ -7,7 +8,6 @@ import {
 } from "@nextgen-cms/core/db/schema";
 import { resolveUploadPublicPath } from "@nextgen-cms/core/media/urls";
 import { and, desc, eq, isNull, like, or, sql } from "drizzle-orm";
-import { normalizeFolderPath } from "@nextgen-cms/contract/media/folder-path";
 
 export type ListMediaAssetsOptions = {
   folderPath?: string;

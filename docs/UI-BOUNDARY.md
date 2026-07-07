@@ -7,7 +7,7 @@
 ```
 apps/pelak/components/
   ui/         primitives — Button, Tag, JalaliDate, …
-  admin/      استودیو — studio/, fields/, media/
+  admin/      استودیو — studio/, fields/, media/, blocks/
   home/       بخش‌های صفحهٔ اصلی
   article/    کارت/لیست/هدر مقاله
   content-group/      گروه‌های محتوا (ماژول)
@@ -20,6 +20,7 @@ apps/pelak/components/
 |------|------------|-------|
 | `ui/` | site + admin | `packages/ui` (design system) |
 | `admin/` | `/admin` فقط | `packages/ui/admin` |
+| `admin/blocks/` | ادیتور بدنهٔ مقاله | رجیستری بلوک — جزئیات `docs/BLOCK-EDITOR.md` |
 | `home/`, `article/` | site عمومی | `packages/ui` یا app-local |
 | `layout/` | هر دو | app-local (brand-specific) |
 
@@ -42,6 +43,7 @@ apps/pelak/components/
 ## Roadmap (document only)
 
 - [ ] `packages/ui` — design system extract از `components/ui/`
+- [x] ادیتور بلوکی قابل‌گسترش (رجیستری) — `docs/BLOCK-EDITOR.md`
 - [ ] نوع محتوا (content types) — schema-driven forms مشترک
 - [ ] ماژول نظرات
 - [ ] ماژول صفحات (static pages CMS)

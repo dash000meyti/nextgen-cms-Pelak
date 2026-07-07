@@ -64,7 +64,9 @@ export async function findMemberByEmail(email: string) {
 }
 
 export async function findMemberByUsername(username: string) {
-  const rows = await memberQuery().where(eq(members.username, username)).limit(1);
+  const rows = await memberQuery()
+    .where(eq(members.username, username))
+    .limit(1);
   const row = rows[0];
   return row ? mapMemberRow(row as MemberRowWithRole) : null;
 }

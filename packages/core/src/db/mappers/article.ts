@@ -6,6 +6,7 @@ import type {
   ImageMeta,
   Topic,
 } from "@nextgen-cms/contract/types/article";
+import { normalizeArticleBlocks } from "@nextgen-cms/contract/types/article";
 import { mapAuthorRow } from "@nextgen-cms/core/db/mappers/author";
 import { mapTopicRow } from "@nextgen-cms/core/db/mappers/topic";
 import type { ArticleRow } from "@nextgen-cms/core/db/schema/articles";
@@ -66,7 +67,7 @@ export function mapArticleRowToPreview(
 }
 
 export function mapArticleRowToArticle(row: ArticleWithRelations): Article {
-  const body =
+  const rawBody =
     typeof row.body === "string"
       ? (JSON.parse(row.body) as ArticleWithRelations["body"])
       : row.body;
@@ -77,7 +78,7 @@ export function mapArticleRowToArticle(row: ArticleWithRelations): Article {
 
   return {
     ...mapPreviewFields(row),
-    body: body ?? [],
+    body: normalizeArticleBlocks(rawBody ?? []),
     relatedSlugs: relatedSlugs ?? [],
   };
 }

@@ -30,7 +30,7 @@ export const exampleSchema = {
 | `boolean` | checkbox |
 | `date` | تاریخ شمسی (ادمین: `JalaliDateField`) |
 | `image` | URL + آپلود |
-| `blocks` | `ArticleBlock[]` |
+| `blocks` | `ArticleBlock[]` — ادیتور بلوکی (رجیستری) — `docs/BLOCK-EDITOR.md` |
 | `reference` | entity دیگر |
 | `status` | وضعیت publish |
 | `palette` | `ThemePalette` |

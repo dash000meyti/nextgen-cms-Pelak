@@ -8,8 +8,8 @@ import {
   memberUsernameExists,
   setMemberPassword,
   updateMemberEmail,
-  updateMemberUsername,
   updateMemberPersonal,
+  updateMemberUsername,
 } from "@nextgen-cms/core/db/repositories/members";
 import type { MemberAdminWriteInput } from "@nextgen-cms/core/db/repositories/members-admin";
 import {

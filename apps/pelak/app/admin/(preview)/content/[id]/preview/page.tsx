@@ -3,8 +3,8 @@ import {
   buildContentShortPath,
 } from "@nextgen-cms/contract/short-links";
 import {
-  getCurrentContentGroup,
   getContentGroupModuleSettings,
+  getCurrentContentGroup,
   getRelatedArticles,
   getSiteConfig,
 } from "@nextgen-cms/site-data/get-content";
@@ -45,11 +45,11 @@ export default async function ContentPreviewPage({ params }: PreviewPageProps) {
   const { article, slug, status } = result;
   const [related, currentContentGroup, siteConfig, contentGroupModuleSettings] =
     await Promise.all([
-    getRelatedArticles(slug, 4),
-    getCurrentContentGroup(),
-    getSiteConfig(),
-    getContentGroupModuleSettings(),
-  ]);
+      getRelatedArticles(slug, 4),
+      getCurrentContentGroup(),
+      getSiteConfig(),
+      getContentGroupModuleSettings(),
+    ]);
 
   const shareUrl = buildContentShortPath(articleId);
   const pdfDownloadUrl =

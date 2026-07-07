@@ -12,8 +12,8 @@ import { CurrentContentGroupHero } from "@/components/home/CurrentContentGroupHe
 import { EditorsPick } from "@/components/home/EditorsPick";
 import { FeaturedContent } from "@/components/home/FeaturedContent";
 import { SurveyCta } from "@/components/home/SurveyCta";
-import { TopicsWithContent } from "@/components/home/TopicsWithContent";
 import { TopContentGroup } from "@/components/home/TopContentGroup";
+import { TopicsWithContent } from "@/components/home/TopicsWithContent";
 import { VideoSection } from "@/components/home/VideoSection";
 
 export default async function HomePage() {

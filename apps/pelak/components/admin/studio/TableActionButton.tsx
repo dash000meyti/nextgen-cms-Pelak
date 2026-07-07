@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 const actionButtonClass =
   "inline-flex size-8 shrink-0 items-center justify-center rounded border border-rule text-ink-muted transition-colors hover:border-accent hover:text-accent disabled:opacity-50";

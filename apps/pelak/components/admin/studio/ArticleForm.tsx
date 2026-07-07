@@ -20,7 +20,7 @@ import type { PickerOption } from "@nextgen-cms/studio/cms/queries";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { BlockEditor } from "@/components/admin/fields/BlockEditor";
+import { BlockEditor } from "@/components/admin/blocks/BlockEditor";
 import { ImageField } from "@/components/admin/fields/ImageField";
 import { ReferencePicker } from "@/components/admin/fields/ReferencePicker";
 import { SlugField } from "@/components/admin/fields/SlugField";

@@ -3,8 +3,8 @@ import { assertMemberPermission } from "@nextgen-cms/core/db/access/assert-permi
 import { PermissionDeniedError } from "@nextgen-cms/core/db/access/permission-denied-error";
 import type { AdminAccess } from "@nextgen-cms/core/db/access/types";
 import { videos } from "@nextgen-cms/core/db/schema";
-import { purgeMediaFolder } from "@nextgen-cms/core/media/purge-folder";
 import { videoPath } from "@nextgen-cms/core/media/path-policy";
+import { purgeMediaFolder } from "@nextgen-cms/core/media/purge-folder";
 import { and, eq, ne } from "drizzle-orm";
 
 export type VideoWriteInput = {

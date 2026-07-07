@@ -6,7 +6,7 @@ import { useState, useTransition } from "react";
 
 type UseSingletonSettingsFormOptions<T> = {
   initialValue: T;
-  save: (value: T) => Promise<void | MutationResult | undefined>;
+  save: (value: T) => Promise<MutationResult | undefined>;
 };
 
 export function useSingletonSettingsForm<T>({

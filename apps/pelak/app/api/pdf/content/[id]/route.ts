@@ -5,14 +5,11 @@ import {
 } from "@nextgen-cms/site-data/get-content";
 import { notFound } from "next/navigation";
 import { NextResponse } from "next/server";
-import { buildArticlePdfHtml } from "@/lib/pdf/html/article";
-import { resolveArticleBlocks } from "@/lib/pdf/resolve-blocks";
-import { renderHtmlToPdf } from "@/lib/pdf/render-html-pdf";
-import {
-  getSiteBaseUrl,
-  resolvePdfImageSrc,
-} from "@/lib/pdf/resolve-image";
 import { formatPdfAuthors, formatPdfDate } from "@/lib/pdf/format";
+import { buildArticlePdfHtml } from "@/lib/pdf/html/article";
+import { renderHtmlToPdf } from "@/lib/pdf/render-html-pdf";
+import { resolveArticleBlocks } from "@/lib/pdf/resolve-blocks";
+import { getSiteBaseUrl, resolvePdfImageSrc } from "@/lib/pdf/resolve-image";
 
 export const dynamic = "force-dynamic";
 

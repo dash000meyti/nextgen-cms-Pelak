@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { type ReactNode, useMemo, useState } from "react";
-import { TableActionLink, TableHeaderIcon } from "./TableActionButton";
 import {
   type DocumentListSort,
   filterRows,
@@ -10,6 +9,7 @@ import {
   type SortDirection,
   sortRows,
 } from "./document-list-utils";
+import { TableActionLink, TableHeaderIcon } from "./TableActionButton";
 
 export type DocumentListColumn<T> = {
   key: string;

@@ -4,8 +4,8 @@ import {
 } from "@nextgen-cms/contract/short-links";
 import {
   getArticleBySlug,
-  getContentGroupModuleSettings,
   getArticleShareMetaBySlug,
+  getContentGroupModuleSettings,
   getCurrentContentGroup,
   getRelatedArticles,
   getSiteConfig,
@@ -49,8 +49,12 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   if (!article) notFound();
 
   const related = await getRelatedArticles(slug, 4);
-  const [currentContentGroup, siteConfig, shareMeta, contentGroupModuleSettings] =
-    await Promise.all([
+  const [
+    currentContentGroup,
+    siteConfig,
+    shareMeta,
+    contentGroupModuleSettings,
+  ] = await Promise.all([
     getCurrentContentGroup(),
     getSiteConfig(),
     getArticleShareMetaBySlug(slug),

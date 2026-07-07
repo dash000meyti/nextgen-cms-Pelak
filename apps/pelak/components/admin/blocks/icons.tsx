@@ -40,6 +40,46 @@ export function HeadingIcon({ className }: IconProps): JSX.Element {
   );
 }
 
+function HeadingLevelIconImpl({
+  className,
+  text,
+}: IconProps & { text: string }): JSX.Element {
+  return (
+    <svg viewBox="0 0 24 24" className={base(className)} aria-hidden="true">
+      <path
+        d="M5 5v14M14 5v14M5 12h9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <text
+        x="19"
+        y="18"
+        fontSize="9"
+        fontWeight="700"
+        fill="currentColor"
+        textAnchor="middle"
+      >
+        {text}
+      </text>
+    </svg>
+  );
+}
+
+export function Heading2Icon({ className }: IconProps): JSX.Element {
+  return <HeadingLevelIconImpl className={className} text="۲" />;
+}
+
+export function Heading3Icon({ className }: IconProps): JSX.Element {
+  return <HeadingLevelIconImpl className={className} text="۳" />;
+}
+
+export function Heading4Icon({ className }: IconProps): JSX.Element {
+  return <HeadingLevelIconImpl className={className} text="۴" />;
+}
+
 export function QuoteIcon({ className }: IconProps): JSX.Element {
   return (
     <svg

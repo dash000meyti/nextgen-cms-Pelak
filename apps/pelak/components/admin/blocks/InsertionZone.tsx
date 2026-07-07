@@ -26,7 +26,7 @@ export function InsertionZone({
     <div
       className={[
         "group relative flex items-center transition-all",
-        dragActive ? "h-8" : "h-3",
+        dragActive ? "h-8" : "h-5",
       ].join(" ")}
       onDragOver={(e) => {
         if (!onDropAt) return;
@@ -43,23 +43,22 @@ export function InsertionZone({
         }
       }}
     >
-      <div
-        className={[
-          "flex w-full items-center",
-          dragActive ? "opacity-100" : "opacity-0 group-hover:opacity-100",
-        ].join(" ")}
-      >
-        <div className="h-px flex-1 bg-rule" />
-        <button
-          type="button"
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-label={`افزودن بلوک در موقعیت ${index + 1}`}
-          className="mx-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-rule bg-paper text-ink-muted hover:border-accent hover:text-accent"
-        >
-          <PlusIcon className="h-3 w-3" />
-        </button>
-        <div className="h-px flex-1 bg-rule" />
-      </div>
+      {dragActive ? (
+        <div className="h-0.5 w-full rounded-full bg-accent animate-block-drop-blink" />
+      ) : (
+        <div className="flex w-full items-center opacity-0 transition-opacity group-hover:opacity-100">
+          <div className="h-px flex-1 bg-rule" />
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={`افزودن بلوک در موقعیت ${index + 1}`}
+            className="mx-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-rule bg-paper text-ink-muted hover:border-accent hover:text-accent"
+          >
+            <PlusIcon className="h-3 w-3" />
+          </button>
+          <div className="h-px flex-1 bg-rule" />
+        </div>
+      )}
 
       {menuOpen ? (
         <div className="absolute start-0 top-full z-30">

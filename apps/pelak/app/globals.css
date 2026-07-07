@@ -17,6 +17,9 @@
   --accent: #8b0016;
   --accent-hover: #6e0011;
   --accent-soft: #f4e8ea;
+  --btn-accent-bg: #8b0016;
+  --btn-accent-hover: #6e0011;
+  --btn-accent-active: #c63b51;
 
   /* lines */
   --rule: #e6e2dd;
@@ -41,6 +44,9 @@
   --accent: #e0455d;
   --accent-hover: #f0566e;
   --accent-soft: #2a1518;
+  --btn-accent-bg: #8b0016;
+  --btn-accent-hover: #6e0011;
+  --btn-accent-active: #c63b51;
 
   --rule: #2a2723;
   --rule-strong: #3a362f;
@@ -138,6 +144,12 @@ a:hover {
   line-height: 1.85;
   color: var(--ink);
 }
+.prose-article p.article-paragraph-justify {
+  text-align: justify;
+}
+.prose-article p.article-paragraph-start {
+  text-align: start;
+}
 .prose-article p + p {
   margin-top: 1.25rem;
 }
@@ -152,6 +164,22 @@ a:hover {
   color: var(--ink-muted);
   margin-inline-end: 8px;
   margin-top: 1px;
+}
+
+/* Accent solid buttons (admin): normalized contrast across themes */
+.bg-accent.text-paper.hover\:bg-accent-hover {
+  background-color: var(--btn-accent-bg);
+  color: #fff;
+}
+.bg-accent.text-paper.hover\:bg-accent-hover:hover {
+  background-color: var(--btn-accent-hover);
+}
+.bg-accent.text-paper.hover\:bg-accent-hover:active {
+  background-color: var(--btn-accent-active);
+}
+.bg-accent.text-paper.hover\:bg-accent-hover:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--btn-accent-hover) 72%, white);
+  outline-offset: 2px;
 }
 
 /* Public site typography scale */
@@ -205,4 +233,18 @@ a:hover {
 }
 .nav-scroll::-webkit-scrollbar {
   display: none;
+}
+
+/* Block editor: blinking drop targets while dragging */
+@keyframes block-drop-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+.animate-block-drop-blink {
+  animation: block-drop-blink 1s ease-in-out infinite;
 }

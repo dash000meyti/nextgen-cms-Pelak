@@ -12,7 +12,7 @@ export function ContentPreviewBanner({
   status,
 }: ContentPreviewBannerProps) {
   return (
-    <div className="sticky top-0 z-50 border-b border-rule bg-surface-2 px-4 py-3">
+    <div className="sticky top-[57px] z-30 border-b border-rule bg-surface-2 px-4 py-3">
       <div className="mx-auto flex max-w-wide flex-wrap items-center justify-between gap-3 text-sm">
         <div className="flex flex-wrap items-center gap-3">
           <span className="font-medium text-ink">

@@ -22,6 +22,7 @@ type ArticleDetailViewProps = {
   currentContentGroup: ContentGroup;
   contentGroupPageTitle: string;
   siteConfig: SiteConfig;
+  unoptimized?: boolean;
 };
 
 export function ArticleDetailView({
@@ -32,6 +33,7 @@ export function ArticleDetailView({
   currentContentGroup,
   contentGroupPageTitle,
   siteConfig,
+  unoptimized = false,
 }: ArticleDetailViewProps) {
   return (
     <>
@@ -55,6 +57,7 @@ export function ArticleDetailView({
             image={article.heroImage}
             priority
             className="w-full lg:w-1/2"
+            unoptimized={unoptimized}
           />
         </div>
       </Container>

@@ -41,7 +41,7 @@ export function parseAparatHash(input: string): string | null {
 }
 
 export function buildAparatEmbedUrl(hash: string): string {
-  return `https://www.aparat.com/video/video/embed/videohash/${hash}`;
+  return `https://www.aparat.com/video/video/embed/videohash/${hash}/vt/frame`;
 }
 
 export function buildAparatEmbedSrc(input: string): string | null {

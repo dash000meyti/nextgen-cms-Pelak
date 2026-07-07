@@ -13,7 +13,6 @@ export function ParagraphBlock({
   return (
     <TextareaField
       id={`block-paragraph-${blockId}`}
-      label="متن"
       value={block.content}
       onChange={(content) => onChange({ ...block, content })}
       rows={5}

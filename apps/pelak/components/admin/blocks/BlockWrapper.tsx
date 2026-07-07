@@ -39,6 +39,7 @@ export function BlockWrapper({
 }: BlockWrapperProps) {
   const meta = getBlockMeta(block.type);
   const Editor = meta.Editor;
+  const Settings = meta.Settings;
 
   const [deleteArmed, setDeleteArmed] = useState(false);
   const disarmTimerRef = useRef<number | null>(null);
@@ -94,25 +95,33 @@ export function BlockWrapper({
           onMoveDown={onMoveDown}
           dragHandleProps={{ draggable: true, onDragStart, onDragEnd }}
         />
-        <div className="flex items-center gap-2 text-xs font-medium text-ink-muted">
-          <meta.Icon className="h-3.5 w-3.5" />
-          <span>{meta.label}</span>
-          <button
-            type="button"
-            aria-label={deleteArmed ? "تأیید حذف" : "حذف بلوک"}
-            title={deleteArmed ? "بار دیگر برای حذف" : "حذف"}
-            onClick={handleDeleteClick}
-            onBlur={disarmDelete}
-            aria-pressed={deleteArmed}
-            className={[
-              "rounded p-1 transition-colors",
-              deleteArmed
-                ? "bg-accent text-paper"
-                : "text-ink-muted hover:bg-accent-soft hover:text-accent",
-            ].join(" ")}
-          >
-            <TrashIcon className="h-3.5 w-3.5" />
-          </button>
+        <div className="flex items-center gap-2">
+          {Settings ? (
+            <Settings
+              block={block}
+              onChange={(next) => onChange({ ...next, _key: block._key })}
+            />
+          ) : null}
+          <div className="flex items-center gap-2 text-xs font-medium text-ink-muted">
+            <meta.Icon className="h-3.5 w-3.5" />
+            <span>{meta.label}</span>
+            <button
+              type="button"
+              aria-label={deleteArmed ? "تأیید حذف" : "حذف بلوک"}
+              title={deleteArmed ? "بار دیگر برای حذف" : "حذف"}
+              onClick={handleDeleteClick}
+              onBlur={disarmDelete}
+              aria-pressed={deleteArmed}
+              className={[
+                "rounded p-1 transition-colors",
+                deleteArmed
+                  ? "bg-accent text-paper"
+                  : "text-ink-muted hover:bg-accent-soft hover:text-accent",
+              ].join(" ")}
+            >
+              <TrashIcon className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       </div>
       <Editor

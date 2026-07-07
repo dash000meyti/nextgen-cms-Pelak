@@ -5,8 +5,46 @@ import type {
 import type { TextDirection } from "@nextgen-cms/contract/types/site";
 import { getSiteConfig } from "@nextgen-cms/site-data/get-content";
 import { articleParagraphClassName } from "@nextgen-cms/site-data/typography";
-import Image from "next/image";
 import { buildAparatEmbedSrc } from "@/lib/aparat";
+
+type IconProps = { className?: string };
+
+function QuestionMarkIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className ?? "h-5 w-5"}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9.2a2.5 2.5 0 1 1 3.4 2.3c-.7.4-.9.8-.9 1.5v.5" />
+      <circle cx="12" cy="16.5" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function ChevronIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className ?? "h-4 w-4"}
+      aria-hidden="true"
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
 
 type ArticleBodyProps = {
   blocks: ArticleBlock[];
@@ -19,7 +57,10 @@ const HEADING_CLASS: Record<HeadingLevel, string> = {
   4: "mt-4 mb-3 font-heading text-sm leading-normal text-ink md:text-base",
 };
 
-export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
+export async function ArticleBody({
+  blocks,
+  dir,
+}: ArticleBodyProps) {
   const siteConfig = await getSiteConfig();
   const paragraphClassName = articleParagraphClassName(siteConfig, dir);
   const firstParagraphIndex = blocks.findIndex(
@@ -82,16 +123,14 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
 
         if (block.type === "image") {
           return (
-            <figure key={key} className="my-8 overflow-hidden">
-              <div className="relative aspect-video w-full overflow-hidden rounded bg-rule">
-                <Image
-                  src={block.image.src}
-                  alt={block.image.alt}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 42rem"
-                />
-              </div>
+            <figure key={key} className="my-8 w-full overflow-hidden">
+              {/* biome-ignore lint/performance/noImgElement: must preserve original image ratio without known dimensions */}
+              <img
+                src={block.image.src}
+                alt={block.image.alt}
+                className="h-auto w-full rounded object-contain"
+                loading="lazy"
+              />
               {block.image.caption ? (
                 <figcaption className="mt-3 space-y-1 text-xs leading-relaxed text-ink-muted">
                   <p>{block.image.caption}</p>
@@ -148,19 +187,38 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
         }
 
         if (block.type === "question") {
+          const hasAnswer = Boolean(block.answer);
+          if (!hasAnswer) {
+            return (
+              <div
+                key={key}
+                className="my-4 w-full overflow-hidden rounded-lg border border-rule"
+              >
+                <div className="flex w-full items-center gap-3 bg-accent-soft/60 py-2 ps-3 pe-5 text-lg leading-relaxed text-ink">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-accent text-paper">
+                    <QuestionMarkIcon className="h-5 w-5" />
+                  </span>
+                  <p className="m-0 flex-1 font-heading">{block.content}</p>
+                </div>
+              </div>
+            );
+          }
           return (
             <details
               key={key}
-              className="my-4 rounded-lg border border-rule bg-surface-2 px-5 py-3"
+              open
+              className="group my-4 w-full overflow-hidden rounded-lg border border-rule"
             >
-              <summary className="cursor-pointer font-heading text-base text-ink marker:font-sans">
-                {block.content}
+              <summary className="flex cursor-pointer list-none items-center gap-3 bg-accent-soft/60 py-2 ps-3 pe-5 text-lg leading-relaxed text-ink [&::-webkit-details-marker]:hidden">
+                <span className="flex h-9 w-9 shrink-0 flex-col items-center justify-center rounded bg-accent text-paper">
+                  <QuestionMarkIcon className="h-4 w-4" />
+                  <ChevronIcon className="h-3 w-3 transition-transform group-open:rotate-180" />
+                </span>
+                <span className="flex-1 font-heading">{block.content}</span>
               </summary>
-              {block.answer ? (
-                <p className="mt-3 text-base leading-relaxed text-ink">
-                  {block.answer}
-                </p>
-              ) : null}
+              <p className="m-0 border-t border-rule bg-surface-2 px-5 py-3 text-base leading-relaxed text-ink">
+                {block.answer}
+              </p>
             </details>
           );
         }

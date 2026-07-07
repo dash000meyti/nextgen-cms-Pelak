@@ -8,7 +8,7 @@ import { MediaPickerModal } from "@/components/admin/media/MediaPickerModal";
 
 type ImageFieldProps = {
   id: string;
-  label: string;
+  label?: string;
   src: string;
   alt: string;
   caption?: string;
@@ -21,6 +21,8 @@ type ImageFieldProps = {
   required?: boolean;
   uploadContext?: MediaUploadContext;
   previewAspectClass?: string;
+  /** Two-column layout: preview + upload on the start side, fields on the end side. */
+  twoColumn?: boolean;
 };
 
 export function ImageField({
@@ -38,6 +40,7 @@ export function ImageField({
   required,
   uploadContext,
   previewAspectClass,
+  twoColumn = false,
 }: ImageFieldProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -58,56 +61,59 @@ export function ImageField({
     if (result.url) onSrcChange(result.url);
   }
 
-  return (
-    <div className="space-y-4 rounded border border-rule bg-surface-2 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-medium text-ink">{label}</h3>
-        <div className="flex gap-2">
-          {uploadContext ? (
-            <button
-              type="button"
-              onClick={() => setPickerOpen(true)}
-              className="rounded border border-rule px-3 py-1.5 text-xs text-ink hover:bg-surface"
-            >
-              انتخاب از مدیا
-            </button>
-          ) : null}
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/svg+xml"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) void handleUpload(file);
-            }}
-          />
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            className="rounded border border-rule px-3 py-1.5 text-xs text-ink hover:bg-surface disabled:opacity-50"
-          >
-            {uploading ? "در حال آپلود…" : "آپلود"}
-          </button>
-        </div>
-      </div>
-
+  const uploadButtons = (
+    <div className="flex flex-wrap gap-2">
       {uploadContext ? (
-        <MediaPickerModal
-          open={pickerOpen}
-          uploadContext={uploadContext}
-          onSelect={onSrcChange}
-          onClose={() => setPickerOpen(false)}
+        <button
+          type="button"
+          onClick={() => setPickerOpen(true)}
+          className="rounded border border-rule px-3 py-1.5 text-xs text-ink hover:bg-surface"
+        >
+          انتخاب از مدیا
+        </button>
+      ) : null}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/svg+xml"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void handleUpload(file);
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => fileRef.current?.click()}
+        disabled={uploading}
+        className="rounded border border-rule px-3 py-1.5 text-xs text-ink hover:bg-surface disabled:opacity-50"
+      >
+        {uploading ? "در حال آپلود…" : "آپلود"}
+      </button>
+    </div>
+  );
+
+  const preview = (
+    <div
+      className={`relative w-full overflow-hidden rounded border border-rule bg-paper ${previewAspectClass ?? "aspect-video"}`}
+    >
+      {src ? (
+        // biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs
+        <img
+          src={src}
+          alt={alt || label || "پیش‌نمایش تصویر"}
+          className="h-full w-full object-cover"
         />
-      ) : null}
+      ) : (
+        <div className="flex h-full w-full items-center justify-center text-xs text-ink-faint">
+          پیش‌نمایش تصویر
+        </div>
+      )}
+    </div>
+  );
 
-      {uploadError ? (
-        <p className="text-xs text-accent" role="alert">
-          {uploadError}
-        </p>
-      ) : null}
-
+  const fields = (
+    <div className="space-y-3">
       <TextField
         id={`${id}-src`}
         label="آدرس تصویر"
@@ -138,28 +144,54 @@ export function ImageField({
           onChange={onCreditChange}
         />
       ) : null}
+    </div>
+  );
 
-      {src ? (
-        previewAspectClass ? (
-          <div
-            className={`relative overflow-hidden rounded border border-rule ${previewAspectClass}`}
-          >
-            {/* biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs */}
+  return (
+    <div className="space-y-3 rounded border border-rule bg-surface-2 p-4">
+      {uploadContext ? (
+        <MediaPickerModal
+          open={pickerOpen}
+          uploadContext={uploadContext}
+          onSelect={onSrcChange}
+          onClose={() => setPickerOpen(false)}
+        />
+      ) : null}
+
+      {uploadError ? (
+        <p className="text-xs text-accent" role="alert">
+          {uploadError}
+        </p>
+      ) : null}
+
+      {twoColumn ? (
+        <div className="grid gap-4 sm:grid-cols-[1fr_1fr]">
+          <div className="space-y-2">
+            {preview}
+            {uploadButtons}
+          </div>
+          {fields}
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            {label ? (
+              <h3 className="text-sm font-medium text-ink">{label}</h3>
+            ) : null}
+            {uploadButtons}
+          </div>
+          {previewAspectClass ? preview : null}
+          {fields}
+          {src && !previewAspectClass ? (
+            // biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs
             <img
               src={src}
-              alt={alt || label}
-              className="h-full w-full object-cover"
+              alt={alt || label || "پیش‌نمایش"}
+              className="max-h-40 rounded border border-rule"
             />
-          </div>
-        ) : (
-          // biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs
-          <img
-            src={src}
-            alt={alt || label}
-            className="max-h-40 rounded border border-rule"
-          />
-        )
-      ) : null}
+          ) : null}
+        </>
+      )}
     </div>
   );
 }

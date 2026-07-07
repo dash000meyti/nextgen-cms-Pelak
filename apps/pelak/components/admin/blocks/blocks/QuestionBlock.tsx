@@ -19,7 +19,6 @@ export function QuestionBlock({
     <div className="space-y-2">
       <TextareaField
         id={`block-question-content-${blockId}`}
-        label="پرسش"
         value={block.content}
         onChange={(content) => onChange({ ...block, content })}
         rows={2}
@@ -29,7 +28,6 @@ export function QuestionBlock({
       {showAnswer ? (
         <TextareaField
           id={`block-question-answer-${blockId}`}
-          label="پاسخ"
           value={block.answer ?? ""}
           onChange={(answer) => onChange({ ...block, answer })}
           rows={4}

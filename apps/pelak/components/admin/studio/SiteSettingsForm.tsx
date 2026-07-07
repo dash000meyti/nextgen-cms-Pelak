@@ -32,6 +32,7 @@ export function SiteSettingsForm({ siteConfig }: SiteSettingsFormProps) {
           contactEmail: site.contactEmail,
           defaultTheme: site.defaultTheme,
           defaultDirection: site.defaultDirection,
+          typography: site.typography,
         });
         setSuccess("ذخیره شد.");
         router.refresh();
@@ -111,6 +112,55 @@ export function SiteSettingsForm({ siteConfig }: SiteSettingsFormProps) {
               <option value="rtl">راست‌به‌چپ</option>
               <option value="ltr">چپ‌به‌راست</option>
             </select>
+          </label>
+        </div>
+        <div className="space-y-3 rounded border border-rule bg-surface/50 p-4">
+          <p className="text-sm font-medium text-ink">تایپوگرافی بدنهٔ مقاله</p>
+          <label className="flex items-center gap-2 text-sm text-ink">
+            <input
+              type="checkbox"
+              checked={site.typography.articleBody.rtl.justifyParagraphs}
+              onChange={(e) =>
+                setSite({
+                  ...site,
+                  typography: {
+                    ...site.typography,
+                    articleBody: {
+                      ...site.typography.articleBody,
+                      rtl: {
+                        ...site.typography.articleBody.rtl,
+                        justifyParagraphs: e.target.checked,
+                      },
+                    },
+                  },
+                })
+              }
+              className="h-4 w-4 rounded border-rule text-accent focus:ring-accent"
+            />
+            <span>جاستیفای پاراگراف‌ها برای متن راست‌به‌چپ (RTL)</span>
+          </label>
+          <label className="flex items-center gap-2 text-sm text-ink">
+            <input
+              type="checkbox"
+              checked={site.typography.articleBody.ltr.justifyParagraphs}
+              onChange={(e) =>
+                setSite({
+                  ...site,
+                  typography: {
+                    ...site.typography,
+                    articleBody: {
+                      ...site.typography.articleBody,
+                      ltr: {
+                        ...site.typography.articleBody.ltr,
+                        justifyParagraphs: e.target.checked,
+                      },
+                    },
+                  },
+                })
+              }
+              className="h-4 w-4 rounded border-rule text-accent focus:ring-accent"
+            />
+            <span>جاستیفای پاراگراف‌ها برای متن چپ‌به‌راست (LTR)</span>
           </label>
         </div>
       </div>

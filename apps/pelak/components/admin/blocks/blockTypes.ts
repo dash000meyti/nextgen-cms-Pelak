@@ -18,6 +18,15 @@ export type BlockEditorComponent = (
   props: BlockEditorProps,
 ) => JSX.Element | null;
 
+export type BlockSettingsProps = {
+  block: ArticleBlock;
+  onChange: (block: ArticleBlock) => void;
+};
+
+export type BlockSettingsComponent = (
+  props: BlockSettingsProps,
+) => JSX.Element | null;
+
 export type BlockIcon = (props: { className?: string }) => JSX.Element;
 
 export type BlockGroup = "text" | "media" | "interactive";
@@ -29,6 +38,8 @@ export type BlockMeta = {
   Icon: BlockIcon;
   createDefault: () => ArticleBlock;
   Editor: BlockEditorComponent;
+  /** Inline settings rendered in the card header next to the label. */
+  Settings?: BlockSettingsComponent;
   /** Types this block can be transformed into via the toolbar. */
   convertibleTo: BlockType[];
 };

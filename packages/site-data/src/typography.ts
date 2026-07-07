@@ -8,6 +8,6 @@ export function articleParagraphClassName(
   dir: TextDirection = siteConfig.defaultDirection,
 ): string {
   return siteConfig.typography.articleBody[dir].justifyParagraphs
-    ? "text-justify"
-    : "text-start";
+    ? "article-paragraph-justify"
+    : "article-paragraph-start";
 }

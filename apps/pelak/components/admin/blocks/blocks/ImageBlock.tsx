@@ -15,7 +15,6 @@ export function ImageBlock({
   return (
     <ImageField
       id={`block-image-${blockId}`}
-      label="تصویر"
       src={image.src}
       alt={image.alt}
       caption={image.caption ?? ""}
@@ -31,7 +30,7 @@ export function ImageBlock({
       showCaption
       required
       uploadContext={uploadContext}
-      previewAspectClass="aspect-video w-full"
+      twoColumn
     />
   );
 }

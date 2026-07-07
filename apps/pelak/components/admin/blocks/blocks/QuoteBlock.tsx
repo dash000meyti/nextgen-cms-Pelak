@@ -12,21 +12,19 @@ export function QuoteBlock({
   if (rawBlock.type !== "quote") return null;
   const block = rawBlock;
   return (
-    <div className="space-y-2">
+    <div className="grid gap-2 sm:grid-cols-[1fr_18rem]">
       <TextareaField
         id={`block-quote-content-${blockId}`}
-        label="نقل‌قول"
         value={block.content}
         onChange={(content) => onChange({ ...block, content })}
-        rows={3}
+        rows={2}
         placeholder="متن نقل‌قول…"
       />
       <TextField
         id={`block-quote-attribution-${blockId}`}
-        label="نسبت (اختیاری)"
         value={block.attribution ?? ""}
         onChange={(attribution) => onChange({ ...block, attribution })}
-        placeholder="نام گوینده یا منبع"
+        placeholder="نسبت (اختیاری)"
       />
     </div>
   );

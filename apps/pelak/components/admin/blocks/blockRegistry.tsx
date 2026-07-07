@@ -2,10 +2,10 @@ import type {
   ArticleBlock,
   BlockType,
 } from "@nextgen-cms/contract/types/article";
-import { ButtonBlock } from "./blocks/ButtonBlock";
-import { HeadingBlock } from "./blocks/HeadingBlock";
+import { ButtonBlock, ButtonSettings } from "./blocks/ButtonBlock";
+import { HeadingBlock, HeadingSettings } from "./blocks/HeadingBlock";
 import { ImageBlock } from "./blocks/ImageBlock";
-import { ListBlock } from "./blocks/ListBlock";
+import { ListBlock, ListSettings } from "./blocks/ListBlock";
 import { ParagraphBlock } from "./blocks/ParagraphBlock";
 import { QuestionBlock } from "./blocks/QuestionBlock";
 import { QuoteBlock } from "./blocks/QuoteBlock";
@@ -13,6 +13,9 @@ import { VideoBlock } from "./blocks/VideoBlock";
 import type { BlockMeta } from "./blockTypes";
 import {
   ButtonIcon,
+  Heading2Icon,
+  Heading3Icon,
+  Heading4Icon,
   HeadingIcon,
   ImageIcon,
   ListBulletIcon,
@@ -49,6 +52,7 @@ const registry: Record<BlockType, BlockMeta> = {
     Icon: HeadingIcon,
     createDefault: () => ({ type: "heading", level: 2, content: "" }),
     Editor: HeadingBlock,
+    Settings: HeadingSettings,
     convertibleTo: ["paragraph", "quote", "list", "question"],
   },
   quote: {
@@ -67,6 +71,7 @@ const registry: Record<BlockType, BlockMeta> = {
     Icon: ListBulletIcon,
     createDefault: () => ({ type: "list", variant: "bullet", items: [""] }),
     Editor: ListBlock,
+    Settings: ListSettings,
     convertibleTo: ["paragraph", "heading", "quote", "question"],
   },
   question: {
@@ -108,9 +113,10 @@ const registry: Record<BlockType, BlockMeta> = {
       type: "button",
       label: "",
       href: "",
-      variant: "primary",
+      variant: "outline",
     }),
     Editor: ButtonBlock,
+    Settings: ButtonSettings,
     convertibleTo: [],
   },
 };
@@ -136,26 +142,51 @@ export function createBlock(type: BlockType): ArticleBlock {
   return getBlockMeta(type).createDefault();
 }
 
-export function listInsertableBlocks(): Array<{
+type InsertableEntry = {
   type: BlockType;
   label: string;
   group: BlockMeta["group"];
   Icon: BlockMeta["Icon"];
   payload: ArticleBlock;
-}> {
-  const base: Array<{
-    type: BlockType;
-    label: string;
-    group: BlockMeta["group"];
-    Icon: BlockMeta["Icon"];
-    payload: ArticleBlock;
-  }> = Object.values(registry).map((meta) => ({
+};
+
+export function listInsertableBlocks(): InsertableEntry[] {
+  const base: InsertableEntry[] = Object.values(registry).map((meta) => ({
     type: meta.type,
     label: meta.label,
     group: meta.group,
     Icon: meta.Icon,
     payload: meta.createDefault(),
   }));
+
+  // Replace the single "heading" entry with three level-specific buttons.
+  const headingIndex = base.findIndex((entry) => entry.type === "heading");
+  if (headingIndex >= 0) {
+    const headingLevels: InsertableEntry[] = [
+      {
+        type: "heading",
+        label: "عنوان",
+        group: "text",
+        Icon: Heading2Icon,
+        payload: { type: "heading", level: 2, content: "" },
+      },
+      {
+        type: "heading",
+        label: "زیرعنوان",
+        group: "text",
+        Icon: Heading3Icon,
+        payload: { type: "heading", level: 3, content: "" },
+      },
+      {
+        type: "heading",
+        label: "ریزعنوان",
+        group: "text",
+        Icon: Heading4Icon,
+        payload: { type: "heading", level: 4, content: "" },
+      },
+    ];
+    base.splice(headingIndex, 1, ...headingLevels);
+  }
 
   // Split the single "list" entry into bullet + ordered for clarity in the menu.
   const listIndex = base.findIndex((entry) => entry.type === "list");
@@ -237,7 +268,7 @@ export function convertBlock(
     case "button":
       return source.type === "button"
         ? source
-        : { type: "button", label: primaryText, href: "", variant: "primary" };
+        : { type: "button", label: primaryText, href: "", variant: "outline" };
     default:
       return fallback;
   }

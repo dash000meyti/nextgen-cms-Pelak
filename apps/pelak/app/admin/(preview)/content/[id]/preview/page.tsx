@@ -66,6 +66,7 @@ export default async function ContentPreviewPage({ params }: PreviewPageProps) {
         currentContentGroup={currentContentGroup}
         contentGroupPageTitle={contentGroupModuleSettings.pageTitle}
         siteConfig={siteConfig}
+        unoptimized={status !== "published"}
       />
     </>
   );

@@ -5,12 +5,14 @@ type ArticleHeroProps = {
   image: ImageMeta;
   priority?: boolean;
   className?: string;
+  unoptimized?: boolean;
 };
 
 export function ArticleHero({
   image,
   priority = false,
   className = "",
+  unoptimized = false,
 }: ArticleHeroProps) {
   return (
     <figure className={`overflow-hidden ${className}`.trim()}>
@@ -22,6 +24,7 @@ export function ArticleHero({
           className="object-cover"
           sizes="(max-width: 1023px) 100vw, 50vw"
           priority={priority}
+          unoptimized={unoptimized}
         />
       </div>
       {image.caption ? (

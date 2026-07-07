@@ -121,6 +121,14 @@ export async function findAllArticleSlugs() {
   return rows.map((row) => row.slug);
 }
 
+export async function findPublishedArticleSitemapEntries() {
+  const rows = await db
+    .select({ slug: articles.slug, publishedAt: articles.publishedAt })
+    .from(articles)
+    .where(published);
+  return rows;
+}
+
 export async function findArticleBySlug(slug: string) {
   const rows = await findPublishedArticles(eq(articles.slug, slug));
   const article = rows[0];

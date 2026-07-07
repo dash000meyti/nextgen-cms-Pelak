@@ -103,8 +103,9 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     authInterrupts: true,
+    proxyClientMaxBodySize: "30mb",
     serverActions: {
-      bodySizeLimit: "12mb",
+      bodySizeLimit: "30mb",
     },
   },
   transpilePackages: [

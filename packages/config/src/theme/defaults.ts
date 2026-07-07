@@ -68,6 +68,8 @@ export const DEFAULT_CONTENT_GROUP_MODULE_SETTINGS: ContentGroupModuleSettings =
     itemsPerPage: 12,
     showInMenu: true,
     groupByYear: false,
+    maxImageBytes: 10 * 1024 * 1024,
+    maxPdfBytes: 25 * 1024 * 1024,
   };
 
 export const DEFAULT_VIDEO_MODULE_SETTINGS: VideoModuleSettings = {
@@ -136,6 +138,8 @@ export function normalizeContentGroupModuleSettings(
     period,
     ...normalizeSectionListSettings(stored, defaults),
     groupByYear: stored?.groupByYear ?? defaults.groupByYear,
+    maxImageBytes: stored?.maxImageBytes ?? defaults.maxImageBytes,
+    maxPdfBytes: stored?.maxPdfBytes ?? defaults.maxPdfBytes,
   };
 }
 

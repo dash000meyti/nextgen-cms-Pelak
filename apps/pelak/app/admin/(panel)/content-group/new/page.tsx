@@ -32,6 +32,8 @@ export default async function NewContentGroupPage() {
         mode="create"
         initial={EMPTY_FORM}
         contentGroupPeriod={period}
+        maxImageBytes={settings.maxImageBytes}
+        maxPdfBytes={settings.maxPdfBytes}
       />
     </div>
   );

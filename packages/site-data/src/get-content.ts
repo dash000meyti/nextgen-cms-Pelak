@@ -19,6 +19,7 @@ import {
   findFeaturedArticles,
   findPublishedArticleById,
   findPublishedArticleShareMetaBySlug,
+  findPublishedArticleSitemapEntries,
 } from "@nextgen-cms/core/db/repositories/articles";
 import {
   findAllContentGroupNumbers,
@@ -118,6 +119,12 @@ export const getAllArticleSlugs = platformCache(
   ["article-slugs"],
   [CACHE_TAGS.articles],
   findAllArticleSlugs,
+);
+
+export const getPublishedArticleSitemapEntries = platformCache(
+  ["article-sitemap-entries"],
+  [CACHE_TAGS.articles],
+  findPublishedArticleSitemapEntries,
 );
 
 export async function getArticleBySlug(

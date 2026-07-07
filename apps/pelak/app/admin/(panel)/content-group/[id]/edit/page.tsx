@@ -41,6 +41,8 @@ export default async function EditContentGroupPage({ params }: PageProps) {
         contentGroupId={contentGroupId}
         initial={initial}
         contentGroupPeriod={settings.period}
+        maxImageBytes={settings.maxImageBytes}
+        maxPdfBytes={settings.maxPdfBytes}
       />
     </div>
   );

@@ -22,6 +22,8 @@ type ContentGroupFormProps = {
   contentGroupId?: number;
   initial: ContentGroupFormData;
   contentGroupPeriod: ContentGroupPeriod;
+  maxImageBytes: number;
+  maxPdfBytes: number;
 };
 
 function renderPeriodField(
@@ -101,6 +103,8 @@ export function ContentGroupForm({
   contentGroupId,
   initial,
   contentGroupPeriod,
+  maxImageBytes,
+  maxPdfBytes,
 }: ContentGroupFormProps) {
   const router = useRouter();
   const session = useAdminMember();
@@ -127,19 +131,23 @@ export function ContentGroupForm({
     setError(null);
     setSuccess(null);
     startTransition(async () => {
-      if (mode === "create") {
-        const result = await createContentGroupAndRedirect(form);
-        if (result && !result.ok) setError(result.error);
-        return;
+      try {
+        if (mode === "create") {
+          const result = await createContentGroupAndRedirect(form);
+          if (result && !result.ok) setError(result.error);
+          return;
+        }
+        if (!contentGroupId) return;
+        const result = await saveContentGroup(contentGroupId, form);
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        setSuccess("ذخیره شد.");
+        router.refresh();
+      } catch {
+        setError("خطا در ذخیره — دوباره تلاش کنید.");
       }
-      if (!contentGroupId) return;
-      const result = await saveContentGroup(contentGroupId, form);
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-      setSuccess("ذخیره شد.");
-      router.refresh();
     });
   }
 
@@ -186,6 +194,7 @@ export function ContentGroupForm({
         onSrcChange={(coverSrc) => update("coverSrc", coverSrc)}
         onAltChange={(coverAlt) => update("coverAlt", coverAlt)}
         uploadContext={uploadContext}
+        maxBytes={maxImageBytes}
         previewAspectClass="aspect-2/3 w-full max-w-[160px]"
         required
       />
@@ -195,6 +204,7 @@ export function ContentGroupForm({
         src={form.pdfSrc}
         onSrcChange={(pdfSrc) => update("pdfSrc", pdfSrc)}
         uploadContext={uploadContext}
+        maxBytes={maxPdfBytes}
       />
       <button
         type="button"

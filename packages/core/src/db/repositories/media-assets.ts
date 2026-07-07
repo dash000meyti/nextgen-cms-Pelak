@@ -175,6 +175,20 @@ export async function updateMediaAssetFolder(
     .where(eq(mediaAssets.id, id));
 }
 
+export async function updateMediaAssetFilename(
+  id: number,
+  filename: string,
+  originalName?: string,
+): Promise<void> {
+  await db
+    .update(mediaAssets)
+    .set({
+      filename,
+      ...(originalName !== undefined ? { originalName } : {}),
+    })
+    .where(eq(mediaAssets.id, id));
+}
+
 export function buildPublicUrl(
   row: Pick<MediaAssetRow, "folderPath" | "filename">,
 ): string {

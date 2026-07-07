@@ -37,7 +37,7 @@ export function SlugField({
       <input
         id={id}
         type="text"
-        dir="ltr"
+        dir="auto"
         value={value}
         onChange={(e) => {
           touched.current = true;
@@ -47,7 +47,7 @@ export function SlugField({
         className="w-full rounded border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent"
       />
       <p className="text-xs text-ink-faint">
-        فقط حروف کوچک لاتین، اعداد و خط تیره
+        حروف فارسی یا لاتین، اعداد و خط تیره
       </p>
     </div>
   );

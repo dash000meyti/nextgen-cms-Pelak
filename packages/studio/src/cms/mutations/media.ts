@@ -32,6 +32,7 @@ import {
   getMaxUploadBytes,
   isMimeAllowed,
 } from "@nextgen-cms/core/media/settings";
+import { findContentGroupModuleSettings } from "@nextgen-cms/core/db/repositories/site-config";
 import {
   removeMediaFile,
   saveMediaFile,
@@ -156,6 +157,22 @@ async function validateUploadAccess(
   return null;
 }
 
+async function resolveMaxUploadBytes(
+  uploadContext: MediaUploadContext,
+  mimeType: string,
+): Promise<number> {
+  if (uploadContext.contentGroupId != null) {
+    const settings = await findContentGroupModuleSettings();
+    if (mimeType === "application/pdf") {
+      return settings.maxPdfBytes;
+    }
+    if (mimeType.startsWith("image/")) {
+      return settings.maxImageBytes;
+    }
+  }
+  return getMaxUploadBytes();
+}
+
 export async function uploadMedia(
   formData: FormData,
   context?: MediaUploadContext,
@@ -174,14 +191,6 @@ export async function uploadMedia(
     return { ok: false, error: "فرمت فایل مجاز نیست." };
   }
 
-  const maxBytes = await getMaxUploadBytes();
-  if (file.size > maxBytes) {
-    return {
-      ok: false,
-      error: `حداکثر حجم فایل ${Math.round(maxBytes / (1024 * 1024))} مگابایت است.`,
-    };
-  }
-
   const ext = getExtensionForMimeType(file.type);
   if (!ext) {
     return { ok: false, error: "فرمت فایل مجاز نیست." };
@@ -198,6 +207,15 @@ export async function uploadMedia(
         ? context?.memberId
         : (context?.memberId ?? session.memberId),
   });
+
+  const maxBytes = await resolveMaxUploadBytes(uploadContext, file.type);
+  if (file.size > maxBytes) {
+    return {
+      ok: false,
+      error: `حداکثر حجم فایل ${Math.round(maxBytes / (1024 * 1024))} مگابایت است.`,
+    };
+  }
+
   const folderPath = resolveUploadFolder(uploadContext);
 
   const accessError = await validateUploadAccess(

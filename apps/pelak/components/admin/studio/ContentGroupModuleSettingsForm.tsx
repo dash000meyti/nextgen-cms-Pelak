@@ -8,6 +8,7 @@ import type {
 import { saveContentGroupModuleSettings } from "@nextgen-cms/studio/cms/mutations/settings";
 import { SectionListSettingsFields } from "@/components/admin/studio/SectionListSettingsFields";
 import { SettingsSaveBar } from "@/components/admin/studio/SettingsSaveBar";
+import { TextField } from "@/components/admin/fields/TextField";
 import { useSingletonSettingsForm } from "@/components/admin/studio/useSingletonSettingsForm";
 
 const PERIOD_OPTIONS: ContentGroupPeriod[] = [
@@ -73,6 +74,32 @@ export function ContentGroupModuleSettingsForm({
         />
         <span>تفکیک شدن به سال</span>
       </label>
+      <TextField
+        id="content-group-max-image-bytes"
+        label="حداکثر حجم تصویر جلد (بایت)"
+        type="number"
+        value={String(settings.maxImageBytes)}
+        onChange={(raw) =>
+          setValue({
+            ...settings,
+            maxImageBytes: Number.parseInt(raw, 10) || settings.maxImageBytes,
+          })
+        }
+        hint={`معادل ${Math.round(settings.maxImageBytes / (1024 * 1024))} مگابایت`}
+      />
+      <TextField
+        id="content-group-max-pdf-bytes"
+        label="حداکثر حجم PDF (بایت)"
+        type="number"
+        value={String(settings.maxPdfBytes)}
+        onChange={(raw) =>
+          setValue({
+            ...settings,
+            maxPdfBytes: Number.parseInt(raw, 10) || settings.maxPdfBytes,
+          })
+        }
+        hint={`معادل ${Math.round(settings.maxPdfBytes / (1024 * 1024))} مگابایت`}
+      />
       <SettingsSaveBar
         pending={pending}
         error={error}

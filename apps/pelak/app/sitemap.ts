@@ -1,8 +1,8 @@
 import {
-  getAllArticleSlugs,
   getAllAuthorSlugs,
-  getAllContentGroupNumbers,
   getAllTopicSlugs,
+  getContentGroups,
+  getPublishedArticleSitemapEntries,
 } from "@nextgen-cms/site-data/get-content";
 import type { MetadataRoute } from "next";
 
@@ -11,18 +11,19 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hokmran.example";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [articleSlugs, authorSlugs, topicSlugs, contentGroupNumbers] =
+  const [articleEntries, authorSlugs, topicSlugs, contentGroups] =
     await Promise.all([
-      getAllArticleSlugs(),
+      getPublishedArticleSitemapEntries(),
       getAllAuthorSlugs(),
       getAllTopicSlugs(),
-      getAllContentGroupNumbers(),
+      getContentGroups(),
     ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     "",
     "/content",
     "/content-group",
+    "/members",
     "/video",
     "/about",
     "/contact",
@@ -32,8 +33,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === "" ? 1 : 0.8,
   }));
 
-  const articleRoutes = articleSlugs.map((slug: string) => ({
-    url: `${baseUrl}/content/${slug}`,
+  const articleRoutes = articleEntries.map((entry) => ({
+    url: `${baseUrl}/content/${entry.slug}`,
+    lastModified: entry.publishedAt,
     changeFrequency: "weekly" as const,
     priority: 0.9,
   }));
@@ -50,11 +52,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  const contentGroupRoutes = contentGroupNumbers.map((number: number) => ({
-    url: `${baseUrl}/content-group/${number}`,
+  const contentGroupRoutes = contentGroups.map((group) => ({
+    url: `${baseUrl}/content-group/${group.number}`,
+    lastModified: group.publishedAt,
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
+
+  const contentGroupPdfRoutes = contentGroups
+    .filter((group) => group.pdfSrc?.trim())
+    .map((group) => ({
+      url: `${baseUrl}${group.pdfSrc}`,
+      lastModified: group.publishedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }));
 
   return [
     ...staticRoutes,
@@ -62,5 +74,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...authorRoutes,
     ...topicRoutes,
     ...contentGroupRoutes,
+    ...contentGroupPdfRoutes,
   ];
 }

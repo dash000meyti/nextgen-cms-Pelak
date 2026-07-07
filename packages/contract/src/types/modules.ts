@@ -15,6 +15,8 @@ export type ModuleSettings = {
 export type ContentGroupModuleSettings = SectionListSettings & {
   period: ContentGroupPeriod;
   groupByYear: boolean;
+  maxImageBytes: number;
+  maxPdfBytes: number;
 };
 
 export type VideoModuleSettings = SectionListSettings;

@@ -179,6 +179,19 @@ npm run dev
 
 `npm run build` به DB نیاز ندارد.
 
+## محدودیت حجم آپلود (Server Actions)
+
+آپلود مدیا از Server Action روی مسیرهای `/admin/*` انجام می‌شود. در `apps/pelak/next.config.ts`:
+
+```ts
+experimental: {
+  proxyClientMaxBodySize: "30mb",  // باید ≥ maxPdfBytes گروه محتوا
+  serverActions: { bodySizeLimit: "30mb" },
+}
+```
+
+اگر `maxPdfBytes` در `/admin/content-group/settings` افزایش یابد، هر دو مقدار config را هم بالاتر ببرید. جزئیات: `docs/SEO.md`.
+
 ## دستورات مفید
 
 | دستور | کاربرد |

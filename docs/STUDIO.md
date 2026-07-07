@@ -100,7 +100,7 @@ packages/core/src/db/repositories/ — نوشتن DB
 - `contentGroup` / `video` / `newsletter`: فعال/غیرفعال + `label` (نام منوی کنار)
 
 تنظیمات بخش ماژول (ستون‌های جدا):
-- `content_group_module_settings`: `period` (`yearly|seasonal|monthly|weekly`)
+- `content_group_module_settings`: `period` (`yearly|seasonal|monthly|weekly`), `maxImageBytes` (پیش‌فرض 10MB), `maxPdfBytes` (پیش‌فرض 25MB)
 - `video_module_settings`: `pageTitle`, `itemsPerPage`
 
 برچسب پیش‌فرض: `packages/contract/src/modules/labels.ts` + `modulePermissionGroups`
@@ -134,7 +134,7 @@ site/                      دارایی عمومی سایت (public)
 members/{memberId}/        آواتار عضو (public)
 members/{memberId}/draft/  staging قبل از ثبت entity (private)
 content/{articleId}/       مدیا مقاله (public فقط وقتی status=published)
-content-group/{groupId}/   جلد گروه محتوا (public)
+content-group/{groupId}/   جلد + PDF گروه محتوا (public؛ یک PDF با نام SEO)
 videos/{videoId}/          بندانگشتی ویدیو (public)
 ```
 
@@ -147,6 +147,12 @@ videos/{videoId}/          بندانگشتی ویدیو (public)
 5. **حذف دائمی**: `purgeMediaForContent` — پاکسازی `content/{id}/`
 
 Media picker: entity نساخته → فولدر draft عضو؛ entity ساخته → فولدر همان entity.
+
+### گروه محتوا — PDF
+
+- محدودیت حجم جدا: تصویر جلد و PDF در `/admin/content-group/settings`
+- هنگام save: `finalizeContentGroupPdf` — promote، rename به `{pageTitle} شماره {n} - سال {y}.pdf`، purge PDFهای دیگر
+- جزئیات SEO: `docs/SEO.md`
 
 ### migration legacy
 

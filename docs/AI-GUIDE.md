@@ -19,6 +19,7 @@
 | مجوز RBAC | `packages/contract/src/permissions.ts` | `hokmran-rbac` · `docs/STUDIO.md` |
 | theme tokens | `packages/config/src/theme/` | `hokmran-theme` · `styling.mdc` |
 | Docker/startup | `docker/` | `platform-deployment.mdc` · `docs/DEPLOYMENT.md` |
+| SEO / sitemap / PDF | `apps/pelak/app/sitemap.ts`, `content-group/[number]/page.tsx` | `docs/SEO.md` |
 | seed/fixture | `packages/seed/src/` | `data-layer.mdc` |
 | migration | `packages/core/drizzle/migrations/` | `docs/MIGRATION-POLICY.md` |
 

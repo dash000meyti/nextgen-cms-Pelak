@@ -24,6 +24,12 @@ function isSafeRelativePath(relativePath: string): boolean {
   return segments.every((segment) => segment.length > 0 && segment !== "..");
 }
 
+function pdfContentDisposition(filename: string): string {
+  const safe = filename.replace(/"/g, "");
+  const encoded = encodeURIComponent(filename);
+  return `inline; filename="${safe}"; filename*=UTF-8''${encoded}`;
+}
+
 async function readUploadFile(relativePath: string): Promise<Buffer | null> {
   const ext = path.extname(relativePath).toLowerCase();
   if (!MIME_TYPES[ext]) return null;
@@ -103,6 +109,13 @@ export async function GET(
       "Cache-Control": access.isPublic
         ? "public, max-age=31536000, immutable"
         : "private, no-store",
+      ...(contentType === "application/pdf"
+        ? {
+            "Content-Disposition": pdfContentDisposition(
+              path.basename(relativePath),
+            ),
+          }
+        : {}),
     },
   });
 }

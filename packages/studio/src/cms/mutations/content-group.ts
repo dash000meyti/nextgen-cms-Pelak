@@ -14,6 +14,8 @@ import {
 } from "@nextgen-cms/core/db/repositories/content-groups-admin";
 import { contentGroupPath } from "@nextgen-cms/core/media/path-policy";
 import { promoteMediaToFolder } from "@nextgen-cms/core/media/promote-media";
+import { finalizeContentGroupPdf } from "@nextgen-cms/core/media/finalize-content-group-pdf";
+import { findContentGroupModuleSettings } from "@nextgen-cms/core/db/repositories/site-config";
 import { parseJalaliInput } from "@nextgen-cms/core/platform/datetime";
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";
@@ -94,9 +96,16 @@ async function resolveContentGroupCoverSrc(
 async function resolveContentGroupPdfSrc(
   contentGroupId: number,
   pdfSrc: string | null | undefined,
+  meta: { number: number; year: number },
 ): Promise<string | null> {
-  if (!pdfSrc?.trim()) return null;
-  return promoteMediaToFolder(pdfSrc, contentGroupPath(contentGroupId));
+  const settings = await findContentGroupModuleSettings();
+  return finalizeContentGroupPdf({
+    contentGroupId,
+    pdfSrc,
+    number: meta.number,
+    year: meta.year,
+    pageTitle: settings.pageTitle,
+  });
 }
 
 export async function createContentGroup(
@@ -115,7 +124,10 @@ export async function createContentGroup(
   try {
     const id = await insertContentGroup(input, access(session.memberId));
     const coverSrc = await resolveContentGroupCoverSrc(id, input.coverSrc);
-    const pdfSrc = await resolveContentGroupPdfSrc(id, input.pdfSrc);
+    const pdfSrc = await resolveContentGroupPdfSrc(id, input.pdfSrc, {
+      number: input.number,
+      year: input.year,
+    });
     if (coverSrc !== input.coverSrc || pdfSrc !== input.pdfSrc) {
       await updateContentGroup(
         id,
@@ -150,7 +162,10 @@ export async function saveContentGroup(
 
   try {
     const coverSrc = await resolveContentGroupCoverSrc(id, input.coverSrc);
-    const pdfSrc = await resolveContentGroupPdfSrc(id, input.pdfSrc);
+    const pdfSrc = await resolveContentGroupPdfSrc(id, input.pdfSrc, {
+      number: input.number,
+      year: input.year,
+    });
     await updateContentGroup(
       id,
       { ...input, coverSrc, pdfSrc },

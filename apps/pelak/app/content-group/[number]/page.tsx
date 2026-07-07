@@ -3,6 +3,7 @@ import {
   getAllContentGroupNumbers,
   getContentGroupByNumber,
   getContentGroupModuleSettings,
+  getSiteConfig,
 } from "@nextgen-cms/site-data/get-content";
 import { requireFeatureModule } from "@nextgen-cms/site-data/require-feature-module";
 import type { Metadata } from "next";
@@ -20,6 +21,13 @@ import { ShareBar } from "@/components/ui/ShareBar";
 type ContentGroupPageProps = {
   params: Promise<{ number: string }>;
 };
+
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hokmran.example";
+
+function absoluteUrl(path: string): string {
+  if (path.startsWith("http")) return path;
+  return `${baseUrl}${path}`;
+}
 
 function adjacentContentGroupNumbers(
   numbers: number[],
@@ -39,9 +47,43 @@ export async function generateMetadata({
   params,
 }: ContentGroupPageProps): Promise<Metadata> {
   const { number } = await params;
-  const group = await getContentGroupByNumber(Number(number));
+  const [group, siteConfig] = await Promise.all([
+    getContentGroupByNumber(Number(number)),
+    getSiteConfig(),
+  ]);
   if (!group) return { title: "گروه محتوا یافت نشد" };
-  return { title: group.label };
+
+  const pageUrl = `${baseUrl}/content-group/${group.number}`;
+  const description = `${group.label} — ${group.articleCount.toLocaleString("fa-IR")} محتوا`;
+  const pdfUrl = group.pdfSrc ? absoluteUrl(group.pdfSrc) : undefined;
+
+  return {
+    title: group.label,
+    description,
+    alternates: {
+      canonical: pageUrl,
+      ...(pdfUrl
+        ? {
+            types: {
+              "application/pdf": pdfUrl,
+            },
+          }
+        : {}),
+    },
+    openGraph: {
+      type: "website",
+      url: pageUrl,
+      siteName: siteConfig.name,
+      title: group.label,
+      description,
+      images: [
+        {
+          url: absoluteUrl(group.cover.src),
+          alt: group.cover.alt,
+        },
+      ],
+    },
+  };
 }
 
 export default async function ContentGroupPage({
@@ -50,12 +92,42 @@ export default async function ContentGroupPage({
   await requireFeatureModule("contentGroup");
   const { number: numberParam } = await params;
   const number = Number(numberParam);
-  const [group, allNumbers, contentGroupModuleSettings] = await Promise.all([
-    getContentGroupByNumber(number),
-    getAllContentGroupNumbers(),
-    getContentGroupModuleSettings(),
-  ]);
+  const [group, allNumbers, contentGroupModuleSettings, siteConfig] =
+    await Promise.all([
+      getContentGroupByNumber(number),
+      getAllContentGroupNumbers(),
+      getContentGroupModuleSettings(),
+      getSiteConfig(),
+    ]);
   if (!group) notFound();
+
+  const pageUrl = `${baseUrl}/content-group/${group.number}`;
+  const pdfUrl = group.pdfSrc ? absoluteUrl(group.pdfSrc) : undefined;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "PublicationIssue",
+    name: group.label,
+    issueNumber: group.number,
+    datePublished: group.publishedAt,
+    url: pageUrl,
+    isPartOf: {
+      "@type": "Periodical",
+      name: contentGroupModuleSettings.pageTitle,
+      publisher: {
+        "@type": "Organization",
+        name: siteConfig.name,
+      },
+    },
+    ...(pdfUrl
+      ? {
+          associatedMedia: {
+            "@type": "MediaObject",
+            contentUrl: pdfUrl,
+            encodingFormat: "application/pdf",
+          },
+        }
+      : {}),
+  };
 
   const { prevNumber, nextNumber } = adjacentContentGroupNumbers(
     allNumbers,
@@ -69,6 +141,11 @@ export default async function ContentGroupPage({
 
   return (
     <Container className="py-8 md:py-14">
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD requires inline script
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Breadcrumbs
         items={[
           { label: "خانه", href: "/" },

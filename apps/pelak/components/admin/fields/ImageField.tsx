@@ -20,6 +20,7 @@ type ImageFieldProps = {
   showCaption?: boolean;
   required?: boolean;
   uploadContext?: MediaUploadContext;
+  maxBytes?: number;
   previewAspectClass?: string;
   /** Two-column layout: preview + upload on the start side, fields on the end side. */
   twoColumn?: boolean;
@@ -39,6 +40,7 @@ export function ImageField({
   showCaption = false,
   required,
   uploadContext,
+  maxBytes,
   previewAspectClass,
   twoColumn = false,
 }: ImageFieldProps) {
@@ -50,15 +52,27 @@ export function ImageField({
   async function handleUpload(file: File) {
     setUploading(true);
     setUploadError(null);
-    const formData = new FormData();
-    formData.set("file", file);
-    const result = await uploadMedia(formData, uploadContext);
-    setUploading(false);
-    if (!result.ok) {
-      setUploadError(result.error);
+    if (maxBytes != null && file.size > maxBytes) {
+      setUploading(false);
+      setUploadError(
+        `حداکثر حجم فایل ${Math.round(maxBytes / (1024 * 1024))} مگابایت است.`,
+      );
       return;
     }
-    if (result.url) onSrcChange(result.url);
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      const result = await uploadMedia(formData, uploadContext);
+      if (!result.ok) {
+        setUploadError(result.error);
+        return;
+      }
+      if (result.url) onSrcChange(result.url);
+    } catch {
+      setUploadError("خطا در آپلود — دوباره تلاش کنید.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   const uploadButtons = (

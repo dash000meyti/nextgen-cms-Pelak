@@ -42,6 +42,16 @@ export const exampleSchema = {
 
 `getContentGroupFieldDefs(period)` در `packages/contract/src/cms-schema/content-group.ts` — فیلدها بر اساس `yearly|seasonal|monthly|weekly`.
 
+تنظیمات ماژول (`ContentGroupModuleSettings` در `site_settings.content_group_module_settings`):
+
+| فیلد | پیش‌فرض |
+|------|---------|
+| `pageTitle` | هفته‌نامه |
+| `period` | seasonal |
+| `maxImageBytes` | 10 MB |
+| `maxPdfBytes` | 25 MB |
+| `groupByYear` | false |
+
 ## Settings schemas
 
 `packages/contract/src/cms-schema/settings.ts` — site، theme، modules، media، members، content.
@@ -66,5 +76,6 @@ export const exampleSchema = {
 
 ## Slug
 
-- الگو: `^[a-z0-9]+(?:-[a-z0-9]+)*$`
+- الگو: حروف فارسی یا لاتین، اعداد، خط تیره — `[\p{Script=Arabic}a-z0-9]+(?:-…)*`
 - یکتا: `assertUniqueSlug()` در mutation
+- جزئیات SEO: `docs/SEO.md`

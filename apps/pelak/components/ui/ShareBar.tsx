@@ -80,6 +80,7 @@ export function ShareBar({
   const pdfButton = pdfDownloadUrl ? (
     <a
       href={pdfDownloadUrl}
+      type="application/pdf"
       download
       aria-label={`دانلود PDF: ${title}`}
       className={`${buttonClass} flex flex-col items-center gap-1 px-3 py-2 text-center`}
@@ -92,6 +93,7 @@ export function ShareBar({
   const pdfButtonInline = pdfDownloadUrl ? (
     <a
       href={pdfDownloadUrl}
+      type="application/pdf"
       download
       aria-label={`دانلود PDF: ${title}`}
       className={`${buttonClass} inline-flex items-center gap-1.5 px-4 py-1.5`}

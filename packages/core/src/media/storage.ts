@@ -48,6 +48,16 @@ export async function moveMediaFile(
   await rename(fromPath, toPath);
 }
 
+export async function renameMediaFile(
+  folderPath: string,
+  fromFilename: string,
+  toFilename: string,
+): Promise<void> {
+  const fromPath = resolveMediaStoragePath(folderPath, fromFilename);
+  const toPath = resolveMediaStoragePath(folderPath, toFilename);
+  await rename(fromPath, toPath);
+}
+
 export async function removeMediaFolderDir(folderPath: string): Promise<void> {
   const folder = normalizeFolderPath(folderPath).replace(/\/$/, "");
   if (!folder) return;

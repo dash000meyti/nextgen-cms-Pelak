@@ -12,6 +12,7 @@ type PdfFieldProps = {
   src: string;
   onSrcChange: (value: string) => void;
   uploadContext?: MediaUploadContext;
+  maxBytes?: number;
 };
 
 export function PdfField({
@@ -20,6 +21,7 @@ export function PdfField({
   src,
   onSrcChange,
   uploadContext,
+  maxBytes,
 }: PdfFieldProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -29,15 +31,27 @@ export function PdfField({
   async function handleUpload(file: File) {
     setUploading(true);
     setUploadError(null);
-    const formData = new FormData();
-    formData.set("file", file);
-    const result = await uploadMedia(formData, uploadContext);
-    setUploading(false);
-    if (!result.ok) {
-      setUploadError(result.error);
+    if (maxBytes != null && file.size > maxBytes) {
+      setUploading(false);
+      setUploadError(
+        `حداکثر حجم فایل ${Math.round(maxBytes / (1024 * 1024))} مگابایت است.`,
+      );
       return;
     }
-    if (result.url) onSrcChange(result.url);
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      const result = await uploadMedia(formData, uploadContext);
+      if (!result.ok) {
+        setUploadError(result.error);
+        return;
+      }
+      if (result.url) onSrcChange(result.url);
+    } catch {
+      setUploadError("خطا در آپلود — دوباره تلاش کنید.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   return (

@@ -20,7 +20,7 @@ export function Container({
 }: ContainerProps) {
   return (
     <Tag
-      className={`mx-auto w-full px-4 sm:px-6 lg:px-8 ${variantClasses[variant]} ${className}`.trim()}
+      className={`mx-auto w-full px-5 lg:px-8 ${variantClasses[variant]} ${className}`.trim()}
     >
       {children}
     </Tag>

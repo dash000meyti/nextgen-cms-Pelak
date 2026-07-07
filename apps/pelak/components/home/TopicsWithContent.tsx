@@ -28,7 +28,7 @@ export function TopicsWithContent({ sections }: TopicsWithContentProps) {
 
         return (
           <div key={topic.slug}>
-            <Container className="border-b border-rule py-25">
+            <Container className="border-b border-rule py-10 md:py-20">
               <ArticleCard
                 article={lead}
                 variant="featuredLead"
@@ -41,7 +41,7 @@ export function TopicsWithContent({ sections }: TopicsWithContentProps) {
 
             {listArticles.length > 0 ? (
               <section className="bg-surface">
-                <Container className="border-b border-rule py-25">
+                <Container className="border-b border-rule py-10 md:py-20">
                   <SectionTitle
                     title="بیشتر بخوانید"
                     titleWeight="normal"

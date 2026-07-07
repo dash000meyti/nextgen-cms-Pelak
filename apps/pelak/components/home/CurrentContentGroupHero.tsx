@@ -19,7 +19,7 @@ export function CurrentContentGroupHero({
 }: CurrentContentGroupHeroProps) {
   return (
     <section className="bg-surface">
-      <Container className="py-[100px]">
+      <Container className="py-10 md:py-20">
         <div className="grid gap-8 md:grid-cols-[1fr_280px] md:gap-20">
           <div>
             <SectionTitle
@@ -46,7 +46,7 @@ export function CurrentContentGroupHero({
             </ul>
           </div>
 
-          <div className="self-center">
+          <div className="self-center py-10 md:py-0">
             <div className="flex items-center justify-between px-2 gap-2 text-base md:text-lg">
               <p className="min-w-0 font-sans leading-none text-ink-muted">
                 تعداد محتوا در این شماره :

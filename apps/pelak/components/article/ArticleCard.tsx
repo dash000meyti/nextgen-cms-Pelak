@@ -123,24 +123,35 @@ export function ArticleCard({
   }
 
   if (variant === "featuredLead") {
+    const imageOrder = imageFirst ? "md:order-1" : "md:order-2";
+    const contentOrder = imageFirst ? "md:order-2" : "md:order-1";
+
     const imageLink = (
-      <Link
-        href={`/content/${article.slug}`}
-        className="group relative block aspect-square w-full self-center overflow-hidden rounded bg-rule md:col-span-5"
-      >
-        <Image
-          src={article.heroImage.src}
-          alt={article.heroImage.alt}
-          fill
-          className={imgClass}
-          sizes="(max-width: 768px) 100vw, 42vw"
-          priority={priority}
-        />
-      </Link>
+      <div className={`order-2 ${imageOrder} md:col-span-5`}>
+        <Link
+          href={`/content/${article.slug}`}
+          className="group relative block aspect-square w-full self-center overflow-hidden rounded bg-rule"
+        >
+          <Image
+            src={article.heroImage.src}
+            alt={article.heroImage.alt}
+            fill
+            className={imgClass}
+            sizes="(max-width: 768px) 100vw, 42vw"
+            priority={priority}
+          />
+        </Link>
+      </div>
     );
 
-    const contentBlock = (
-      <div className="flex flex-col justify-center gap-2 md:col-span-7">
+    const authorBlock = (
+      <AuthorChipList authors={article.authors} tone={authorTone} />
+    );
+
+    const leadHeader = (
+      <div
+        className={`order-1 flex flex-col justify-center gap-2 ${contentOrder} md:col-span-7`}
+      >
         {sectionTitle ? <SectionTitle title={sectionTitle} bordered /> : null}
         <Link
           href={`/content/${article.slug}`}
@@ -153,10 +164,18 @@ export function ArticleCard({
             {article.subtitle}
           </p>
         </Link>
-        <p className="line-clamp-3 text-sm leading-7 text-ink-muted">
+        <div className="md:hidden">{authorBlock}</div>
+      </div>
+    );
+
+    const leadFooter = (
+      <div
+        className={`order-3 flex flex-col justify-center gap-2 ${contentOrder} md:col-span-7`}
+      >
+        <p className="hidden line-clamp-3 text-sm leading-7 text-ink-muted md:block">
           {article.excerpt}
         </p>
-        <AuthorChipList authors={article.authors} tone={authorTone} />
+        <div className="hidden md:block">{authorBlock}</div>
         {secondaryArticles && secondaryArticles.length > 0 ? (
           <div className="mt-6 border-t border-rule [&>article:first-child]:border-b [&>article:first-child]:border-rule">
             {secondaryArticles.map((secondary) => (
@@ -174,17 +193,9 @@ export function ArticleCard({
 
     return (
       <article className="grid gap-6 md:grid-cols-12 md:gap-20">
-        {imageFirst ? (
-          <>
-            {imageLink}
-            {contentBlock}
-          </>
-        ) : (
-          <>
-            {contentBlock}
-            {imageLink}
-          </>
-        )}
+        {leadHeader}
+        {imageLink}
+        {leadFooter}
       </article>
     );
   }

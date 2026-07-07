@@ -3,7 +3,7 @@ import { SurveyForm } from "@/components/ui/SurveyForm";
 
 export function SurveyCta() {
   return (
-    <Container className="border-t border-rule py-10 md:py-14">
+    <Container className="border-t border-rule py-10 md:py-20">
       <div className="rounded-lg bg-surface px-5 py-8 text-center sm:px-8 md:px-12 md:py-10">
         <h2 className="text-card-title text-center">نظرسنجی</h2>
         <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-ink-muted">

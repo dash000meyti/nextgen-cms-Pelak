@@ -41,7 +41,9 @@ Release: `npm run release [patch|minor|major]` + به‌روز `CHANGELOG.md`
 
 - migrate **هر startup** — `docker/docker-entrypoint.sh`
 - seed **فقط first-boot**
-- backup خودکار قبل از migrate
+- backup خودکار قبل از migrate — به‌صورت پیش‌فرض فقط DB چون migrations به `uploads/` دست نمی‌زنند؛ با `SNAPSHOT_BEFORE_MIGRATE=1` snapshot کامل (DB + uploads) گرفته می‌شود
+
+> برای Disaster Recovery از snapshot کامل استفاده کنید (رجوع کنید به `docs/DEPLOYMENT.md`). ریستور DB بدون `uploads/` هماهنگ باعث شکسته شدن URLهای رسانه می‌شود.
 
 ## Package API
 

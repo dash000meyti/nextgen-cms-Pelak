@@ -22,6 +22,8 @@ npm run build
 npm run build:pelak
 npm run ci:check
 npm run start:prod
+npm run db:backup:snapshot        # snapshot کامل (DB + uploads) → data/backups/pelak-snapshot-*.tar.gz
+npm run db:restore:snapshot -- <file.tar.gz>   # بازیابی از snapshot کامل
 ```
 
 ## معماری مخزن
@@ -56,6 +58,7 @@ docs/             مستندات فنی و عملیاتی
 - تصویر production در `Dockerfile` (ریشه repo)
 - entrypoint در `docker/docker-entrypoint.sh`
 - volume داده: `/data` (شامل `/data/pelak.sqlite` و `/data/uploads`)
+- پشتیبان کامل (DB + رسانه‌ها) از `/admin/settings/database` یا `npm run db:backup:snapshot`
 
 راهنمای کامل:
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)

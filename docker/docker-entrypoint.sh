@@ -9,8 +9,13 @@ mkdir -p /data/uploads
 chown -R nextjs:nodejs /data
 
 if [ -f /data/pelak.sqlite ]; then
-  echo "Backing up database before migrate..."
-  su-exec nextjs:nodejs node ./node_modules/tsx/dist/cli.mjs packages/core/scripts/backup-db.ts
+  if [ "${SNAPSHOT_BEFORE_MIGRATE:-0}" = "1" ]; then
+    echo "Taking full snapshot (DB + uploads) before migrate..."
+    su-exec nextjs:nodejs node ./node_modules/tsx/dist/cli.mjs packages/core/scripts/backup-snapshot.ts
+  else
+    echo "Backing up database before migrate..."
+    su-exec nextjs:nodejs node ./node_modules/tsx/dist/cli.mjs packages/core/scripts/backup-db.ts
+  fi
 fi
 
 echo "Running migrations..."

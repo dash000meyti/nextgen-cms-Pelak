@@ -19,6 +19,8 @@
     "db:seed": "npm run db:seed -w @nextgen-cms/seed",
     "db:backup": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:backup -w @nextgen-cms/core",
     "db:restore": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:restore -w @nextgen-cms/core --",
+    "db:backup:snapshot": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:backup:snapshot -w @nextgen-cms/core --",
+    "db:restore:snapshot": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:restore:snapshot -w @nextgen-cms/core --",
     "db:migrate-media-paths": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:migrate-media-paths -w @nextgen-cms/core",
     "db:migrate-content-group-uploads": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:migrate-content-group-uploads -w @nextgen-cms/core",
     "db:promote-article-media": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:promote-article-media -w @nextgen-cms/core",

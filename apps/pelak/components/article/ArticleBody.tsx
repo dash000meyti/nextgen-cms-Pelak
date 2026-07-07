@@ -45,7 +45,6 @@ function ChevronIcon({ className }: IconProps) {
   );
 }
 
-
 type ArticleBodyProps = {
   blocks: ArticleBlock[];
   dir?: TextDirection;
@@ -57,10 +56,7 @@ const HEADING_CLASS: Record<HeadingLevel, string> = {
   4: "mt-4 mb-3 font-heading text-sm leading-normal text-ink md:text-base",
 };
 
-export async function ArticleBody({
-  blocks,
-  dir,
-}: ArticleBodyProps) {
+export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
   const siteConfig = await getSiteConfig();
   const paragraphClassName = articleParagraphClassName(siteConfig, dir);
   const firstParagraphIndex = blocks.findIndex(

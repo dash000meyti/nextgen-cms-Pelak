@@ -26,7 +26,7 @@ docker compose -f docker-compose.yml <command>
 1. `SESSION_SECRET` مقدار امن و بلند داشته باشد.
 2. `NEXT_PUBLIC_SITE_URL` با دامنه واقعی تولید یکی باشد.
 3. mount پایدار `/data` فعال باشد.
-4. از دیتابیس فعلی backup خارج از هاست نیز نگه‌داری شود.
+4. از دیتابیس و uploads فعلی snapshot کامل خارج از هاست نیز نگه‌داری شود.
 5. روی commit/tag مقصد، `npm run ci:check` پاس شده باشد.
 
 ## متغیرهای محیطی
@@ -40,6 +40,8 @@ docker compose -f docker-compose.yml <command>
 | `SEED_MODE` | اختیاری | `auto` \| `seed-if-empty` \| `seed-if-no-platform-meta` \| `never` |
 | `NEXT_PUBLIC_SITE_URL` | بله | مبنای sitemap/robots و URL عمومی |
 | `DATABASE_URL` | خیر | entrypoint آن را به `file:/data/pelak.sqlite` override می‌کند |
+| `SNAPSHOT_BEFORE_MIGRATE` | خیر | `1` = قبل از migrate یک snapshot کامل (DB + uploads) گرفته می‌شود. پیش‌فرض: فقط بکاپ DB |
+| `SNAPSHOT_MAX_BYTES` | خیر | حداکثر حجم آرشیو آپلودی در `/api/admin/database/import-snapshot` (پیش‌فرض: بدون محدودیت) |
 
 ## استقرار اولیه
 
@@ -60,7 +62,7 @@ docker compose -f docker-compose.yml up -d --build
 ```bash
 # 1) backup دستی داخل کانتینر (پیش از restart)
 docker compose -f docker-compose.yml exec pelak \
-  node ./node_modules/tsx/dist/cli.mjs packages/core/scripts/backup-db.ts
+  node ./node_modules/tsx/dist/cli.mjs packages/core/scripts/backup-snapshot.ts
 
 # 2) rebuild + restart
 docker compose -f docker-compose.yml up -d --build
@@ -70,7 +72,7 @@ curl -sSf http://localhost:3000/api/health
 ```
 
 Startup خودکار در هر restart:
-- backup timestamped قبل از migrate (اگر DB موجود باشد)
+- backup timestamped قبل از migrate (اگر DB موجود باشد) — به‌صورت پیش‌فرض فقط DB؛ با `SNAPSHOT_BEFORE_MIGRATE=1` یک snapshot کامل (DB + uploads) گرفته می‌شود
 - migrate additive
 - seed فقط در first boot
 - اجرای `ensure-platform-meta` برای نصب‌های موجود
@@ -85,10 +87,41 @@ Startup خودکار در هر restart:
 
 ## Backup retention و بازیابی
 
-- حداقل 7 نسخه روزانه + 4 نسخه هفتگی نگه‌داری شود.
-- backupهای داخلی `/data/backups` باید به storage خارجی نیز کپی شوند.
+دو نوع پشتیبان وجود دارد:
 
-### Rollback / Restore
+| نوع | شامل | فرمت | دستور/مسیر |
+|------|-------|-------|------------|
+| **سریع (DB-only)** | فقط `pelak.sqlite` | فایل sqlite خام | `npm run db:backup` / `db:restore`، `/api/admin/database/export` |
+| **کامل (snapshot)** | `pelak.sqlite` + `uploads/` + `manifest.json` | `tar.gz` | `npm run db:backup:snapshot` / `db:restore:snapshot`، `/api/admin/database/export-snapshot` |
+
+> ریستور DB بدون `uploads/` هماهنگ باعث شکسته شدن همهٔ URLهای `/uploads/...` در سایت می‌شود. برای Disaster Recovery همیشه از snapshot کامل استفاده کنید.
+
+- حداقل 7 نسخه روزانه + 4 نسخه هفتگی نگه‌داری شود (برای هر دو نوع).
+- backupهای داخلی `/data/backups` (شامل `pelak-*.sqlite`، `pelak-snapshot-*.tar.gz` و `uploads-*/`) باید به storage خارجی نیز کپی شوند.
+
+### ساخت snapshot کامل (درون container)
+
+```bash
+docker compose -f docker-compose.yml exec pelak \
+  node ./node_modules/tsx/dist/cli.mjs packages/core/scripts/backup-snapshot.ts
+# خروجی: /data/backups/pelak-snapshot-ISO.tar.gz
+```
+
+همچنین از رابط ادمین: `/admin/settings/database` → «دانلود پشتیبان کامل».
+
+### بازیابی از snapshot کامل
+
+```bash
+docker compose -f docker-compose.yml down
+docker compose -f docker-compose.yml run --rm \
+  pelak node ./node_modules/tsx/dist/cli.mjs \
+  packages/core/scripts/restore-snapshot.ts /data/backups/pelak-snapshot-ISO.tar.gz
+docker compose -f docker-compose.yml up -d
+```
+
+ریستور قبل از جایگزینی، یک نسخه پشتیبان از DB فعلی (`pelak-*.sqlite`) و uploads فعلی (`uploads-*/`) در `/data/backups` می‌گیرد و در صورت خطا rollback می‌کند.
+
+### Rollback / Restore (DB-only، سریع)
 
 1. سرویس را متوقف کنید.
 2. فایل backup معتبر را روی `/data/pelak.sqlite` برگردانید.
@@ -102,6 +135,18 @@ docker compose -f docker-compose.yml up -d
 ```
 
 > rollback schema فقط وقتی ایمن است که backup قبل از migration ناسازگار گرفته شده باشد.
+
+### Disaster recovery / مهاجرت به هاست جدید
+
+1. آخرین snapshot کامل (`pelak-snapshot-*.tar.gz`) را از backup خارجی بازیابی کنید.
+2. روی هاست جدید: container را با volume `/data` خالی بالا بیاورید (first boot را رها کنید).
+3. سرویس را متوقف کنید و محتوای آرشیو را در `/data` استخراج کنید:
+   ```bash
+   tar -xzf pelak-snapshot-ISO.tar.gz -C /data
+   # اکنون /data/pelak.sqlite و /data/uploads/ در جای خود هستند
+   ```
+4. سرویس را بالا بیاورید (`SNAPSHOT_BEFORE_MIGRATE` خاموش کافی است؛ migrations additive روی همان schema اعمال می‌شوند).
+5. smoke checks (`/api/health`، `/uploads/...`، مسیرهای public) را verify کنید.
 
 ## Secret rotation policy
 
@@ -139,8 +184,10 @@ npm run dev
 | دستور | کاربرد |
 |-------|--------|
 | `npm run db:migrate` | اعمال migrations |
-| `npm run db:backup` | backup دستی در محیط local |
+| `npm run db:backup` | backup دستی در محیط local (فقط DB) |
 | `npm run db:restore -- <path/to/file.sqlite>` | بازیابی دیتابیس از فایل sqlite |
+| `npm run db:backup:snapshot` | snapshot کامل (DB + uploads) به `data/backups/pelak-snapshot-*.tar.gz` |
+| `npm run db:restore:snapshot -- <path/to/file.tar.gz>` | بازیابی از snapshot کامل |
 | `FIRST_BOOT=1 npm run db:seed` | seed اولیه |
 | `npm run db:seed -- --force` | re-seed کامل (خطرناک در prod) |
 | `npm run start:prod` | migrate + start (بدون Docker) |

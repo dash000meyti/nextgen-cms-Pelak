@@ -73,7 +73,7 @@ sequenceDiagram
 
   Ops->>Img: tag image جدید
   Img->>EP: container restart
-  EP->>DB: backup (اگر موجود)
+  EP->>DB: backup (اگر موجود) — DB-only پیش‌فرض؛ snapshot کامل با SNAPSHOT_BEFORE_MIGRATE=1
   EP->>DB: migrate additive
   Note over DB: دادهٔ مشتری حفظ می‌شود
   EP->>Img: node apps/pelak/server.js
@@ -83,6 +83,7 @@ sequenceDiagram
 2. startup: backup → `npm run db:migrate` (additive-only)
 3. seed فقط first-boot — دادهٔ موجود دست‌نخورده
 4. health: `GET /api/health`
+5. برای DR: snapshot کامل (DB + uploads) از `/admin/settings/database` یا `npm run db:backup:snapshot`
 
 جزئیات Docker: `docs/DEPLOYMENT.md` · migration policy: `docs/MIGRATION-POLICY.md`
 
@@ -124,6 +125,7 @@ sequenceDiagram
 - **بایگانی مقاله:** فقط `status` در DB — فایل‌ها در `content/{id}/` می‌مانند
 - **حذف دائمی:** purge فولدر `content/{id}/`
 - **serve:** `site/`, `members/{id}/` (غیر-draft), ماژول‌ها public؛ draft و مدیا مقالهٔ unpublished نیاز به session دارند
+- **بکاپ:** فایل‌های آپلود بخش جدایی‌ناپذیر snapshot هستند چون DB فقط `folder_path` + `filename` نگه می‌دارد و URL در لحظه ساخته می‌شود. snapshot کامل (DB + uploads + manifest) در `packages/core/src/platform/snapshot.ts` پیاده‌سازی شده — رجوع کنید به `docs/DEPLOYMENT.md`.
 
 جزئیات: `docs/STUDIO.md` · migration legacy: `npm run db:migrate-media-paths`
 

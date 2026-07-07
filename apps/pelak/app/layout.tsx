@@ -24,12 +24,26 @@ import "./globals.css";
 
 export const dynamic = "force-dynamic";
 
+function resolveMetadataBase(): URL {
+  const fallback = "http://localhost:3000";
+  const raw =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    process.env.SITE_URL?.trim() ||
+    fallback;
+  try {
+    return new URL(raw);
+  } catch {
+    return new URL(fallback);
+  }
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const siteConfig = await getSiteConfig();
   const logoUrl = siteConfig.logo?.trim();
   const iconVersion = logoUrl ? encodeURIComponent(logoUrl) : "default";
   const iconUrl = `/icon?v=${iconVersion}`;
   return {
+    metadataBase: resolveMetadataBase(),
     title: {
       default: `${siteConfig.name} | ${siteConfig.tagline}`,
       template: `%s | ${siteConfig.name}`,

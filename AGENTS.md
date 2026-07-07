@@ -89,6 +89,8 @@ npm run dev          # apps/pelak
 npm run build        # بدون migrate/seed
 npm run build:pelak  # deploy
 npm run db:setup     # migrate + first-boot seed
+npm run db:backup:snapshot        # snapshot کامل (DB + uploads) → tar.gz
+npm run db:restore:snapshot -- <file.tar.gz>   # بازیابی از snapshot
 npm run ci:check     # lint + build + migrate dry-run
 ```
 

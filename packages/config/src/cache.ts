@@ -65,9 +65,9 @@ export function invalidateContentGroups() {
   updateTag(CACHE_TAGS.contentGroups);
 }
 
-export function invalidateContentGroup(number: number) {
+export function invalidateContentGroup(slug: string) {
   updateTag(CACHE_TAGS.contentGroups);
-  updateTag(CACHE_TAGS.contentGroup(number));
+  updateTag(CACHE_TAGS.contentGroup(slug));
 }
 
 export function invalidateVideos() {

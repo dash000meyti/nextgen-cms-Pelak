@@ -1,14 +1,17 @@
+import type { ContentGroupStatus } from "@nextgen-cms/contract/content-group-status";
 import { db } from "@nextgen-cms/core/db";
 import { PermissionDeniedError } from "@nextgen-cms/core/db/access/permission-denied-error";
 import { mapArticleRowToArticle } from "@nextgen-cms/core/db/mappers/article";
 import {
   findArticleById,
+  findArticleContentGroupIds,
   findArticlesForMember,
   resolveMemberIdsFromAuthorIds,
   resolveMemberNamesByAuthorIds,
 } from "@nextgen-cms/core/db/repositories/articles";
 import {
   findAllContentGroupsAdmin,
+  findContentGroupArticleIds,
   findContentGroupById,
 } from "@nextgen-cms/core/db/repositories/content-groups-admin";
 import { findMembersForArticleAttribution } from "@nextgen-cms/core/db/repositories/members";
@@ -72,7 +75,7 @@ export async function getArticleForAdmin(id: number) {
       heroAlt: row.heroAlt,
       heroCaption: row.heroCaption,
       heroCredit: row.heroCredit,
-      contentGroupNumber: row.contentGroupNumber,
+      contentGroupIds: await findArticleContentGroupIds(row.id),
       isFeatured: row.isFeatured,
       isEditorsPick: row.isEditorsPick,
       body: row.body,
@@ -188,15 +191,22 @@ export async function getTopicForAdmin(id: number) {
   });
 }
 
-export async function listContentGroupsAdmin() {
+export async function listContentGroupsAdmin(
+  status?: ContentGroupStatus | "all",
+) {
   return withMemberAccess(async (memberId) => {
-    return findAllContentGroupsAdmin(access(memberId));
+    return findAllContentGroupsAdmin(access(memberId), {
+      status: status && status !== "all" ? status : undefined,
+    });
   });
 }
 
 export async function getContentGroupForAdmin(id: number) {
   return withMemberAccess(async (memberId) => {
-    return findContentGroupById(id, access(memberId));
+    const row = await findContentGroupById(id, access(memberId));
+    if (!row) return undefined;
+    const articleIds = await findContentGroupArticleIds(id);
+    return { ...row, articleIds };
   });
 }
 
@@ -264,10 +274,10 @@ export async function findContentGroupsForPicker(): Promise<PickerOption[]> {
   const rows = await db
     .select()
     .from(contentGroups)
-    .orderBy(contentGroups.number);
+    .orderBy(contentGroups.title);
   return rows.map((row) => ({
     id: row.id,
-    label: `گروه محتوا ${row.number.toLocaleString("fa-IR")} — ${row.label}`,
-    number: row.number,
+    label: row.title,
+    slug: row.slug,
   }));
 }

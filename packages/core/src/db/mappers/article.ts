@@ -7,6 +7,7 @@ import type {
   Topic,
 } from "@nextgen-cms/contract/types/article";
 import { normalizeArticleBlocks } from "@nextgen-cms/contract/types/article";
+import type { ContentGroupSummary } from "@nextgen-cms/contract/types/content-group";
 import { mapAuthorRow } from "@nextgen-cms/core/db/mappers/author";
 import { mapTopicRow } from "@nextgen-cms/core/db/mappers/topic";
 import type { ArticleRow } from "@nextgen-cms/core/db/schema/articles";
@@ -20,6 +21,7 @@ export type ArticleWithRelations = ArticleRow & {
     articleCount: number;
   }>;
   topics: TopicRow[];
+  contentGroups: ContentGroupSummary[];
 };
 
 function mapHero(row: ArticleRow): ImageMeta {
@@ -52,8 +54,8 @@ function mapPreviewFields(row: ArticleWithRelations): ArticlePreview {
     topics: mapTopics(row.topics),
     readingMinutes: row.readingMinutes,
     heroImage: mapHero(row),
-    ...(row.contentGroupNumber != null
-      ? { contentGroupNumber: row.contentGroupNumber }
+    ...(row.contentGroups.length > 0
+      ? { contentGroups: row.contentGroups }
       : {}),
     ...(row.isFeatured ? { isFeatured: true } : {}),
     ...(row.isEditorsPick ? { isEditorsPick: true } : {}),

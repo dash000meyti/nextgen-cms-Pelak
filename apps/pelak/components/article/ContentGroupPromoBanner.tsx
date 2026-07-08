@@ -19,7 +19,7 @@ export function ContentGroupPromoBanner({
       className="w-full overflow-hidden rounded border border-rule bg-surface/50"
     >
       <Link
-        href={`/content-group/${group.number}`}
+        href={`/content-group/${group.slug}`}
         className="group m-14 mb-8 block"
       >
         <div
@@ -39,13 +39,13 @@ export function ContentGroupPromoBanner({
           آخرین {contentGroupPageTitle}
         </p>
         <p className="font-heading text-sm leading-normal text-ink">
-          {group.label}
+          {group.title}
         </p>
         <p className="text-xs text-ink-muted">
           {group.articleCount.toLocaleString("fa-IR")} محتوا
         </p>
         <Button
-          href={`/content-group/${group.number}`}
+          href={`/content-group/${group.slug}`}
           variant="outline"
           className="w-full text-xs"
         >

@@ -67,11 +67,9 @@ export const DEFAULT_MODULE_SETTINGS: ModuleSettings = {
 
 export const DEFAULT_CONTENT_GROUP_MODULE_SETTINGS: ContentGroupModuleSettings =
   {
-    period: "seasonal",
     pageTitle: "هفته‌نامه",
     itemsPerPage: 12,
     showInMenu: true,
-    groupByYear: false,
   };
 
 export const DEFAULT_VIDEO_MODULE_SETTINGS: VideoModuleSettings = {
@@ -126,21 +124,13 @@ export function normalizeContentGroupModuleSettings(
   stored: Partial<ContentGroupModuleSettings> | null | undefined,
   legacyModuleSettings?: LegacyModuleSettings | null,
 ): ContentGroupModuleSettings {
-  const period =
-    stored?.period ??
-    legacyModuleSettings?.contentGroup?.period ??
-    DEFAULT_CONTENT_GROUP_MODULE_SETTINGS.period;
   const legacyLabel = legacyModuleSettings?.contentGroup?.label?.trim();
   const defaults: ContentGroupModuleSettings = {
     ...DEFAULT_CONTENT_GROUP_MODULE_SETTINGS,
     pageTitle: legacyLabel || DEFAULT_CONTENT_GROUP_MODULE_SETTINGS.pageTitle,
   };
 
-  return {
-    period,
-    ...normalizeSectionListSettings(stored, defaults),
-    groupByYear: stored?.groupByYear ?? defaults.groupByYear,
-  };
+  return normalizeSectionListSettings(stored, defaults);
 }
 
 export function normalizeVideoModuleSettings(

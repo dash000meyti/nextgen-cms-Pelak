@@ -4,38 +4,45 @@ import {
   invalidateContentGroup,
   invalidateContentGroups,
 } from "@nextgen-cms/config/cache";
+import type { ContentGroupStatus } from "@nextgen-cms/contract/content-group-status";
 import { PermissionDeniedError } from "@nextgen-cms/core/db/access/permission-denied-error";
 import {
   type ContentGroupWriteInput,
-  contentGroupNumberExistsAdmin,
+  deleteContentGroup,
   findContentGroupById,
   insertContentGroup,
+  setContentGroupArticleLinks,
+  setContentGroupStatus,
   updateContentGroup,
 } from "@nextgen-cms/core/db/repositories/content-groups-admin";
-import { findContentGroupModuleSettings } from "@nextgen-cms/core/db/repositories/site-config";
 import { finalizeContentGroupPdf } from "@nextgen-cms/core/media/finalize-content-group-pdf";
 import { contentGroupPath } from "@nextgen-cms/core/media/path-policy";
 import { promoteMediaToFolder } from "@nextgen-cms/core/media/promote-media";
 import { parseJalaliInput } from "@nextgen-cms/core/platform/datetime";
-import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
+import {
+  hasPermission,
+  permissionDeniedResult,
+} from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-permission";
 import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
+import { assertUniqueSlug } from "@nextgen-cms/studio/cms/queries/slug";
 import {
   validateImageMeta,
   validateRequired,
+  validateSlug,
 } from "@nextgen-cms/studio/cms/validation";
 import { redirect } from "next/navigation";
 
 export type ContentGroupFormData = {
-  number: number;
-  season: string;
-  year: number;
-  label: string;
+  slug: string;
+  title: string;
+  status: ContentGroupStatus;
+  publishedAt: string;
   coverSrc: string;
   coverAlt: string;
   pdfSrc: string;
-  publishedAt: string;
+  articleIds: number[];
 };
 
 function access(memberId: number) {
@@ -58,10 +65,9 @@ function parseFormData(data: ContentGroupFormData): ContentGroupWriteInput {
   }
 
   return {
-    number: data.number,
-    season: data.season.trim(),
-    year: data.year,
-    label: data.label.trim(),
+    slug: data.slug.trim(),
+    title: data.title.trim(),
+    status: data.status,
     coverSrc: data.coverSrc.trim(),
     coverAlt: data.coverAlt.trim(),
     pdfSrc: data.pdfSrc.trim() || null,
@@ -69,19 +75,38 @@ function parseFormData(data: ContentGroupFormData): ContentGroupWriteInput {
   };
 }
 
-async function validate(input: ContentGroupWriteInput, excludeId?: number) {
-  if (!input.number || input.number < 1) {
-    return "شماره گروه محتوا نامعتبر است.";
+function resolveContentGroupStatus(
+  inputStatus: ContentGroupStatus,
+  existingStatus: ContentGroupStatus | null,
+  canPublish: boolean,
+): ContentGroupStatus | MutationResult {
+  if (canPublish) return inputStatus;
+  if (!existingStatus) return "draft";
+  if (inputStatus !== existingStatus && inputStatus !== "draft") {
+    return permissionDeniedResult();
   }
-  const labelError = validateRequired(input.label, "برچسب");
-  if (labelError) return labelError;
+  return existingStatus;
+}
+
+async function validate(
+  input: ContentGroupWriteInput,
+  excludeId?: number,
+): Promise<string | undefined> {
+  const titleError = validateRequired(input.title, "عنوان");
+  if (titleError) return titleError;
+  const slugError = validateSlug(input.slug);
+  if (slugError) return slugError;
+  const uniqueError = await assertUniqueSlug(
+    "contentGroup",
+    input.slug,
+    excludeId,
+  );
+  if (uniqueError) return uniqueError;
   const coverError = validateImageMeta(input.coverSrc, input.coverAlt, "جلد");
   if (coverError) return coverError;
   if (input.pdfSrc && !input.pdfSrc.toLowerCase().endsWith(".pdf")) {
     return "فایل PDF نامعتبر است.";
   }
-  const exists = await contentGroupNumberExistsAdmin(input.number, excludeId);
-  if (exists) return "این شماره قبلاً استفاده شده است.";
   return undefined;
 }
 
@@ -96,16 +121,25 @@ async function resolveContentGroupCoverSrc(
 async function resolveContentGroupPdfSrc(
   contentGroupId: number,
   pdfSrc: string | null | undefined,
-  meta: { number: number; year: number },
+  meta: { slug: string; title: string },
 ): Promise<string | null> {
-  const settings = await findContentGroupModuleSettings();
   return finalizeContentGroupPdf({
     contentGroupId,
     pdfSrc,
-    number: meta.number,
-    year: meta.year,
-    pageTitle: settings.pageTitle,
+    slug: meta.slug,
+    title: meta.title,
   });
+}
+
+function invalidateAfterSave(
+  slug: string,
+  options?: { previousSlug?: string },
+) {
+  invalidateContentGroups();
+  invalidateContentGroup(slug);
+  if (options?.previousSlug && options.previousSlug !== slug) {
+    invalidateContentGroup(options.previousSlug);
+  }
 }
 
 export async function createContentGroup(
@@ -118,6 +152,17 @@ export async function createContentGroup(
   const session = sessionOrDenied as Awaited<ReturnType<typeof requireMember>>;
 
   const input = parseFormData(data);
+  const canPublish = hasPermission(session, "modules.contentGroup.edit");
+  const statusResult = resolveContentGroupStatus(
+    input.status,
+    null,
+    canPublish,
+  );
+  if (typeof statusResult === "object" && "ok" in statusResult) {
+    return statusResult;
+  }
+  input.status = statusResult;
+
   const error = await validate(input);
   if (error) return { ok: false, error };
 
@@ -125,8 +170,8 @@ export async function createContentGroup(
     const id = await insertContentGroup(input, access(session.memberId));
     const coverSrc = await resolveContentGroupCoverSrc(id, input.coverSrc);
     const pdfSrc = await resolveContentGroupPdfSrc(id, input.pdfSrc, {
-      number: input.number,
-      year: input.year,
+      slug: input.slug,
+      title: input.title,
     });
     if (coverSrc !== input.coverSrc || pdfSrc !== input.pdfSrc) {
       await updateContentGroup(
@@ -135,8 +180,8 @@ export async function createContentGroup(
         access(session.memberId),
       );
     }
-    invalidateContentGroups();
-    invalidateContentGroup(input.number);
+    await setContentGroupArticleLinks(id, data.articleIds);
+    invalidateAfterSave(input.slug);
     return { ok: true, id };
   } catch (error) {
     return handleMutationError(error);
@@ -157,26 +202,145 @@ export async function saveContentGroup(
   if (!existing) return { ok: false, error: "گروه محتوا یافت نشد." };
 
   const input = parseFormData(data);
+  const statusResult = resolveContentGroupStatus(
+    input.status,
+    existing.status,
+    true,
+  );
+  if (typeof statusResult === "object" && "ok" in statusResult) {
+    return statusResult;
+  }
+  input.status = statusResult;
+
   const error = await validate(input, id);
   if (error) return { ok: false, error };
 
   try {
     const coverSrc = await resolveContentGroupCoverSrc(id, input.coverSrc);
     const pdfSrc = await resolveContentGroupPdfSrc(id, input.pdfSrc, {
-      number: input.number,
-      year: input.year,
+      slug: input.slug,
+      title: input.title,
     });
     await updateContentGroup(
       id,
       { ...input, coverSrc, pdfSrc },
       access(session.memberId),
     );
-    invalidateContentGroups();
-    invalidateContentGroup(input.number);
-    if (existing.number !== input.number) {
-      invalidateContentGroup(existing.number);
-    }
+    await setContentGroupArticleLinks(id, data.articleIds);
+    invalidateAfterSave(input.slug, { previousSlug: existing.slug });
     return { ok: true, id };
+  } catch (error) {
+    return handleMutationError(error);
+  }
+}
+
+export async function publishContentGroup(id: number): Promise<MutationResult> {
+  const sessionOrDenied = await requirePermissionMutation(
+    "modules.contentGroup.edit",
+  );
+  if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
+  const session = sessionOrDenied as Awaited<ReturnType<typeof requireMember>>;
+
+  const existing = await findContentGroupById(id, access(session.memberId));
+  if (!existing) return { ok: false, error: "گروه محتوا یافت نشد." };
+
+  try {
+    await setContentGroupStatus(id, "published", access(session.memberId));
+    invalidateAfterSave(existing.slug);
+    return { ok: true, id };
+  } catch (error) {
+    return handleMutationError(error);
+  }
+}
+
+export async function unpublishContentGroup(
+  id: number,
+): Promise<MutationResult> {
+  const sessionOrDenied = await requirePermissionMutation(
+    "modules.contentGroup.edit",
+  );
+  if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
+  const session = sessionOrDenied as Awaited<ReturnType<typeof requireMember>>;
+
+  const existing = await findContentGroupById(id, access(session.memberId));
+  if (!existing) return { ok: false, error: "گروه محتوا یافت نشد." };
+
+  try {
+    await setContentGroupStatus(id, "draft", access(session.memberId));
+    invalidateAfterSave(existing.slug);
+    return { ok: true, id };
+  } catch (error) {
+    return handleMutationError(error);
+  }
+}
+
+export async function archiveContentGroup(id: number): Promise<MutationResult> {
+  const sessionOrDenied = await requirePermissionMutation(
+    "modules.contentGroup.edit",
+  );
+  if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
+  const session = sessionOrDenied as Awaited<ReturnType<typeof requireMember>>;
+
+  const existing = await findContentGroupById(id, access(session.memberId));
+  if (!existing) return { ok: false, error: "گروه محتوا یافت نشد." };
+  if (existing.status === "archived") {
+    return { ok: false, error: "این گروه محتوا قبلاً بایگانی شده است." };
+  }
+
+  try {
+    await setContentGroupStatus(id, "archived", access(session.memberId));
+    invalidateAfterSave(existing.slug);
+    return { ok: true, id };
+  } catch (error) {
+    return handleMutationError(error);
+  }
+}
+
+export async function restoreContentGroupFromArchive(
+  id: number,
+): Promise<MutationResult> {
+  const sessionOrDenied = await requirePermissionMutation(
+    "modules.contentGroup.edit",
+  );
+  if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
+  const session = sessionOrDenied as Awaited<ReturnType<typeof requireMember>>;
+
+  const existing = await findContentGroupById(id, access(session.memberId));
+  if (!existing) return { ok: false, error: "گروه محتوا یافت نشد." };
+  if (existing.status !== "archived") {
+    return { ok: false, error: "این گروه محتوا در بایگانی نیست." };
+  }
+
+  try {
+    await setContentGroupStatus(id, "draft", access(session.memberId));
+    invalidateAfterSave(existing.slug);
+    return { ok: true, id };
+  } catch (error) {
+    return handleMutationError(error);
+  }
+}
+
+export async function removeContentGroup(id: number): Promise<MutationResult> {
+  const sessionOrDenied = await requirePermissionMutation(
+    "modules.contentGroup.delete",
+  );
+  if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
+  const session = sessionOrDenied as Awaited<ReturnType<typeof requireMember>>;
+
+  const existing = await findContentGroupById(id, access(session.memberId));
+  if (!existing) return { ok: false, error: "گروه محتوا یافت نشد." };
+  if (existing.status !== "archived") {
+    return {
+      ok: false,
+      error: "فقط گروه محتوای بایگانی‌شده قابل حذف دائمی است.",
+    };
+  }
+
+  try {
+    const slug = existing.slug;
+    await deleteContentGroup(id, access(session.memberId));
+    invalidateAfterSave(slug);
+    return { ok: true };
   } catch (error) {
     return handleMutationError(error);
   }
@@ -188,4 +352,22 @@ export async function createContentGroupAndRedirect(
   const result = await createContentGroup(data);
   if (!result.ok) return result;
   redirect(`/admin/content-group/${result.id}/edit`);
+}
+
+export async function archiveContentGroupAndRedirect(id: number) {
+  const result = await archiveContentGroup(id);
+  if (!result.ok) return result;
+  redirect("/admin/content-group?status=archived");
+}
+
+export async function restoreContentGroupFromArchiveAndRedirect(id: number) {
+  const result = await restoreContentGroupFromArchive(id);
+  if (!result.ok) return result;
+  redirect("/admin/content-group?status=draft");
+}
+
+export async function removeContentGroupAndRedirect(id: number) {
+  const result = await removeContentGroup(id);
+  if (!result.ok) return result;
+  redirect("/admin/content-group?status=archived");
 }

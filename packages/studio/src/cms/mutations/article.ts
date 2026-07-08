@@ -13,11 +13,13 @@ import {
   archiveArticle as archiveArticleRepo,
   deleteArticle,
   findArticleById,
+  findArticleContentGroupIds,
   insertArticle,
   resolveMemberIdsFromAuthorIds,
   restoreArticleFromArchive as restoreArticleFromArchiveRepo,
   updateArticle,
 } from "@nextgen-cms/core/db/repositories/articles";
+import { findContentGroupsByIds } from "@nextgen-cms/core/db/repositories/content-groups-admin";
 import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
 import { promoteArticleMedia } from "@nextgen-cms/core/media/promote-article-media";
 import { purgeMediaForContent } from "@nextgen-cms/core/media/purge-folder";
@@ -54,7 +56,7 @@ export type ArticleFormData = {
   heroAlt: string;
   heroCaption: string;
   heroCredit: string;
-  contentGroupNumber: number | null;
+  contentGroupIds: number[];
   isFeatured: boolean;
   isEditorsPick: boolean;
   body: ArticleBlock[];
@@ -90,7 +92,7 @@ function parseFormData(data: ArticleFormData): ArticleWriteInput {
     heroAlt: data.heroAlt.trim(),
     heroCaption: data.heroCaption.trim() || null,
     heroCredit: data.heroCredit.trim() || null,
-    contentGroupNumber: data.contentGroupNumber,
+    contentGroupIds: data.contentGroupIds,
     isFeatured: data.isFeatured,
     isEditorsPick: data.isEditorsPick,
     body: parseArticleBlocks(data.body),
@@ -144,14 +146,16 @@ async function validateArticleInput(
   return undefined;
 }
 
-function invalidateContentGroupsForArticle(
-  current: number | null,
-  previous?: number | null,
+async function invalidateContentGroupsForArticle(
+  current: number[],
+  previous?: number[],
 ) {
   invalidateContentGroups();
-  if (current != null) invalidateContentGroup(current);
-  if (previous != null && previous !== current) {
-    invalidateContentGroup(previous);
+  const allIds = [...new Set([...current, ...(previous ?? [])])];
+  if (allIds.length === 0) return;
+  const groups = await findContentGroupsByIds(allIds);
+  for (const group of groups) {
+    invalidateContentGroup(group.slug);
   }
 }
 
@@ -159,8 +163,8 @@ async function invalidateAfterSave(
   slug: string,
   options?: {
     previousSlug?: string;
-    contentGroupNumber?: number | null;
-    previousContentGroupNumber?: number | null;
+    contentGroupIds?: number[];
+    previousContentGroupIds?: number[];
   },
 ) {
   invalidateArticles();
@@ -168,10 +172,14 @@ async function invalidateAfterSave(
   if (options?.previousSlug && options.previousSlug !== slug) {
     invalidateArticle(options.previousSlug);
   }
-  invalidateContentGroupsForArticle(
-    options?.contentGroupNumber ?? null,
-    options?.previousContentGroupNumber,
+  await invalidateContentGroupsForArticle(
+    options?.contentGroupIds ?? [],
+    options?.previousContentGroupIds,
   );
+}
+
+async function existingContentGroupIds(articleId: number): Promise<number[]> {
+  return findArticleContentGroupIds(articleId);
 }
 
 async function existingMemberIds(
@@ -222,7 +230,7 @@ export async function createArticle(
     }
 
     await invalidateAfterSave(input.slug, {
-      contentGroupNumber: input.contentGroupNumber,
+      contentGroupIds: input.contentGroupIds,
     });
     return { ok: true, id };
   } catch (error) {
@@ -265,10 +273,11 @@ export async function saveArticle(
         : input,
       access(session.memberId),
     );
+    const previousContentGroupIds = await existingContentGroupIds(id);
     await invalidateAfterSave(input.slug, {
       previousSlug: existing.slug,
-      contentGroupNumber: input.contentGroupNumber,
-      previousContentGroupNumber: existing.contentGroupNumber,
+      contentGroupIds: input.contentGroupIds,
+      previousContentGroupIds,
     });
     return { ok: true, id };
   } catch (error) {
@@ -289,6 +298,7 @@ export async function publishArticle(id: number): Promise<MutationResult> {
 
   try {
     const memberIds = await existingMemberIds(existing);
+    const contentGroupIds = await existingContentGroupIds(id);
     const promoted = await promoteArticleMedia(
       id,
       existing.heroSrc,
@@ -308,7 +318,7 @@ export async function publishArticle(id: number): Promise<MutationResult> {
         heroAlt: existing.heroAlt,
         heroCaption: existing.heroCaption,
         heroCredit: existing.heroCredit,
-        contentGroupNumber: existing.contentGroupNumber,
+        contentGroupIds,
         isFeatured: existing.isFeatured,
         isEditorsPick: existing.isEditorsPick,
         body: promoted.body,
@@ -320,7 +330,7 @@ export async function publishArticle(id: number): Promise<MutationResult> {
     );
 
     await invalidateAfterSave(existing.slug, {
-      contentGroupNumber: existing.contentGroupNumber,
+      contentGroupIds,
     });
     return { ok: true, id };
   } catch (error) {
@@ -339,6 +349,7 @@ export async function unpublishArticle(id: number): Promise<MutationResult> {
 
   try {
     const memberIds = await existingMemberIds(existing);
+    const contentGroupIds = await existingContentGroupIds(id);
     await updateArticle(
       id,
       {
@@ -353,7 +364,7 @@ export async function unpublishArticle(id: number): Promise<MutationResult> {
         heroAlt: existing.heroAlt,
         heroCaption: existing.heroCaption,
         heroCredit: existing.heroCredit,
-        contentGroupNumber: existing.contentGroupNumber,
+        contentGroupIds,
         isFeatured: existing.isFeatured,
         isEditorsPick: existing.isEditorsPick,
         body: existing.body,
@@ -365,7 +376,7 @@ export async function unpublishArticle(id: number): Promise<MutationResult> {
     );
 
     await invalidateAfterSave(existing.slug, {
-      contentGroupNumber: existing.contentGroupNumber,
+      contentGroupIds,
     });
     return { ok: true, id };
   } catch (error) {
@@ -388,8 +399,9 @@ export async function archiveArticle(id: number): Promise<MutationResult> {
       heroSrc: existing.heroSrc,
       body: existing.body,
     });
+    const contentGroupIds = await existingContentGroupIds(id);
     await invalidateAfterSave(existing.slug, {
-      contentGroupNumber: existing.contentGroupNumber,
+      contentGroupIds,
     });
     return { ok: true, id };
   } catch (error) {
@@ -414,8 +426,9 @@ export async function restoreArticleFromArchive(
       heroSrc: existing.heroSrc,
       body: existing.body,
     });
+    const contentGroupIds = await existingContentGroupIds(id);
     await invalidateAfterSave(existing.slug, {
-      contentGroupNumber: existing.contentGroupNumber,
+      contentGroupIds,
     });
     return { ok: true, id };
   } catch (error) {
@@ -438,9 +451,10 @@ export async function removeArticle(id: number): Promise<MutationResult> {
 
   try {
     await purgeMediaForContent(id);
+    const contentGroupIds = await existingContentGroupIds(id);
     await deleteArticle(id, access(session.memberId));
     await invalidateAfterSave(existing.slug, {
-      contentGroupNumber: existing.contentGroupNumber,
+      contentGroupIds,
     });
     return { ok: true };
   } catch (error) {

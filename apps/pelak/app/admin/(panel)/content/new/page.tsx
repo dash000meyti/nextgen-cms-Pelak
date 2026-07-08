@@ -31,7 +31,7 @@ export default async function NewArticlePage() {
     heroAlt: "",
     heroCaption: "",
     heroCredit: "",
-    contentGroupNumber: null,
+    contentGroupIds: [],
     isFeatured: false,
     isEditorsPick: false,
     body: [{ type: "paragraph", content: "" }],

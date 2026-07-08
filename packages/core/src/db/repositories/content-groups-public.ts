@@ -4,14 +4,17 @@ import {
   mapContentGroupRow,
   mapContentGroupSummaryRow,
 } from "@nextgen-cms/core/db/mappers/content-group";
-import { findArticlesByContentGroupNumber } from "@nextgen-cms/core/db/repositories/articles";
+import { findArticlesByContentGroupId } from "@nextgen-cms/core/db/repositories/articles";
 import {
   articleAuthors,
+  articleContentGroups,
   articles,
   authors,
   contentGroups,
 } from "@nextgen-cms/core/db/schema";
 import { and, asc, count, desc, eq } from "drizzle-orm";
+
+const published = eq(contentGroups.status, "published");
 
 async function getAuthorArticleCount(authorId: number) {
   const rows = await db
@@ -63,47 +66,69 @@ export async function countAuthors() {
   return rows[0]?.total ?? 0;
 }
 
+async function countPublishedArticlesForGroup(contentGroupId: number) {
+  const rows = await db
+    .select({ total: count() })
+    .from(articleContentGroups)
+    .innerJoin(articles, eq(articleContentGroups.articleId, articles.id))
+    .where(
+      and(
+        eq(articleContentGroups.contentGroupId, contentGroupId),
+        eq(articles.status, "published"),
+      ),
+    );
+  return rows[0]?.total ?? 0;
+}
+
 export async function findAllContentGroupSummaries() {
   const rows = await db
     .select()
     .from(contentGroups)
-    .orderBy(desc(contentGroups.number));
+    .where(published)
+    .orderBy(desc(contentGroups.publishedAt));
   const summaries = await Promise.all(
     rows.map(async (row) => {
-      const articleRows = await db
-        .select({ total: count() })
-        .from(articles)
-        .where(
-          and(
-            eq(articles.contentGroupNumber, row.number),
-            eq(articles.status, "published"),
-          ),
-        );
-      return mapContentGroupSummaryRow(row, articleRows[0]?.total ?? 0);
+      const articleCount = await countPublishedArticlesForGroup(row.id);
+      return mapContentGroupSummaryRow(row, articleCount);
     }),
   );
   return summaries;
 }
 
-export async function findAllContentGroupNumbers() {
+export async function findAllContentGroupSlugs() {
   const rows = await db
-    .select({ number: contentGroups.number })
+    .select({ slug: contentGroups.slug })
     .from(contentGroups)
-    .orderBy(desc(contentGroups.number));
-  return rows.map((row) => row.number);
+    .where(published)
+    .orderBy(desc(contentGroups.publishedAt));
+  return rows.map((row) => row.slug);
 }
 
-export async function findContentGroupByNumber(number: number) {
+export async function findContentGroupBySlug(slug: string) {
   const rows = await db
     .select()
     .from(contentGroups)
-    .where(eq(contentGroups.number, number))
+    .where(and(eq(contentGroups.slug, slug), published))
     .limit(1);
 
   const row = rows[0];
   if (!row) return undefined;
 
-  const groupArticles = await findArticlesByContentGroupNumber(number);
+  const groupArticles = await findArticlesByContentGroupId(row.id);
+  return mapContentGroupRow(row, groupArticles);
+}
+
+export async function findContentGroupById(id: number) {
+  const rows = await db
+    .select()
+    .from(contentGroups)
+    .where(and(eq(contentGroups.id, id), published))
+    .limit(1);
+
+  const row = rows[0];
+  if (!row) return undefined;
+
+  const groupArticles = await findArticlesByContentGroupId(row.id);
   return mapContentGroupRow(row, groupArticles);
 }
 
@@ -111,7 +136,8 @@ export async function findCurrentContentGroup() {
   const rows = await db
     .select()
     .from(contentGroups)
-    .orderBy(desc(contentGroups.number))
+    .where(published)
+    .orderBy(desc(contentGroups.publishedAt))
     .limit(1);
 
   const row = rows[0];
@@ -119,11 +145,14 @@ export async function findCurrentContentGroup() {
     throw new Error("No content groups found in database");
   }
 
-  const groupArticles = await findArticlesByContentGroupNumber(row.number);
+  const groupArticles = await findArticlesByContentGroupId(row.id);
   return mapContentGroupRow(row, groupArticles);
 }
 
 export async function countContentGroups() {
-  const rows = await db.select({ total: count() }).from(contentGroups);
+  const rows = await db
+    .select({ total: count() })
+    .from(contentGroups)
+    .where(published);
   return rows[0]?.total ?? 0;
 }

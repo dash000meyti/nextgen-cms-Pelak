@@ -1,4 +1,4 @@
-import type { ContentGroup } from "@nextgen-cms/contract/types/content-group";
+import type { ContentGroupSummary } from "@nextgen-cms/contract/types/content-group";
 import Image from "next/image";
 import Link from "next/link";
 import { contentGroupCoverAspectClass } from "@/components/content-group/content-group-cover-aspect";
@@ -6,7 +6,7 @@ import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 
 type TopContentGroupProps = {
-  group: ContentGroup;
+  group: ContentGroupSummary;
   contentGroupPageTitle: string;
 };
 
@@ -19,7 +19,7 @@ export function TopContentGroup({
       <Container className="flex flex-col items-stretch">
         <div className="flex w-full flex-row items-center justify-between gap-2 py-0.5 sm:py-2">
           <Link
-            href={`/content-group/${group.number}`}
+            href={`/content-group/${group.slug}`}
             className={`relative hidden ${contentGroupCoverAspectClass} w-[50px] shrink-0 overflow-hidden rounded-md transition-opacity duration-300 hover:opacity-80 sm:block`}
           >
             <Image
@@ -32,19 +32,19 @@ export function TopContentGroup({
             />
           </Link>
           <Link
-            href={`/content-group/${group.number}`}
+            href={`/content-group/${group.slug}`}
             className="min-w-0 flex-1"
           >
             <p className="py-1.5 text-center font-heading text-sm text-ink sm:text-center sm:text-base md:text-lg">
               <span className="px-1 text-ink-muted">
                 جدیدترین {contentGroupPageTitle}:{" "}
               </span>{" "}
-              {group.label}
+              {group.title}
             </p>
           </Link>
           <div className="hidden shrink-0 sm:block">
             <Button
-              href={`/content-group/${group.number}`}
+              href={`/content-group/${group.slug}`}
               variant="outline"
               className="px-3 py-1 text-xs sm:px-5 sm:py-2 sm:text-sm"
             >

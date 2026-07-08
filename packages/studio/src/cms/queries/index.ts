@@ -31,6 +31,5 @@ export {
 } from "@nextgen-cms/studio/cms/queries/messages";
 export {
   assertUniqueSlug,
-  contentGroupNumberExists,
   slugExists,
 } from "@nextgen-cms/studio/cms/queries/slug";

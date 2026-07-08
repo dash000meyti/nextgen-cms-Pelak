@@ -131,7 +131,9 @@ export function ArticleCard({
       : "md:col-start-1 md:col-span-7";
 
     const imageLink = (
-      <div className={`order-2 ${imageSide} md:flex md:flex-col md:justify-center`}>
+      <div
+        className={`order-2 ${imageSide} md:flex md:flex-col md:justify-center`}
+      >
         <Link
           href={`/content/${article.slug}`}
           className="group relative block aspect-square w-full self-center overflow-hidden rounded bg-rule"

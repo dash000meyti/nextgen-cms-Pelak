@@ -2,73 +2,76 @@ import type {
   ContentGroup,
   ContentGroupSummary,
 } from "@nextgen-cms/contract/types/content-group";
-import { articles } from "./articles";
+import { articles, type SeedArticle } from "./articles";
 
 const contentGroupMeta: Array<{
-  number: number;
-  season: string;
-  year: number;
-  label: string;
+  slug: string;
+  title: string;
   publishedAt: string;
   cover: { src: string; alt: string };
 }> = [
   {
-    number: 24,
-    season: "بهار",
-    year: 1405,
-    label: "گروه محتوا ۲۴ — بهار ۱۴۰۵",
+    slug: "24",
+    title: "گروه محتوا ۲۴ — بهار ۱۴۰۵",
     publishedAt: "۱۴۰۵/۰۳/۳۱",
     cover: { src: "/images/1.png", alt: "جلد گروه محتوا ۲۴" },
   },
   {
-    number: 23,
-    season: "زمستان",
-    year: 1404,
-    label: "گروه محتوا ۲۳ — زمستان ۱۴۰۴",
+    slug: "23",
+    title: "گروه محتوا ۲۳ — زمستان ۱۴۰۴",
     publishedAt: "۱۴۰۴/۱۲/۲۵",
     cover: { src: "/images/1.png", alt: "جلد گروه محتوا ۲۳" },
   },
   {
-    number: 22,
-    season: "پاییز",
-    year: 1404,
-    label: "گروه محتوا ۲۲ — پاییز ۱۴۰۴",
+    slug: "22",
+    title: "گروه محتوا ۲۲ — پاییز ۱۴۰۴",
     publishedAt: "۱۴۰۴/۰۹/۳۰",
     cover: { src: "/images/1.png", alt: "جلد گروه محتوا ۲۲" },
   },
   {
-    number: 21,
-    season: "تابستان",
-    year: 1404,
-    label: "گروه محتوا ۲۱ — تابستان ۱۴۰۴",
+    slug: "21",
+    title: "گروه محتوا ۲۱ — تابستان ۱۴۰۴",
     publishedAt: "۱۴۰۴/۰۶/۳۱",
     cover: { src: "/images/1.png", alt: "جلد گروه محتوا ۲۱" },
   },
 ];
 
+function articleBelongsToGroup(article: SeedArticle, slug: string): boolean {
+  return article.contentGroupSlugs.includes(slug);
+}
+
 export const contentGroups: ContentGroup[] = contentGroupMeta.map((meta) => {
   const groupArticles = articles
-    .filter((article) => article.contentGroupNumber === meta.number)
-    .map(({ body: _body, relatedSlugs: _related, ...preview }) => preview);
+    .filter((article) => articleBelongsToGroup(article, meta.slug))
+    .map(
+      ({
+        body: _body,
+        relatedSlugs: _related,
+        contentGroupSlugs: _slugs,
+        ...preview
+      }) => preview,
+    );
 
   return {
-    ...meta,
+    id: 0,
+    slug: meta.slug,
+    title: meta.title,
+    status: "published" as const,
     cover: meta.cover,
+    publishedAt: meta.publishedAt,
     articleCount: groupArticles.length,
     articles: groupArticles,
   };
 });
 
-const contentGroupMap = new Map(contentGroups.map((g) => [g.number, g]));
+const contentGroupMap = new Map(contentGroups.map((g) => [g.slug, g]));
 
 export function getContentGroups(): ContentGroupSummary[] {
   return contentGroups.map(({ articles: _articles, ...summary }) => summary);
 }
 
-export function getContentGroupByNumber(
-  number: number,
-): ContentGroup | undefined {
-  return contentGroupMap.get(number);
+export function getContentGroupBySlug(slug: string): ContentGroup | undefined {
+  return contentGroupMap.get(slug);
 }
 
 export function getCurrentContentGroup(): ContentGroup {

@@ -30,10 +30,11 @@ export const articleSchema = {
     { key: "heroCredit", label: "اعتبار تصویر", kind: "text" },
     { key: "readingMinutes", label: "زمان مطالعه (دقیقه)", kind: "number" },
     {
-      key: "contentGroupNumber",
+      key: "contentGroupIds",
       label: "گروه محتوا",
       kind: "reference",
       collection: "contentGroup",
+      multiple: true,
     },
     {
       key: "memberIds",

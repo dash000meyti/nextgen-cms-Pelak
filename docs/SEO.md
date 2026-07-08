@@ -48,11 +48,10 @@
 هنگام save، PDF به این الگو rename می‌شود:
 
 ```
-{pageTitle} شماره {number} - سال {year}.pdf
+{title} - {slug}.pdf
 ```
 
-- `pageTitle` از `/admin/content-group/settings` (پیش‌فرض: «هفته‌نامه»)
-- اعداد فارسی (`toLocaleString("fa-IR")`)
+- `title` و `slug` از فیلدهای گروه محتوا
 - منطق: `packages/core/src/media/content-group-pdf.ts` + `finalize-content-group-pdf.ts`
 
 ### یک PDF per folder
@@ -67,14 +66,14 @@
 4. JSON-LD `PublicationIssue` + `associatedMedia` در صفحهٔ گروه
 5. `Content-Disposition: inline; filename*=UTF-8''…` در `GET /uploads/.../*.pdf`
 
-PDF آپلودشده canonical است؛ route تولیدی `/api/pdf/content-group/[number]` در UI استفاده نمی‌شود.
+PDF آپلودشده canonical است؛ route تولیدی `/api/pdf/content-group/[slug]` در UI استفاده نمی‌شود.
 
 ## JSON-LD
 
-صفحهٔ گروه محتوا (`content-group/[number]/page.tsx`):
+صفحهٔ گروه محتوا (`content-group/[slug]/page.tsx`):
 
 - `@type`: `PublicationIssue`
-- `issueNumber`, `datePublished`, `url`
+- `name`, `datePublished`, `url`
 - `isPartOf` → `Periodical` با نام `pageTitle`
 - `associatedMedia` → PDF (در صورت وجود)
 

@@ -12,7 +12,6 @@ import {
   findAllArticleSlugs,
   findArticleBySlug,
   findArticlesByAuthorSlug,
-  findArticlesByContentGroupNumber,
   findArticlesBySlugs,
   findArticlesByTopicSlug,
   findEditorsPicks,
@@ -22,9 +21,10 @@ import {
   findPublishedArticleSitemapEntries,
 } from "@nextgen-cms/core/db/repositories/articles";
 import {
-  findAllContentGroupNumbers,
+  findAllContentGroupSlugs,
   findAllContentGroupSummaries,
-  findContentGroupByNumber,
+  findContentGroupById,
+  findContentGroupBySlug,
   findCurrentContentGroup,
 } from "@nextgen-cms/core/db/repositories/content-groups-public";
 import {
@@ -183,12 +183,7 @@ export async function getEditorsPicks(limit = 3): Promise<ArticlePreview[]> {
 
 export async function getLeadEssays(limit = 3): Promise<ArticlePreview[]> {
   const group = await getCurrentContentGroup();
-  const essays = await platformCache(
-    ["articles-by-content-group", String(group.number)],
-    [CACHE_TAGS.articles, CACHE_TAGS.contentGroup(group.number)],
-    () => findArticlesByContentGroupNumber(group.number),
-  )();
-  return essays.slice(0, limit);
+  return group.articles.slice(0, limit);
 }
 
 export async function getRelatedArticles(
@@ -236,19 +231,29 @@ export const getContentGroups = platformCache(
   findAllContentGroupSummaries,
 );
 
-export const getAllContentGroupNumbers = platformCache(
-  ["content-group-numbers"],
+export const getAllContentGroupSlugs = platformCache(
+  ["content-group-slugs"],
   [CACHE_TAGS.contentGroups],
-  findAllContentGroupNumbers,
+  findAllContentGroupSlugs,
 );
 
-export async function getContentGroupByNumber(
-  number: number,
+export async function getContentGroupBySlug(
+  slug: string,
 ): Promise<ContentGroup | undefined> {
   return platformCache(
-    ["content-group", String(number)],
-    [CACHE_TAGS.contentGroups, CACHE_TAGS.contentGroup(number)],
-    () => findContentGroupByNumber(number),
+    ["content-group", slug],
+    [CACHE_TAGS.contentGroups, CACHE_TAGS.contentGroup(slug)],
+    () => findContentGroupBySlug(slug),
+  )();
+}
+
+export async function getContentGroupById(
+  id: number,
+): Promise<ContentGroup | undefined> {
+  return platformCache(
+    ["content-group-by-id", String(id)],
+    [CACHE_TAGS.contentGroups],
+    () => findContentGroupById(id),
   )();
 }
 

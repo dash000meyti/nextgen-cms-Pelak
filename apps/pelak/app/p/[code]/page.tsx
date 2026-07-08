@@ -1,6 +1,6 @@
 import { parseShortLinkCode } from "@nextgen-cms/contract/short-links";
 import {
-  getContentGroupByNumber,
+  getContentGroupById,
   getPublishedArticleById,
 } from "@nextgen-cms/site-data/get-content";
 import { requireFeatureModule } from "@nextgen-cms/site-data/require-feature-module";
@@ -22,7 +22,7 @@ export default async function ShortLinkPage({ params }: ShortLinkPageProps) {
   }
 
   await requireFeatureModule("contentGroup");
-  const group = await getContentGroupByNumber(parsed.number);
+  const group = await getContentGroupById(parsed.id);
   if (!group) notFound();
-  permanentRedirect(`/content-group/${parsed.number}`);
+  permanentRedirect(`/content-group/${group.slug}`);
 }

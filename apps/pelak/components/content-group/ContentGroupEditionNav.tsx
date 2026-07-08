@@ -4,7 +4,8 @@ import Link from "next/link";
 import { contentGroupCoverFrameClass } from "@/components/content-group/content-group-cover-aspect";
 
 type ContentGroupEditionEdge = {
-  number: number;
+  slug: string;
+  title: string;
   cover: ImageMeta;
 };
 
@@ -51,14 +52,14 @@ function EditionCover({ cover }: { cover: ImageMeta }) {
 function EditionLink({
   href,
   label,
-  number,
+  title,
   cover,
   direction,
   align,
 }: {
   href: string;
   label: string;
-  number: number;
+  title: string;
   cover: ImageMeta;
   direction: "start" | "end";
   align: "start" | "end";
@@ -80,8 +81,8 @@ function EditionLink({
           </>
         )}
       </span>
-      <span className="font-heading text-lg text-ink tabular-nums transition-colors group-hover:text-accent">
-        شماره {number.toLocaleString("fa-IR")}
+      <span className="line-clamp-2 font-heading text-sm text-ink transition-colors group-hover:text-accent">
+        {title}
       </span>
     </div>
   );
@@ -175,9 +176,9 @@ export function ContentGroupEditionNav({
     >
       {prev != null ? (
         <EditionLink
-          href={`/content-group/${prev.number}`}
+          href={`/content-group/${prev.slug}`}
           label="نسخه قبلی"
-          number={prev.number}
+          title={prev.title}
           cover={prev.cover}
           direction="end"
           align="start"
@@ -193,9 +194,9 @@ export function ContentGroupEditionNav({
 
       {next != null ? (
         <EditionLink
-          href={`/content-group/${next.number}`}
+          href={`/content-group/${next.slug}`}
           label="نسخه بعدی"
-          number={next.number}
+          title={next.title}
           cover={next.cover}
           direction="start"
           align="end"

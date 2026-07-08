@@ -127,6 +127,13 @@
       "when": 1783767000000,
       "tag": "0017_messages",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1783768000000,
+      "tag": "0018_content_groups_redesign",
+      "breakpoints": true
     }
   ]
 }

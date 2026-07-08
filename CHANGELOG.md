@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **BREAKING:** Content group redesign — `number`/`season`/`year`/`label`/`period` removed; fields are now `slug`, `title`, `status` (`draft`/`published`/`archived`), `publishedAt`, `cover`, `pdfSrc`. Public routes are slug-based (`/content-group/{slug}`). Article↔group is many-to-many via `article_content_groups`. Delete flow: archive → permanent delete. Migration: `0018_content_groups_redesign.sql`. Short links `m{id}` resolve by content group id.
+
 ## [1.0.0] - 2026-06-29
 
 ### Changed

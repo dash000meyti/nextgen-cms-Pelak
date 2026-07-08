@@ -1,5 +1,3 @@
-export type ContentGroupPeriod = "yearly" | "seasonal" | "monthly" | "weekly";
-
 export type SectionListSettings = {
   pageTitle: string;
   itemsPerPage: number;
@@ -12,10 +10,7 @@ export type ModuleSettings = {
   newsletter: { enabled: boolean };
 };
 
-export type ContentGroupModuleSettings = SectionListSettings & {
-  period: ContentGroupPeriod;
-  groupByYear: boolean;
-};
+export type ContentGroupModuleSettings = SectionListSettings;
 
 export type VideoModuleSettings = SectionListSettings;
 
@@ -23,7 +18,7 @@ export type VideoModuleSettings = SectionListSettings;
 export type LegacyModuleSettings = {
   contentGroup: {
     enabled: boolean;
-    period?: ContentGroupPeriod;
+    period?: never;
     label?: string;
   };
   video: {

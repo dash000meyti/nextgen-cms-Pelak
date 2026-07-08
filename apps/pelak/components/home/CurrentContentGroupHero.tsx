@@ -23,13 +23,10 @@ export function CurrentContentGroupHero({
         <div className="grid gap-8 md:grid-cols-[1fr_280px] md:gap-20">
           <div>
             <SectionTitle
-              title={group.label}
+              title={group.title}
               action={
-                <Button
-                  href={`/content-group/${group.number}`}
-                  variant="outline"
-                >
-                  {`مشاهده محتوای شماره ${group.number.toLocaleString("fa-IR")}`}
+                <Button href={`/content-group/${group.slug}`} variant="outline">
+                  مشاهده {group.title}
                 </Button>
               }
               bordered={true}
@@ -49,13 +46,13 @@ export function CurrentContentGroupHero({
           <div className="self-center py-10 md:py-0">
             <div className="flex items-center justify-between px-2 gap-2 text-base md:text-lg">
               <p className="min-w-0 font-sans leading-none text-ink-muted">
-                تعداد محتوا در این شماره :
+                تعداد محتوا:
               </p>
               <span className="inline-flex shrink-0 items-center justify-center rounded-t-full bg-surface-2 px-2.5 py-1 text-base leading-none text-ink-muted tabular-nums md:text-lg">
                 {group.articleCount.toLocaleString("fa-IR")}
               </span>
             </div>
-            <Link href={`/content-group/${group.number}`} className="block">
+            <Link href={`/content-group/${group.slug}`} className="block">
               <div
                 className={`${contentGroupCoverFrameClass} mx-auto w-full max-w-[220px] sm:max-w-[260px] md:max-w-none`}
               >

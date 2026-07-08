@@ -2,7 +2,7 @@ import type {
   Article,
   ArticlePreview,
 } from "@nextgen-cms/contract/types/article";
-import type { ContentGroup } from "@nextgen-cms/contract/types/content-group";
+import type { ContentGroupSummary } from "@nextgen-cms/contract/types/content-group";
 import type { SiteConfig } from "@nextgen-cms/contract/types/site";
 import { ArticleBody } from "@/components/article/ArticleBody";
 import { ArticleHeader } from "@/components/article/ArticleHeader";
@@ -19,7 +19,8 @@ type ArticleDetailViewProps = {
   shareUrl: string;
   pdfDownloadUrl?: string;
   related: ArticlePreview[];
-  currentContentGroup: ContentGroup;
+  currentContentGroup: ContentGroupSummary;
+  linkedContentGroup?: ContentGroupSummary;
   contentGroupPageTitle: string;
   siteConfig: SiteConfig;
   unoptimized?: boolean;
@@ -31,6 +32,7 @@ export function ArticleDetailView({
   pdfDownloadUrl,
   related,
   currentContentGroup,
+  linkedContentGroup,
   contentGroupPageTitle,
   siteConfig,
   unoptimized = false,
@@ -100,12 +102,14 @@ export function ArticleDetailView({
               membersLabel={siteConfig.membersLabel}
               variant="sidebar"
             />
-            <div className="w-full sticky top-[18dvh] z-10">
-              <ContentGroupPromoBanner
-                group={currentContentGroup}
-                contentGroupPageTitle={contentGroupPageTitle}
-              />
-            </div>
+            {linkedContentGroup ? (
+              <div className="w-full sticky top-[18dvh] z-10">
+                <ContentGroupPromoBanner
+                  group={linkedContentGroup}
+                  contentGroupPageTitle={contentGroupPageTitle}
+                />
+              </div>
+            ) : null}
           </aside>
         </div>
       </Container>

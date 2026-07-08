@@ -58,8 +58,7 @@ export function MediaSettingsForm({ value }: MediaSettingsFormProps) {
         onChange={(raw) =>
           setSettings({
             ...settings,
-            maxImageBytes:
-              Number.parseInt(raw, 10) || settings.maxImageBytes,
+            maxImageBytes: Number.parseInt(raw, 10) || settings.maxImageBytes,
           })
         }
         hint={`معادل ${Math.round(settings.maxImageBytes / (1024 * 1024))} مگابایت`}

@@ -114,7 +114,7 @@ export default async function RootLayout({
             <SiteHeader
               siteConfig={siteConfig}
               searchArticles={searchArticles}
-              currentContentGroupLabel={currentContentGroup?.label ?? ""}
+              currentContentGroupLabel={currentContentGroup?.title ?? ""}
             />
             <main className="flex-1">{children}</main>
             <SiteFooter siteConfig={siteConfig} />

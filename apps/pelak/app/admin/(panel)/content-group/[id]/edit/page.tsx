@@ -1,8 +1,14 @@
 import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
-import { getContentGroupModuleSettings, getMediaSettings } from "@nextgen-cms/site-data/get-content";
+import {
+  getContentGroupModuleSettings,
+  getMediaSettings,
+} from "@nextgen-cms/site-data/get-content";
 import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
 import type { ContentGroupFormData } from "@nextgen-cms/studio/cms/mutations/content-group";
-import { getContentGroupForAdmin } from "@nextgen-cms/studio/cms/queries";
+import {
+  getContentGroupForAdmin,
+  listArticlesAdmin,
+} from "@nextgen-cms/studio/cms/queries";
 import { notFound } from "next/navigation";
 import { ContentGroupForm } from "@/components/admin/studio/ContentGroupForm";
 
@@ -16,23 +22,32 @@ export default async function EditContentGroupPage({ params }: PageProps) {
   const contentGroupId = Number.parseInt(id, 10);
   if (Number.isNaN(contentGroupId)) notFound();
 
-  const group = await getContentGroupForAdmin(contentGroupId);
+  const [group, settings, mediaSettings, articles] = await Promise.all([
+    getContentGroupForAdmin(contentGroupId),
+    getContentGroupModuleSettings(),
+    getMediaSettings(),
+    listArticlesAdmin("all"),
+  ]);
   if (!group) notFound();
 
-  const settings = await getContentGroupModuleSettings();
-  const mediaSettings = await getMediaSettings();
   const labels = sectionAdminLabels(settings.pageTitle);
 
   const initial: ContentGroupFormData = {
-    number: group.number,
-    season: group.season,
-    year: group.year,
-    label: group.label,
+    slug: group.slug,
+    title: group.title,
+    status: group.status,
     coverSrc: group.coverSrc,
     coverAlt: group.coverAlt,
     pdfSrc: group.pdfSrc ?? "",
     publishedAt: group.publishedAt,
+    articleIds: group.articleIds,
   };
+
+  const articleOptions = articles.map((article) => ({
+    id: article.id,
+    label: article.title,
+    slug: article.slug,
+  }));
 
   return (
     <div className="space-y-6">
@@ -41,9 +56,11 @@ export default async function EditContentGroupPage({ params }: PageProps) {
         mode="edit"
         contentGroupId={contentGroupId}
         initial={initial}
-        contentGroupPeriod={settings.period}
+        articles={articleOptions}
+        canDelete
         maxImageBytes={mediaSettings.maxImageBytes}
         maxPdfBytes={mediaSettings.maxPdfBytes}
+        pageTitle={settings.pageTitle}
       />
     </div>
   );

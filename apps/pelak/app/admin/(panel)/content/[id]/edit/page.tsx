@@ -46,7 +46,7 @@ export default async function EditArticlePage({ params }: PageProps) {
     heroAlt: article.heroAlt,
     heroCaption: article.heroCaption ?? "",
     heroCredit: article.heroCredit ?? "",
-    contentGroupNumber: article.contentGroupNumber,
+    contentGroupIds: article.contentGroupIds,
     isFeatured: article.isFeatured,
     isEditorsPick: article.isEditorsPick,
     body: article.body,

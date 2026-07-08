@@ -4,7 +4,6 @@ import {
 } from "@nextgen-cms/contract/article-status";
 import type { ArticleBlock } from "@nextgen-cms/contract/types/article";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { contentGroups } from "./content-groups";
 import { members } from "./members";
 
 export { articleStatusValues, type ArticleStatus };
@@ -22,12 +21,6 @@ export const articles = sqliteTable("articles", {
   heroAlt: text("hero_alt").notNull().default(""),
   heroCaption: text("hero_caption"),
   heroCredit: text("hero_credit"),
-  contentGroupNumber: integer("content_group_number").references(
-    () => contentGroups.number,
-    {
-      onDelete: "set null",
-    },
-  ),
   isFeatured: integer("is_featured", { mode: "boolean" })
     .notNull()
     .default(false),

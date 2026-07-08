@@ -15,10 +15,8 @@ export type ContentGroupArticlePdf = {
 };
 
 export type ContentGroupPdfInput = {
-  number: number;
-  label: string;
-  season: string;
-  year: number;
+  slug: string;
+  title: string;
   publishedAt: string;
   siteName: string;
   canonicalUrl: string;
@@ -73,7 +71,7 @@ function renderHeaderHtml(input: {
     <header class="header">
       <div class="header-row">
         ${logo}
-        <a class="view-on-site" href="${escapeHtml(input.canonicalUrl)}">مشاهده این شماره در سایت</a>
+        <a class="view-on-site" href="${escapeHtml(input.canonicalUrl)}">مشاهده در سایت</a>
       </div>
     </header>
   `.trim();
@@ -86,7 +84,6 @@ export async function buildContentGroupPdfHtml(
   const coverImage = input.coverSrc
     ? `<img class="cover-image" src="${input.coverSrc}" alt="" />`
     : "";
-  const seasonLine = `${input.season} ${input.year.toLocaleString("fa-IR")}`;
 
   const articlePages = input.articles
     .map((article) => {
@@ -119,7 +116,7 @@ export async function buildContentGroupPdfHtml(
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="utf-8" />
-    <title>${escapeHtml(input.label)}</title>
+    <title>${escapeHtml(input.title)}</title>
     <style>
       ${fontCss}
       ${pdfBaseStyles}
@@ -133,9 +130,7 @@ export async function buildContentGroupPdfHtml(
     })}
     <section class="cover-page">
       ${coverImage}
-      <p class="meta">شماره ${input.number.toLocaleString("fa-IR")}</p>
-      <h1 class="title">${escapeHtml(input.label)}</h1>
-      <p class="subtitle">${escapeHtml(seasonLine)}</p>
+      <h1 class="title">${escapeHtml(input.title)}</h1>
       <p class="meta">${escapeHtml(formatPdfDate(input.publishedAt))}</p>
     </section>
     ${articlePages}

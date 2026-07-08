@@ -76,25 +76,21 @@ export async function slugExists(
         .limit(1);
       return rows.length > 0;
     }
+    case "contentGroup": {
+      const where =
+        excludeId != null
+          ? and(eq(contentGroups.slug, slug), ne(contentGroups.id, excludeId))
+          : eq(contentGroups.slug, slug);
+      const rows = await db
+        .select({ id: contentGroups.id })
+        .from(contentGroups)
+        .where(where)
+        .limit(1);
+      return rows.length > 0;
+    }
     default:
       return false;
   }
-}
-
-export async function contentGroupNumberExists(
-  number: number,
-  excludeId?: number,
-): Promise<boolean> {
-  const where =
-    excludeId != null
-      ? and(eq(contentGroups.number, number), ne(contentGroups.id, excludeId))
-      : eq(contentGroups.number, number);
-  const rows = await db
-    .select({ id: contentGroups.id })
-    .from(contentGroups)
-    .where(where)
-    .limit(1);
-  return rows.length > 0;
 }
 
 export async function assertUniqueSlug(

@@ -5,6 +5,7 @@ import {
 } from "@nextgen-cms/site-data/get-content";
 import { notFound } from "next/navigation";
 import { NextResponse } from "next/server";
+import { contentDisposition } from "@/lib/pdf/content-disposition";
 import { formatPdfAuthors, formatPdfDate } from "@/lib/pdf/format";
 import { buildArticlePdfHtml } from "@/lib/pdf/html/article";
 import { renderHtmlToPdf } from "@/lib/pdf/render-html-pdf";
@@ -81,7 +82,7 @@ export async function GET(_request: Request, { params }: ContentPdfRouteProps) {
     return new NextResponse(new Uint8Array(pdf), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Disposition": contentDisposition("attachment", filename),
         "Cache-Control": "private, no-store",
       },
     });

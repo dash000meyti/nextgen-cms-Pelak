@@ -1,7 +1,10 @@
-import { buildContentGroupShortPath } from "@nextgen-cms/contract/short-links";
 import {
-  getAllContentGroupNumbers,
-  getContentGroupByNumber,
+  buildContentGroupPdfPath,
+  buildContentGroupShortPath,
+} from "@nextgen-cms/contract/short-links";
+import {
+  getAllContentGroupSlugs,
+  getContentGroupBySlug,
   getContentGroupModuleSettings,
   getSiteConfig,
 } from "@nextgen-cms/site-data/get-content";
@@ -19,7 +22,7 @@ import { JalaliDate } from "@/components/ui/JalaliDate";
 import { ShareBar } from "@/components/ui/ShareBar";
 
 type ContentGroupPageProps = {
-  params: Promise<{ number: string }>;
+  params: Promise<{ slug: string }>;
 };
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hokmran.example";
@@ -29,36 +32,35 @@ function absoluteUrl(path: string): string {
   return `${baseUrl}${path}`;
 }
 
-function adjacentContentGroupNumbers(
-  numbers: number[],
-  current: number,
-): { prevNumber: number | null; nextNumber: number | null } {
-  const index = numbers.indexOf(current);
-  if (index === -1) return { prevNumber: null, nextNumber: null };
+function adjacentContentGroupSlugs(
+  slugs: string[],
+  current: string,
+): { prevSlug: string | null; nextSlug: string | null } {
+  const index = slugs.indexOf(current);
+  if (index === -1) return { prevSlug: null, nextSlug: null };
 
   return {
-    prevNumber:
-      index < numbers.length - 1 ? (numbers[index + 1] ?? null) : null,
-    nextNumber: index > 0 ? (numbers[index - 1] ?? null) : null,
+    prevSlug: index < slugs.length - 1 ? (slugs[index + 1] ?? null) : null,
+    nextSlug: index > 0 ? (slugs[index - 1] ?? null) : null,
   };
 }
 
 export async function generateMetadata({
   params,
 }: ContentGroupPageProps): Promise<Metadata> {
-  const { number } = await params;
+  const { slug } = await params;
   const [group, siteConfig] = await Promise.all([
-    getContentGroupByNumber(Number(number)),
+    getContentGroupBySlug(slug),
     getSiteConfig(),
   ]);
   if (!group) return { title: "گروه محتوا یافت نشد" };
 
-  const pageUrl = `${baseUrl}/content-group/${group.number}`;
-  const description = `${group.label} — ${group.articleCount.toLocaleString("fa-IR")} محتوا`;
+  const pageUrl = `${baseUrl}/content-group/${group.slug}`;
+  const description = `${group.title} — ${group.articleCount.toLocaleString("fa-IR")} محتوا`;
   const pdfUrl = group.pdfSrc ? absoluteUrl(group.pdfSrc) : undefined;
 
   return {
-    title: group.label,
+    title: group.title,
     description,
     alternates: {
       canonical: pageUrl,
@@ -74,7 +76,7 @@ export async function generateMetadata({
       type: "website",
       url: pageUrl,
       siteName: siteConfig.name,
-      title: group.label,
+      title: group.title,
       description,
       images: [
         {
@@ -90,24 +92,22 @@ export default async function ContentGroupPage({
   params,
 }: ContentGroupPageProps) {
   await requireFeatureModule("contentGroup");
-  const { number: numberParam } = await params;
-  const number = Number(numberParam);
-  const [group, allNumbers, contentGroupModuleSettings, siteConfig] =
+  const { slug } = await params;
+  const [group, allSlugs, contentGroupModuleSettings, siteConfig] =
     await Promise.all([
-      getContentGroupByNumber(number),
-      getAllContentGroupNumbers(),
+      getContentGroupBySlug(slug),
+      getAllContentGroupSlugs(),
       getContentGroupModuleSettings(),
       getSiteConfig(),
     ]);
   if (!group) notFound();
 
-  const pageUrl = `${baseUrl}/content-group/${group.number}`;
+  const pageUrl = `${baseUrl}/content-group/${group.slug}`;
   const pdfUrl = group.pdfSrc ? absoluteUrl(group.pdfSrc) : undefined;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "PublicationIssue",
-    name: group.label,
-    issueNumber: group.number,
+    name: group.title,
     datePublished: group.publishedAt,
     url: pageUrl,
     isPartOf: {
@@ -129,14 +129,11 @@ export default async function ContentGroupPage({
       : {}),
   };
 
-  const { prevNumber, nextNumber } = adjacentContentGroupNumbers(
-    allNumbers,
-    number,
-  );
+  const { prevSlug, nextSlug } = adjacentContentGroupSlugs(allSlugs, slug);
 
   const [prevGroup, nextGroup] = await Promise.all([
-    prevNumber != null ? getContentGroupByNumber(prevNumber) : undefined,
-    nextNumber != null ? getContentGroupByNumber(nextNumber) : undefined,
+    prevSlug != null ? getContentGroupBySlug(prevSlug) : undefined,
+    nextSlug != null ? getContentGroupBySlug(nextSlug) : undefined,
   ]);
 
   return (
@@ -150,7 +147,7 @@ export default async function ContentGroupPage({
         items={[
           { label: "خانه", href: "/" },
           { label: "گروه‌های محتوا", href: "/content-group" },
-          { label: group.label },
+          { label: group.title },
         ]}
       />
 
@@ -168,15 +165,17 @@ export default async function ContentGroupPage({
           />
         </div>
         <div className="space-y-3 self-center">
-          <h1 className="text-page-title">{group.label}</h1>
+          <h1 className="text-page-title">{group.title}</h1>
           <p className="text-meta">
             منتشر شده در <JalaliDate value={group.publishedAt} /> —{" "}
             {group.articleCount.toLocaleString("fa-IR")} محتوا
           </p>
           <ShareBar
-            title={group.label}
-            shareUrl={buildContentGroupShortPath(number)}
-            pdfDownloadUrl={group.pdfSrc ?? undefined}
+            title={group.title}
+            shareUrl={buildContentGroupShortPath(group.id)}
+            pdfDownloadUrl={
+              group.pdfSrc ? buildContentGroupPdfPath(group.slug) : undefined
+            }
           />
         </div>
       </div>
@@ -203,12 +202,20 @@ export default async function ContentGroupPage({
         <ContentGroupEditionNav
           prev={
             prevGroup
-              ? { number: prevGroup.number, cover: prevGroup.cover }
+              ? {
+                  slug: prevGroup.slug,
+                  title: prevGroup.title,
+                  cover: prevGroup.cover,
+                }
               : null
           }
           next={
             nextGroup
-              ? { number: nextGroup.number, cover: nextGroup.cover }
+              ? {
+                  slug: nextGroup.slug,
+                  title: nextGroup.title,
+                  cover: nextGroup.cover,
+                }
               : null
           }
         />

@@ -38,17 +38,29 @@ export const exampleSchema = {
 | `select` | dropdown |
 | `json` | JSON خام |
 
-## Content group schema پویا
+## Content group schema
 
-`getContentGroupFieldDefs(period)` در `packages/contract/src/cms-schema/content-group.ts` — فیلدها بر اساس `yearly|seasonal|monthly|weekly`.
+فیلدهای ثابت در `packages/contract/src/cms-schema/content-group.ts`:
+
+| فیلد | kind | توضیح |
+|------|------|--------|
+| `title` | text | عنوان گروه |
+| `slug` | slug | نامک یکتا — مسیر عمومی `/content-group/{slug}` |
+| `status` | status | `draft` / `published` / `archived` |
+| `publishedAt` | date | تاریخ انتشار |
+| `coverSrc` / `coverAlt` | image / text | جلد |
+| `pdfSrc` | text | PDF آپلودشده (اختیاری) |
+| `articleIds` | reference (multiple) | محتواهای متصل — جدول واسط `article_content_groups` |
+
+ارتباط مقاله↔گروه **چند‌به‌چند** است؛ در schema مقاله فیلد `contentGroupIds` (reference به `contentGroup`, multiple).
 
 تنظیمات ماژول (`ContentGroupModuleSettings` در `site_settings.content_group_module_settings`):
 
 | فیلد | پیش‌فرض |
 |------|---------|
 | `pageTitle` | هفته‌نامه |
-| `period` | seasonal |
-| `groupByYear` | false |
+| `itemsPerPage` | 12 |
+| `showInMenu` | true |
 
 تنظیمات مدیا (`MediaSettings` در `site_settings.media_settings`):
 

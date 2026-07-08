@@ -1,5 +1,6 @@
 import type { ArticleStatus } from "@nextgen-cms/contract/article-status";
 import type { Permission } from "@nextgen-cms/contract/permissions";
+import type { ContentGroupSummary } from "@nextgen-cms/contract/types/content-group";
 import { db } from "@nextgen-cms/core/db";
 import {
   assertMemberCanDeleteArticle,
@@ -17,13 +18,16 @@ import {
   mapArticleRowToArticle,
   mapArticleRowToPreview,
 } from "@nextgen-cms/core/db/mappers/article";
+import { mapContentGroupSummaryRow } from "@nextgen-cms/core/db/mappers/content-group";
 import { ensureMemberAuthorProfiles } from "@nextgen-cms/core/db/repositories/members";
 import { getMemberPermissions } from "@nextgen-cms/core/db/repositories/permissions";
 import {
   articleAuthors,
+  articleContentGroups,
   articles,
   articleTopics,
   authors,
+  contentGroups,
   members,
   topics,
 } from "@nextgen-cms/core/db/schema";
@@ -79,6 +83,8 @@ export async function loadArticleRelations(
   const authorIds = [...new Set(authorLinks.map((link) => link.author.id))];
   const authorCounts = await getAuthorCounts(authorIds);
 
+  const contentGroupMap = await loadArticleContentGroups(articleIds);
+
   return articleRows.map((article) => ({
     ...article,
     authors: authorLinks
@@ -91,7 +97,74 @@ export async function loadArticleRelations(
     topics: topicLinks
       .filter((link) => link.articleId === article.id)
       .map((link) => link.topic),
+    contentGroups: contentGroupMap.get(article.id) ?? [],
   }));
+}
+
+async function loadArticleContentGroups(
+  articleIds: number[],
+): Promise<Map<number, ContentGroupSummary[]>> {
+  if (articleIds.length === 0) return new Map();
+
+  const links = await db
+    .select({
+      articleId: articleContentGroups.articleId,
+      contentGroupId: articleContentGroups.contentGroupId,
+      sortOrder: articleContentGroups.sortOrder,
+    })
+    .from(articleContentGroups)
+    .where(inArray(articleContentGroups.articleId, articleIds));
+
+  const groupIds = [...new Set(links.map((link) => link.contentGroupId))];
+  if (groupIds.length === 0) return new Map();
+
+  const groupRows = await db
+    .select()
+    .from(contentGroups)
+    .where(
+      and(
+        inArray(contentGroups.id, groupIds),
+        eq(contentGroups.status, "published"),
+      ),
+    );
+
+  if (groupRows.length === 0) return new Map();
+
+  const publishedGroupIds = groupRows.map((row) => row.id);
+  const countRows = await db
+    .select({
+      contentGroupId: articleContentGroups.contentGroupId,
+      total: count(),
+    })
+    .from(articleContentGroups)
+    .innerJoin(articles, eq(articleContentGroups.articleId, articles.id))
+    .where(
+      and(
+        inArray(articleContentGroups.contentGroupId, publishedGroupIds),
+        eq(articles.status, "published"),
+      ),
+    )
+    .groupBy(articleContentGroups.contentGroupId);
+  const countMap = new Map(
+    countRows.map((row) => [row.contentGroupId, row.total]),
+  );
+
+  const groupSummaryById = new Map(
+    groupRows.map((row) => [
+      row.id,
+      mapContentGroupSummaryRow(row, countMap.get(row.id) ?? 0),
+    ]),
+  );
+
+  const byArticle = new Map<number, ContentGroupSummary[]>();
+  for (const link of links) {
+    const summary = groupSummaryById.get(link.contentGroupId);
+    if (!summary) continue;
+    const list = byArticle.get(link.articleId) ?? [];
+    list.push(summary);
+    byArticle.set(link.articleId, list);
+  }
+  return byArticle;
 }
 
 async function findPublishedArticles(
@@ -226,13 +299,32 @@ export async function findEditorsPicks(limit = 3) {
   return rows.map(mapArticleRowToPreview);
 }
 
-export async function findArticlesByContentGroupNumber(
-  contentGroupNumber: number,
-) {
+export async function findArticlesByContentGroupId(contentGroupId: number) {
+  const linkRows = await db
+    .select({ articleId: articleContentGroups.articleId })
+    .from(articleContentGroups)
+    .where(eq(articleContentGroups.contentGroupId, contentGroupId));
+
+  if (linkRows.length === 0) return [];
+
   const rows = await findPublishedArticles(
-    eq(articles.contentGroupNumber, contentGroupNumber),
+    inArray(
+      articles.id,
+      linkRows.map((row) => row.articleId),
+    ),
   );
   return rows.map(mapArticleRowToPreview);
+}
+
+export async function findArticleContentGroupIds(
+  articleId: number,
+): Promise<number[]> {
+  const rows = await db
+    .select({ contentGroupId: articleContentGroups.contentGroupId })
+    .from(articleContentGroups)
+    .where(eq(articleContentGroups.articleId, articleId))
+    .orderBy(articleContentGroups.sortOrder);
+  return rows.map((row) => row.contentGroupId);
 }
 
 export async function findArticlesBySlugs(slugs: string[]) {
@@ -291,7 +383,7 @@ export type ArticleWriteInput = {
   heroAlt: string;
   heroCaption: string | null;
   heroCredit: string | null;
-  contentGroupNumber: number | null;
+  contentGroupIds: number[];
   isFeatured: boolean;
   isEditorsPick: boolean;
   body: (typeof articles.$inferSelect)["body"];
@@ -383,6 +475,23 @@ async function syncArticleTopics(articleId: number, topicIds: number[]) {
   );
 }
 
+async function syncArticleContentGroups(
+  articleId: number,
+  contentGroupIds: number[],
+) {
+  await db
+    .delete(articleContentGroups)
+    .where(eq(articleContentGroups.articleId, articleId));
+  if (contentGroupIds.length === 0) return;
+  await db.insert(articleContentGroups).values(
+    contentGroupIds.map((contentGroupId, index) => ({
+      articleId,
+      contentGroupId,
+      sortOrder: index,
+    })),
+  );
+}
+
 function articleRowFromInput(input: ArticleWriteInput, updatedAt: string) {
   return {
     slug: input.slug,
@@ -396,7 +505,6 @@ function articleRowFromInput(input: ArticleWriteInput, updatedAt: string) {
     heroAlt: input.heroAlt,
     heroCaption: input.heroCaption,
     heroCredit: input.heroCredit,
-    contentGroupNumber: input.contentGroupNumber,
     isFeatured: input.isFeatured,
     isEditorsPick: input.isEditorsPick,
     body: input.body,
@@ -500,6 +608,7 @@ export async function insertArticle(
 
   await syncArticleAuthors(id, authorIds);
   await syncArticleTopics(id, input.topicIds);
+  await syncArticleContentGroups(id, input.contentGroupIds);
   return id;
 }
 
@@ -533,6 +642,7 @@ export async function updateArticle(
   const authorIds = await resolveAuthorIdsFromMemberIds(input.memberIds);
   await syncArticleAuthors(id, authorIds);
   await syncArticleTopics(id, input.topicIds);
+  await syncArticleContentGroups(id, input.contentGroupIds);
 }
 
 export async function archiveArticle(

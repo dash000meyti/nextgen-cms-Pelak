@@ -60,15 +60,14 @@ async function purgeOtherPdfsInFolder(
 export type FinalizeContentGroupPdfInput = {
   contentGroupId: number;
   pdfSrc: string | null | undefined;
-  number: number;
-  year: number;
-  pageTitle: string;
+  slug: string;
+  title: string;
 };
 
 export async function finalizeContentGroupPdf(
   input: FinalizeContentGroupPdfInput,
 ): Promise<string | null> {
-  const { contentGroupId, pdfSrc, number, year, pageTitle } = input;
+  const { contentGroupId, pdfSrc, slug, title } = input;
   if (!pdfSrc?.trim()) {
     await purgeContentGroupPdfs(contentGroupId);
     return null;
@@ -79,7 +78,7 @@ export async function finalizeContentGroupPdf(
   const parsed = parseUploadPublicUrl(promoted);
   if (!parsed?.filename) return promoted;
 
-  const targetFilename = buildContentGroupPdfFilename(pageTitle, number, year);
+  const targetFilename = buildContentGroupPdfFilename(title, slug);
   let currentFilename = parsed.filename;
 
   if (currentFilename !== targetFilename) {

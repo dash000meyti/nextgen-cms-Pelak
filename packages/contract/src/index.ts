@@ -1,5 +1,6 @@
 export * from "./article-status";
 export * from "./cms-schema";
+export * from "./content-group-status";
 export * from "./media/folder-path";
 export * from "./media/no-op-processor";
 export * from "./permissions";

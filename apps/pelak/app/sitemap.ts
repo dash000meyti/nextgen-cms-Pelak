@@ -53,7 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const contentGroupRoutes = contentGroups.map((group) => ({
-    url: `${baseUrl}/content-group/${group.number}`,
+    url: `${baseUrl}/content-group/${group.slug}`,
     lastModified: group.publishedAt,
     changeFrequency: "monthly" as const,
     priority: 0.7,

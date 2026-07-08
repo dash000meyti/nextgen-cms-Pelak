@@ -8,6 +8,7 @@ import {
 import { resolveUploadsDir } from "@nextgen-cms/core/platform/paths";
 import { getMemberSession } from "@nextgen-cms/studio/admin/session";
 import { NextResponse } from "next/server";
+import { contentDisposition } from "@/lib/pdf/content-disposition";
 
 const MIME_TYPES: Record<string, string> = {
   ".jpg": "image/jpeg",
@@ -25,9 +26,7 @@ function isSafeRelativePath(relativePath: string): boolean {
 }
 
 function pdfContentDisposition(filename: string): string {
-  const safe = filename.replace(/"/g, "");
-  const encoded = encodeURIComponent(filename);
-  return `inline; filename="${safe}"; filename*=UTF-8''${encoded}`;
+  return contentDisposition("inline", filename);
 }
 
 async function readUploadFile(relativePath: string): Promise<Buffer | null> {

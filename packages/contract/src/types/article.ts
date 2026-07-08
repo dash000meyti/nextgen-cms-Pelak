@@ -1,3 +1,5 @@
+import type { ContentGroupSummary } from "./content-group";
+
 export type ImageMeta = {
   src: string;
   alt: string;
@@ -146,7 +148,7 @@ export type ArticlePreview = {
   topics: Topic[];
   readingMinutes: number;
   heroImage: ImageMeta;
-  contentGroupNumber?: number;
+  contentGroups?: ContentGroupSummary[];
   isFeatured?: boolean;
   isEditorsPick?: boolean;
 };

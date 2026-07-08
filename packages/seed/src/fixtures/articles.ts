@@ -2,12 +2,14 @@ import type { Article } from "@nextgen-cms/contract/types/article";
 import { authors } from "./authors";
 import { topics } from "./topics";
 
+export type SeedArticle = Article & { contentGroupSlugs: string[] };
+
 const a = (slug: string) =>
   authors.find((x) => x.slug === slug) as (typeof authors)[number];
 const t = (slug: string) =>
   topics.find((x) => x.slug === slug) as (typeof topics)[number];
 
-export const articles: Article[] = [
+export const articles: SeedArticle[] = [
   {
     slug: "no-arctic-scramble",
     title: "تقلا بر سر قطب شمال وجود ندارد",
@@ -18,7 +20,7 @@ export const articles: Article[] = [
     publishedAt: "۱۳۹۹/۰۵/۰۶",
     topics: [t("siasat-khareji"), t("amniyat")],
     readingMinutes: 12,
-    contentGroupNumber: 24,
+    contentGroupSlugs: ["24"],
     isFeatured: true,
     heroImage: {
       src: "/images/1.png",
@@ -208,7 +210,7 @@ export const articles: Article[] = [
     publishedAt: "۱۴۰۵/۰۳/۳۱",
     topics: [t("siasat-khareji"), t("siasi")],
     readingMinutes: 9,
-    contentGroupNumber: 24,
+    contentGroupSlugs: ["24"],
     isEditorsPick: true,
     heroImage: {
       src: "/images/1.png",
@@ -280,7 +282,7 @@ export const articles: Article[] = [
     publishedAt: "۱۴۰۵/۰۳/۲۸",
     topics: [t("siasat-khareji"), t("amniyat")],
     readingMinutes: 11,
-    contentGroupNumber: 24,
+    contentGroupSlugs: ["24"],
     heroImage: {
       src: "/images/1.png",
       alt: "سفره مذاکره با پرچم‌ها",
@@ -310,7 +312,7 @@ export const articles: Article[] = [
     publishedAt: "۱۴۰۵/۰۳/۲۰",
     topics: [t("amniyat"), t("siasat-khareji")],
     readingMinutes: 10,
-    contentGroupNumber: 24,
+    contentGroupSlugs: ["24"],
     heroImage: {
       src: "/images/1.png",
       alt: "خلیج فارس از بالا",
@@ -340,7 +342,7 @@ export const articles: Article[] = [
     publishedAt: "۱۴۰۵/۰۳/۱۵",
     topics: [t("siasat-khareji")],
     readingMinutes: 8,
-    contentGroupNumber: 23,
+    contentGroupSlugs: ["23"],
     heroImage: {
       src: "/images/1.png",
       alt: "غروب آفتاب بر پایتخت",
@@ -370,7 +372,7 @@ export const articles: Article[] = [
     publishedAt: "۱۴۰۵/۰۳/۱۰",
     topics: [t("eghtesadi"), t("ejtemaei")],
     readingMinutes: 7,
-    contentGroupNumber: 23,
+    contentGroupSlugs: ["23"],
     heroImage: {
       src: "/images/1.png",
       alt: "نمودار اقتصاد و مردم",
@@ -400,7 +402,7 @@ export const articles: Article[] = [
     publishedAt: "۱۴۰۵/۰۳/۰۵",
     topics: [t("eghtesadi")],
     readingMinutes: 6,
-    contentGroupNumber: 23,
+    contentGroupSlugs: ["23"],
     heroImage: {
       src: "/images/1.png",
       alt: "پالایشگاه نفت",
@@ -425,7 +427,7 @@ export const articles: Article[] = [
     publishedAt: "۱۴۰۵/۰۲/۲۸",
     topics: [t("eghtesadi"), t("ejtemaei")],
     readingMinutes: 6,
-    contentGroupNumber: 22,
+    contentGroupSlugs: ["22"],
     heroImage: {
       src: "/images/1.png",
       alt: "آسمان‌خراش‌ها و نمودار نزولی",
@@ -450,7 +452,7 @@ export const articles: Article[] = [
     publishedAt: "۱۴۰۵/۰۲/۲۰",
     topics: [t("siasi")],
     readingMinutes: 8,
-    contentGroupNumber: 22,
+    contentGroupSlugs: ["22"],
     heroImage: {
       src: "/images/hezb-hero.svg",
       alt: "نشست حزبی",
@@ -475,7 +477,7 @@ export const articles: Article[] = [
     publishedAt: "۱۴۰۵/۰۲/۱۵",
     topics: [t("farhangi"), t("eghtesadi")],
     readingMinutes: 7,
-    contentGroupNumber: 22,
+    contentGroupSlugs: ["22"],
     heroImage: {
       src: "/images/1.png",
       alt: "ترکیب نمادین فرهنگ و اقتصاد",
@@ -500,7 +502,7 @@ export const articles: Article[] = [
     publishedAt: "۱۴۰۵/۰۲/۱۰",
     topics: [t("farhangi"), t("ejtemaei")],
     readingMinutes: 5,
-    contentGroupNumber: 21,
+    contentGroupSlugs: ["21"],
     heroImage: {
       src: "/images/1.png",
       alt: "ساعت شنی و گذشته",
@@ -526,7 +528,7 @@ export const articles: Article[] = [
     publishedAt: "۱۴۰۵/۰۲/۰۵",
     topics: [t("siasi"), t("farhangi")],
     readingMinutes: 10,
-    contentGroupNumber: 21,
+    contentGroupSlugs: ["21"],
     heroImage: {
       src: "/images/1.png",
       alt: "گل سرخ و سایه",

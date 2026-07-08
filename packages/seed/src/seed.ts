@@ -203,18 +203,22 @@ for (const topic of mockTopics) {
   topicIdBySlug.set(topic.slug, result[0].id);
 }
 
+const contentGroupIdBySlug = new Map<string, number>();
 for (const group of mockContentGroups) {
-  db.insert(schema.contentGroups)
+  const result = db
+    .insert(schema.contentGroups)
     .values({
-      number: group.number,
-      season: group.season,
-      year: group.year,
-      label: group.label,
+      slug: group.slug,
+      title: group.title,
+      status: "published",
       coverSrc: group.cover.src,
       coverAlt: group.cover.alt,
       publishedAt: group.publishedAt,
+      updatedAt: now,
     })
-    .run();
+    .returning({ id: schema.contentGroups.id })
+    .all();
+  contentGroupIdBySlug.set(group.slug, result[0].id);
 }
 
 const articleIdBySlug = new Map<string, number>();
@@ -238,7 +242,6 @@ for (const article of mockArticles) {
       heroAlt: article.heroImage.alt,
       heroCaption: article.heroImage.caption ?? null,
       heroCredit: article.heroImage.credit ?? null,
-      contentGroupNumber: article.contentGroupNumber ?? null,
       isFeatured: article.isFeatured ?? false,
       isEditorsPick: article.isEditorsPick ?? false,
       body: article.body,
@@ -271,6 +274,18 @@ for (const article of mockArticles) {
       .values({
         articleId,
         topicId,
+      })
+      .run();
+  });
+
+  article.contentGroupSlugs.forEach((slug, index) => {
+    const contentGroupId = contentGroupIdBySlug.get(slug);
+    if (!contentGroupId) return;
+    db.insert(schema.articleContentGroups)
+      .values({
+        articleId,
+        contentGroupId,
+        sortOrder: index,
       })
       .run();
   });

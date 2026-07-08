@@ -294,17 +294,11 @@ export function ArticleForm({
       <ReferencePicker
         label="گروه محتوا"
         options={contentGroups}
-        selectedIds={
-          form.contentGroupNumber != null
-            ? contentGroups
-                .filter((item) => item.number === form.contentGroupNumber)
-                .map((item) => item.id)
-            : []
+        selectedIds={form.contentGroupIds}
+        onChange={(contentGroupIds) =>
+          update("contentGroupIds", contentGroupIds)
         }
-        onChange={(ids) => {
-          const group = contentGroups.find((item) => item.id === ids[0]);
-          update("contentGroupNumber", group?.number ?? null);
-        }}
+        multiple
       />
 
       <BlockEditor

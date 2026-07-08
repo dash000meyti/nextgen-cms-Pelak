@@ -10,10 +10,10 @@ export function mapContentGroupSummaryRow(
   articleCount: number,
 ): ContentGroupSummary {
   return {
-    number: row.number,
-    season: row.season,
-    year: row.year,
-    label: row.label,
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    status: row.status,
     cover: { src: row.coverSrc, alt: row.coverAlt },
     pdfSrc: row.pdfSrc,
     publishedAt: row.publishedAt,

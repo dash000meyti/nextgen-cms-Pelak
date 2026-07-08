@@ -1,11 +1,12 @@
 import {
   getArticleBySlug,
-  getContentGroupByNumber,
+  getContentGroupBySlug,
   getSiteConfig,
 } from "@nextgen-cms/site-data/get-content";
 import { requireFeatureModule } from "@nextgen-cms/site-data/require-feature-module";
 import { notFound } from "next/navigation";
 import { NextResponse } from "next/server";
+import { contentDisposition } from "@/lib/pdf/content-disposition";
 import { buildContentGroupPdfHtml } from "@/lib/pdf/html/content-group";
 import { renderHtmlToPdf } from "@/lib/pdf/render-html-pdf";
 import { resolveArticleBlocks } from "@/lib/pdf/resolve-blocks";
@@ -14,7 +15,7 @@ import { getSiteBaseUrl, resolvePdfImageSrc } from "@/lib/pdf/resolve-image";
 export const dynamic = "force-dynamic";
 
 type ContentGroupPdfRouteProps = {
-  params: Promise<{ number: string }>;
+  params: Promise<{ slug: string }>;
 };
 
 export async function GET(
@@ -23,19 +24,18 @@ export async function GET(
 ) {
   await requireFeatureModule("contentGroup");
 
-  const { number: numberParam } = await params;
-  const number = Number.parseInt(numberParam, 10);
-  if (Number.isNaN(number) || number <= 0) notFound();
+  const { slug } = await params;
+  if (!slug.trim()) notFound();
 
   const [group, siteConfig] = await Promise.all([
-    getContentGroupByNumber(number),
+    getContentGroupBySlug(slug),
     getSiteConfig(),
   ]);
   if (!group) notFound();
 
   const siteUrl = getSiteBaseUrl();
   const base = siteUrl.replace(/\/$/, "");
-  const canonicalUrl = `${base}/content-group/${number}`;
+  const canonicalUrl = `${base}/content-group/${group.slug}`;
 
   const [coverSrc, logoSrc, articles] = await Promise.all([
     resolvePdfImageSrc(group.cover.src, siteUrl),
@@ -74,10 +74,8 @@ export async function GET(
 
   try {
     const html = await buildContentGroupPdfHtml({
-      number,
-      label: group.label,
-      season: group.season,
-      year: group.year,
+      slug: group.slug,
+      title: group.title,
       publishedAt: group.publishedAt,
       siteName: siteConfig.name,
       canonicalUrl,
@@ -87,12 +85,12 @@ export async function GET(
     });
 
     const pdf = await renderHtmlToPdf(html);
-    const filename = `content-group-${number}.pdf`;
+    const filename = `${group.slug}.pdf`;
 
     return new NextResponse(new Uint8Array(pdf), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Disposition": contentDisposition("attachment", filename),
         "Cache-Control": "private, no-store",
       },
     });

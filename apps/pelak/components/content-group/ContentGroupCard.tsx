@@ -10,7 +10,7 @@ type ContentGroupCardProps = {
 export function ContentGroupCard({ group }: ContentGroupCardProps) {
   return (
     <Link
-      href={`/content-group/${group.number}`}
+      href={`/content-group/${group.slug}`}
       className="group block space-y-4"
     >
       <div className={`${contentGroupCoverFrameClass} w-full`}>
@@ -24,7 +24,7 @@ export function ContentGroupCard({ group }: ContentGroupCardProps) {
       </div>
       <div className="space-y-1">
         <p className="font-heading text-base text-ink transition-colors group-hover:text-accent">
-          {group.label}
+          {group.title}
         </p>
         <p className="text-xs text-ink-muted">
           {group.articleCount.toLocaleString("fa-IR")} محتوا

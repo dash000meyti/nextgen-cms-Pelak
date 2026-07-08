@@ -1,10 +1,11 @@
+import type { ContentGroupStatus } from "@nextgen-cms/contract/content-group-status";
 import type { ArticlePreview, ImageMeta } from "../types/article";
 
 export type ContentGroupSummary = {
-  number: number;
-  season: string;
-  year: number;
-  label: string;
+  id: number;
+  slug: string;
+  title: string;
+  status: ContentGroupStatus;
   cover: ImageMeta;
   pdfSrc?: string | null;
   publishedAt: string;

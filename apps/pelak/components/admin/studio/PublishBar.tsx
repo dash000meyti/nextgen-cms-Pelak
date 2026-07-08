@@ -8,7 +8,7 @@ import { StatusBadge } from "@/components/admin/studio/StatusBadge";
 type PublishBarProps = {
   status: ArticleStatus | VideoStatus;
   canPublish: boolean;
-  viewHref: string;
+  viewHref?: string;
   onPublish: () => void;
   onUnpublish: () => void;
   publishing?: boolean;
@@ -32,14 +32,16 @@ export function PublishBar({
       </div>
       {showPublishActions || viewHref ? (
         <div className="flex gap-2">
-          <Link
-            href={viewHref}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded border border-rule px-4 py-2 text-sm text-ink hover:bg-surface"
-          >
-            مشاهده
-          </Link>
+          {viewHref ? (
+            <Link
+              href={viewHref}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded border border-rule px-4 py-2 text-sm text-ink hover:bg-surface"
+            >
+              مشاهده
+            </Link>
+          ) : null}
           {showPublishActions ? (
             status === "published" ? (
               <button

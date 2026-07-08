@@ -78,12 +78,15 @@ export {
 } from "@nextgen-cms/studio/cms/mutations/topic";
 export {
   archiveVideo,
+  archiveVideoAndRedirect,
   createVideo,
   createVideoAndRedirect,
   publishVideo,
   removeVideo,
+  removeVideoAndRedirect,
   resolveAparatFromUrl,
   restoreVideoFromArchive,
+  restoreVideoFromArchiveAndRedirect,
   saveVideo,
   unpublishVideo,
   type VideoFormData,

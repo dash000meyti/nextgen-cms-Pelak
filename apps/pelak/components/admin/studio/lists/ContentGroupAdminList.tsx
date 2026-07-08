@@ -4,8 +4,10 @@ import type { ContentGroupStatus } from "@nextgen-cms/contract/content-group-sta
 import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
 import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import Link from "next/link";
+import { DeleteArchivedContentGroupButton } from "@/components/admin/studio/DeleteArchivedContentGroupButton";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
 import { idColumn } from "@/components/admin/studio/document-list-columns";
+import { RestoreContentGroupButton } from "@/components/admin/studio/RestoreContentGroupButton";
 import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
 import { StatusBadge } from "@/components/admin/studio/StatusBadge";
 
@@ -75,6 +77,16 @@ export function ContentGroupAdminList({
         isArchivedTab
           ? undefined
           : (row) => `/admin/content-group/${row.id}/edit`
+      }
+      renderActions={
+        isArchivedTab
+          ? (row) => (
+              <>
+                <RestoreContentGroupButton contentGroupId={row.id} />
+                <DeleteArchivedContentGroupButton contentGroupId={row.id} />
+              </>
+            )
+          : undefined
       }
       columns={[
         idColumn<ContentGroupAdminListRow>(),

@@ -2,17 +2,18 @@
 
 import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import {
-  archiveVideo,
+  archiveVideoAndRedirect,
   createVideoAndRedirect,
   publishVideo,
-  removeVideo,
+  removeVideoAndRedirect,
   resolveAparatFromUrl,
-  restoreVideoFromArchive,
+  restoreVideoFromArchiveAndRedirect,
   saveVideo,
   unpublishVideo,
   type VideoFormData,
 } from "@nextgen-cms/studio/cms/mutations/video";
 import type { PickerOption } from "@nextgen-cms/studio/cms/queries";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ImageField } from "@/components/admin/fields/ImageField";
@@ -24,6 +25,7 @@ import { TextField } from "@/components/admin/fields/TextField";
 import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { PublishBar } from "@/components/admin/studio/PublishBar";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type VideoFormProps = {
   mode: "create" | "edit";
@@ -57,10 +59,19 @@ export function VideoForm({
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  function runMutation(task: () => Promise<void>) {
+    startTransition(() => {
+      void task().catch((err: unknown) => {
+        if (isRedirectError(err)) throw err;
+        setError(formatServerActionError(err));
+      });
+    });
+  }
+
   function handleSave() {
     setError(null);
     setSuccess(null);
-    startTransition(async () => {
+    runMutation(async () => {
       if (mode === "create") {
         const result = await createVideoAndRedirect(form);
         if (result && !result.ok) setError(result.error);
@@ -107,7 +118,7 @@ export function VideoForm({
     });
     if (!confirmed) return;
     setError(null);
-    startTransition(async () => {
+    runMutation(async () => {
       const result = await publishVideo(videoId);
       if (!result.ok) {
         setError(result.error);
@@ -128,7 +139,7 @@ export function VideoForm({
     });
     if (!confirmed) return;
     setError(null);
-    startTransition(async () => {
+    runMutation(async () => {
       const result = await unpublishVideo(videoId);
       if (!result.ok) {
         setError(result.error);
@@ -149,30 +160,18 @@ export function VideoForm({
     });
     if (!confirmed) return;
     setError(null);
-    startTransition(async () => {
-      const result = await archiveVideo(videoId);
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-      update("status", "archived");
-      setSuccess("به بایگانی ارسال شد.");
-      router.refresh();
+    runMutation(async () => {
+      const result = await archiveVideoAndRedirect(videoId);
+      if (result && !result.ok) setError(result.error);
     });
   }
 
   async function handleRestore() {
     if (!videoId) return;
     setError(null);
-    startTransition(async () => {
-      const result = await restoreVideoFromArchive(videoId);
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-      update("status", "draft");
-      setSuccess("از بایگانی بازگردانی شد.");
-      router.refresh();
+    runMutation(async () => {
+      const result = await restoreVideoFromArchiveAndRedirect(videoId);
+      if (result && !result.ok) setError(result.error);
     });
   }
 
@@ -186,14 +185,9 @@ export function VideoForm({
     });
     if (!confirmed) return;
     setError(null);
-    startTransition(async () => {
-      const result = await removeVideo(videoId);
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-      router.push("/admin/videos?status=archived");
-      router.refresh();
+    runMutation(async () => {
+      const result = await removeVideoAndRedirect(videoId);
+      if (result && !result.ok) setError(result.error);
     });
   }
 
@@ -204,7 +198,7 @@ export function VideoForm({
         <PublishBar
           status={form.status}
           canPublish={canPublish}
-          viewHref={form.externalLink || "#"}
+          viewHref={form.externalLink || undefined}
           onPublish={handlePublish}
           onUnpublish={handleUnpublish}
           publishing={pending || fetchingAparat}

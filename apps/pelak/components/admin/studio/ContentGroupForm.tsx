@@ -175,7 +175,9 @@ export function ContentGroupForm({
           status={form.status}
           canPublish={canPublish}
           viewHref={
-            form.status === "published" ? `/content-group/${form.slug}` : "#"
+            form.status === "published"
+              ? `/content-group/${form.slug}`
+              : undefined
           }
           onPublish={handlePublish}
           onUnpublish={handleUnpublish}

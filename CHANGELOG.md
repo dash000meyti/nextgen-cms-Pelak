@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **BREAKING:** Content group redesign — `number`/`season`/`year`/`label`/`period` removed; fields are now `slug`, `title`, `status` (`draft`/`published`/`archived`), `publishedAt`, `cover`, `pdfSrc`. Public routes are slug-based (`/content-group/{slug}`). Article↔group is many-to-many via `article_content_groups`. Delete flow: archive → permanent delete. Migration: `0018_content_groups_redesign.sql`. Short links `m{id}` resolve by content group id.
+- Unified Studio status behavior in `content-group` and `videos` with `content`: archived tab now exposes restore/delete list actions, archive/restore/delete flows redirect to `?status=...`, and view link in publish bar is shown only when a valid destination exists.
 
 ## [1.0.0] - 2026-06-29
 

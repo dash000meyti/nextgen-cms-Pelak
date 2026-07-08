@@ -280,6 +280,24 @@ export async function removeVideo(id: number): Promise<MutationResult> {
   }
 }
 
+export async function archiveVideoAndRedirect(id: number) {
+  const result = await archiveVideo(id);
+  if (!result.ok) return result;
+  redirect("/admin/videos?status=archived");
+}
+
+export async function restoreVideoFromArchiveAndRedirect(id: number) {
+  const result = await restoreVideoFromArchive(id);
+  if (!result.ok) return result;
+  redirect("/admin/videos?status=draft");
+}
+
+export async function removeVideoAndRedirect(id: number) {
+  const result = await removeVideo(id);
+  if (!result.ok) return result;
+  redirect("/admin/videos?status=archived");
+}
+
 export async function resolveAparatFromUrl(url: string): Promise<
   | {
       ok: true;

@@ -4,11 +4,14 @@ import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
 import type { VideoStatus } from "@nextgen-cms/contract/video-status";
 import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import Link from "next/link";
+import { DeleteArchivedVideoButton } from "@/components/admin/studio/DeleteArchivedVideoButton";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
 import { DocumentListThumbnail } from "@/components/admin/studio/DocumentListThumbnail";
 import { idColumn } from "@/components/admin/studio/document-list-columns";
+import { RestoreVideoButton } from "@/components/admin/studio/RestoreVideoButton";
 import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
 import { StatusBadge } from "@/components/admin/studio/StatusBadge";
+import { TableActionLink } from "@/components/admin/studio/TableActionButton";
 
 export type VideosAdminListRow = {
   id: number;
@@ -17,6 +20,7 @@ export type VideosAdminListRow = {
   thumbnailSrc: string | null;
   thumbnailAlt: string | null;
   duration: string | null;
+  externalLink: string | null;
   publishedAt: string | null;
   status: VideoStatus;
 };
@@ -36,6 +40,7 @@ const STATUS_OPTIONS: { value: VideoStatus | "all"; label: string }[] = [
 export function VideosAdminList({ videos, status }: VideosAdminListProps) {
   const { sectionPageTitles } = useAdminMember();
   const labels = sectionAdminLabels(sectionPageTitles.video);
+  const isArchivedTab = status === "archived";
 
   return (
     <DocumentList
@@ -70,7 +75,28 @@ export function VideosAdminList({ videos, status }: VideosAdminListProps) {
       rows={videos}
       rowKey={(row) => row.id}
       defaultSort={{ key: "publishedAt", direction: "asc" }}
-      editHref={(row) => `/admin/videos/${row.id}/edit`}
+      editHref={
+        isArchivedTab ? undefined : (row) => `/admin/videos/${row.id}/edit`
+      }
+      renderActions={
+        isArchivedTab
+          ? (row) => (
+              <>
+                {row.externalLink ? (
+                  <TableActionLink
+                    href={row.externalLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    label="مشاهده"
+                    icon="view"
+                  />
+                ) : null}
+                <RestoreVideoButton videoId={row.id} />
+                <DeleteArchivedVideoButton videoId={row.id} />
+              </>
+            )
+          : undefined
+      }
       columns={[
         {
           key: "thumb",

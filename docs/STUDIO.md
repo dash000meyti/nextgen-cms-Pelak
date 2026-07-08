@@ -72,7 +72,7 @@
 
 | مسیر | نقش |
 |------|-----|
-| `/admin/content-group` | CRUD گروه‌های محتوا — `modules.contentGroup.*` |
+| `/admin/content-group` | CRUD گروه‌های محتوا + فیلتر وضعیت (پیش‌نویس/منتشرشده/بایگانی) — `modules.contentGroup.*` |
 | `/admin/videos` | CRUD ویدیوها + فیلتر وضعیت (پیش‌نویس/منتشرشده/بایگانی) — `modules.video.*` |
 
 ## لایهٔ CMS (monorepo)
@@ -151,7 +151,16 @@ packages/core/src/db/repositories/ — نوشتن DB
 
 - `draft` → ذخیره پیش‌نویس
 - «انتشار» → `published` + `publishedAt` (شمسی/ISO از `todayIsoIran()`)
+- «ارسال به بایگانی» → `archived` و redirect به لیست بایگانی همان بخش (`?status=archived`)
+- «بازگردانی از بایگانی» → `draft` و redirect به لیست پیش‌نویس (`?status=draft`)
+- «حذف دائمی» فقط برای `archived` مجاز است و کاربر در همان لیست بایگانی می‌ماند
 - public فقط `published`
+
+### رفتار لیست وضعیت‌ها (همسان در محتوا/گروه محتوا/ویدیو)
+
+- تب‌ها: `all`, `draft`, `published`, `archived` با query key برابر `status`
+- در تب `archived`، ویرایش مستقیم غیرفعال است و اکشن‌های `restore/delete` از لیست در دسترس‌اند
+- برای مورد منتشرشده، لینک «مشاهده» فقط وقتی نمایش داده می‌شود که مقصد معتبر وجود داشته باشد
 
 ## Media
 

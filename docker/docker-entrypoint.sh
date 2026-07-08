@@ -1,5 +1,5 @@
 #!/bin/sh
-set -euo pipefail
+set -eu
 
 export DATABASE_URL="file:/data/pelak.sqlite"
 export MIGRATIONS_DIR="/app/packages/core/drizzle/migrations"

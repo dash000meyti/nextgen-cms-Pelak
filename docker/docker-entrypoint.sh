@@ -3,10 +3,16 @@ set -eu
 
 export DATABASE_URL="file:/data/pelak.sqlite"
 export MIGRATIONS_DIR="/app/packages/core/drizzle/migrations"
+export HOME="${HOME:-/home/nextjs}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 
 mkdir -p /data/backups
 mkdir -p /data/uploads
+mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
+mkdir -p /tmp/chromium
 chown -R nextjs:nodejs /data
+chown -R nextjs:nodejs "$HOME" /tmp/chromium
 
 if [ -f /data/pelak.sqlite ]; then
   if [ "${SNAPSHOT_BEFORE_MIGRATE:-0}" = "1" ]; then

@@ -9,6 +9,7 @@ function resolveChromiumExecutable(): string | undefined {
   if (configured) return configured;
 
   const candidates = [
+    "/usr/lib/chromium/chromium",
     "/usr/bin/chromium-browser",
     "/usr/bin/chromium",
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -26,25 +27,40 @@ function resolveChromiumExecutable(): string | undefined {
   return undefined;
 }
 
+function chromiumArgs(): string[] {
+  return [
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-crash-reporter",
+    "--disable-breakpad",
+  ];
+}
+
 async function getBrowser(): Promise<Browser> {
   if (!browserPromise) {
     const executablePath = resolveChromiumExecutable();
-    try {
-      browserPromise = chromium.launch({
+    const attemptedExecutable = executablePath ?? "(playwright default)";
+    browserPromise = chromium
+      .launch({
         headless: true,
         ...(executablePath ? { executablePath } : {}),
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-        ],
+        args: chromiumArgs(),
+      })
+      .then((browser) => {
+        browser.on("disconnected", () => {
+          browserPromise = null;
+        });
+        return browser;
+      })
+      .catch((error) => {
+        browserPromise = null;
+        throw new Error(
+          `Chromium launch failed for PDF generation (executable: ${attemptedExecutable}). ` +
+            "Chrome/Chromium را نصب کنید یا PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH را تنظیم کنید.",
+          { cause: error },
+        );
       });
-    } catch (error) {
-      throw new Error(
-        "Chromium برای ساخت PDF یافت نشد. Chrome را نصب کنید یا PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH را تنظیم کنید.",
-        { cause: error },
-      );
-    }
   }
 
   return browserPromise;

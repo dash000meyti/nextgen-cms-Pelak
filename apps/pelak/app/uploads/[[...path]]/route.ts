@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { findArticleStatusById } from "@nextgen-cms/core/db/repositories/articles";
+import { findContentGroupById } from "@nextgen-cms/core/db/repositories/content-groups-admin";
+import { sanitizePdfFilename } from "@nextgen-cms/core/media/content-group-pdf";
 import {
   classifyUploadPath,
   isContentMediaPublic,
@@ -27,6 +29,24 @@ function isSafeRelativePath(relativePath: string): boolean {
 
 function pdfContentDisposition(filename: string): string {
   return contentDisposition("inline", filename);
+}
+
+function parseContentGroupId(relativePath: string): number | null {
+  const match = /^content-group\/(\d+)\//.exec(relativePath);
+  if (!match) return null;
+  const id = Number.parseInt(match[1] ?? "", 10);
+  return Number.isNaN(id) || id <= 0 ? null : id;
+}
+
+async function resolvePdfDownloadName(relativePath: string): Promise<string> {
+  const basename = path.basename(relativePath);
+  const contentGroupId = parseContentGroupId(relativePath);
+  if (contentGroupId == null) return basename;
+
+  const group = await findContentGroupById(contentGroupId);
+  const safeTitle = sanitizePdfFilename(group?.title?.trim() ?? "");
+  if (!safeTitle) return basename || "file.pdf";
+  return `${safeTitle}.pdf`;
 }
 
 async function readUploadFile(relativePath: string): Promise<Buffer | null> {
@@ -102,6 +122,11 @@ export async function GET(
     return new NextResponse("Not found", { status: 404 });
   }
 
+  const pdfFilename =
+    contentType === "application/pdf"
+      ? await resolvePdfDownloadName(relativePath)
+      : undefined;
+
   return new NextResponse(new Uint8Array(data), {
     headers: {
       "Content-Type": contentType,
@@ -111,7 +136,7 @@ export async function GET(
       ...(contentType === "application/pdf"
         ? {
             "Content-Disposition": pdfContentDisposition(
-              path.basename(relativePath),
+              pdfFilename ?? "file.pdf",
             ),
           }
         : {}),

@@ -108,7 +108,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["better-sqlite3", "playwright-core"],
   outputFileTracingIncludes: {
     "/api/pdf/content/[id]": ["./lib/pdf/fonts/**/*", "./public/images/**/*"],
-    "/api/pdf/content-group/[number]": [
+    "/api/pdf/content-group/[slug]": [
       "./lib/pdf/fonts/**/*",
       "./public/images/**/*",
     ],

@@ -42,6 +42,7 @@ docker compose -f docker-compose.yml <command>
 | `DATABASE_URL` | خیر | entrypoint آن را به `file:/data/pelak.sqlite` override می‌کند |
 | `SNAPSHOT_BEFORE_MIGRATE` | خیر | `1` = قبل از migrate یک snapshot کامل (DB + uploads) گرفته می‌شود. پیش‌فرض: فقط بکاپ DB |
 | `SNAPSHOT_MAX_BYTES` | خیر | حداکثر حجم آرشیو آپلودی در `/api/admin/database/import-snapshot` (پیش‌فرض: بدون محدودیت) |
+| `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` | خیر | مسیر Chromium برای تولید PDF (پیش‌فرض Docker: `/usr/lib/chromium/chromium`) |
 
 ## استقرار اولیه
 
@@ -183,7 +184,16 @@ npm run dev
 
 - Base image: `node:22-bookworm-slim` (Debian) — برای پایداری build روی هاست‌هایی که DNS به mirrorهای Alpine (`dl-cdn.alpinelinux.org`) مشکل دارد.
 - native modules (`better-sqlite3`) در همان libc (glibc) کامپایل و اجرا می‌شوند.
-- PDF: `chromium` از مخزن Debian؛ مسیر پیش‌فرض `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium`.
+- PDF: `chromium` از مخزن Debian؛ مسیر پیش‌فرض `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/lib/chromium/chromium`.
+- runtime dirهای Chromium برای user غیر root باید writable باشند (`HOME`, `XDG_CONFIG_HOME`, `XDG_CACHE_HOME`).
+
+### خطای Chromium/Crashpad (PDF)
+
+اگر خطایی مشابه `chrome_crashpad_handler --database is required` یا `SIGTRAP` دیدید:
+
+1. مطمئن شوید `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` روی binary واقعی Chromium است.
+2. writable بودن مسیرهای `HOME/.config` و `HOME/.cache` را بررسی کنید.
+3. container را rebuild/restart کنید تا envها و entrypoint جدید اعمال شوند.
 
 ## محدودیت حجم آپلود (Server Actions)
 

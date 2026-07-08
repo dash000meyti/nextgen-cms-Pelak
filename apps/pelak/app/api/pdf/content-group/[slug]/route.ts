@@ -1,3 +1,4 @@
+import { buildContentGroupPdfFilename } from "@nextgen-cms/core/media/content-group-pdf";
 import {
   getArticleBySlug,
   getContentGroupBySlug,
@@ -98,7 +99,7 @@ export async function GET(
     });
 
     const pdf = await renderHtmlToPdf(html);
-    const filename = `${group.slug}.pdf`;
+    const filename = buildContentGroupPdfFilename(group.title, group.slug);
 
     return new NextResponse(new Uint8Array(pdf), {
       headers: {
@@ -109,9 +110,23 @@ export async function GET(
     });
   } catch (error) {
     console.error("PDF generation failed:", error);
-    return new NextResponse(
-      error instanceof Error ? error.message : "PDF generation failed",
-      { status: 500 },
+    const fallbackFilename = buildContentGroupPdfFilename(
+      group.title,
+      group.slug,
+    );
+    return NextResponse.json(
+      {
+        error: "PDF generation failed",
+        message:
+          error instanceof Error ? error.message : "PDF generation failed",
+        filename: fallbackFilename,
+      },
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "private, no-store",
+        },
+      },
     );
   }
 }

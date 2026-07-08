@@ -1,7 +1,4 @@
-import {
-  buildContentGroupPdfPath,
-  buildContentGroupShortPath,
-} from "@nextgen-cms/contract/short-links";
+import { buildContentGroupShortPath } from "@nextgen-cms/contract/short-links";
 import {
   getAllContentGroupSlugs,
   getContentGroupBySlug,
@@ -189,9 +186,7 @@ export default async function ContentGroupPage({
           <ShareBar
             title={group.title}
             shareUrl={buildContentGroupShortPath(group.id)}
-            pdfDownloadUrl={
-              group.pdfSrc ? buildContentGroupPdfPath(group.slug) : undefined
-            }
+            pdfDownloadUrl={group.pdfSrc ?? undefined}
           />
         </div>
       </div>

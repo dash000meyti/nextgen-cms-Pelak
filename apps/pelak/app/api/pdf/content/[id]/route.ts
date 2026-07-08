@@ -88,9 +88,18 @@ export async function GET(_request: Request, { params }: ContentPdfRouteProps) {
     });
   } catch (error) {
     console.error("PDF generation failed:", error);
-    return new NextResponse(
-      error instanceof Error ? error.message : "PDF generation failed",
-      { status: 500 },
+    return NextResponse.json(
+      {
+        error: "PDF generation failed",
+        message:
+          error instanceof Error ? error.message : "PDF generation failed",
+      },
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "private, no-store",
+        },
+      },
     );
   }
 }

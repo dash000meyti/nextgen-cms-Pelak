@@ -36,10 +36,15 @@ ENV DATABASE_URL=file:/data/pelak.sqlite
 ENV MIGRATIONS_DIR=/app/packages/core/drizzle/migrations
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
-ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
+ENV HOME=/home/nextjs
+ENV XDG_CONFIG_HOME=/home/nextjs/.config
+ENV XDG_CACHE_HOME=/home/nextjs/.cache
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/lib/chromium/chromium
 
 RUN groupadd --system --gid 1001 nodejs \
   && useradd --system --uid 1001 --gid nodejs --shell /usr/sbin/nologin nextjs
+RUN mkdir -p /home/nextjs/.config /home/nextjs/.cache /tmp/chromium \
+  && chown -R nextjs:nodejs /home/nextjs /tmp/chromium
 
 COPY --from=build /app/apps/pelak/public ./apps/pelak/public
 COPY --from=build /app/apps/pelak/lib/pdf/fonts ./apps/pelak/lib/pdf/fonts

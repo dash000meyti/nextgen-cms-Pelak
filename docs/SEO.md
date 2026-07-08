@@ -30,7 +30,7 @@
 شامل:
 - صفحات ثابت (`/`, `/content`, `/content-group`, `/members`, …)
 - مقالات، نویسنده‌ها، موضوعات، لیست‌های پخش و گروه‌های محتوا
-- **URL مستقیم PDF** گروه‌های محتوا (فقط وقتی `pdfSrc` دارند)
+- URL مستقیم PDF گروه‌های محتوا (فقط وقتی `pdfSrc` دارند)
 - `lastModified` از `publishedAt` برای مقالات و گروه‌های محتوا
 - segmentهای slug در sitemap به‌صورت `encodeURIComponent` ساخته می‌شوند
 
@@ -56,6 +56,7 @@
 
 - `title` و `slug` از فیلدهای گروه محتوا
 - منطق: `packages/core/src/media/content-group-pdf.ts` + `finalize-content-group-pdf.ts`
+- در دانلود فایل آپلودشده، نام دانلودی بر پایه عنوان گروه و با الگوی `title.pdf` تنظیم می‌شود.
 
 ### یک PDF per folder
 
@@ -65,11 +66,18 @@
 
 1. لینک دانلود در `ShareBar` با `type="application/pdf"`
 2. `alternates.types["application/pdf"]` در metadata صفحه
-3. URL PDF در sitemap
+3. URL PDF در sitemap (بر پایه `pdfSrc`)
 4. JSON-LD `PublicationIssue` + `associatedMedia` در صفحهٔ گروه
 5. `Content-Disposition: inline; filename*=UTF-8''…` در `GET /uploads/.../*.pdf`
 
-PDF آپلودشده canonical است؛ route تولیدی `/api/pdf/content-group/[slug]` در UI استفاده نمی‌شود.
+برای گروه محتوا، `pdfSrc` (فایل آپلودشده در uploads) canonical است (metadata + sitemap + دکمهٔ دانلود).
+دکمهٔ دانلود فقط زمانی نمایش داده می‌شود که `pdfSrc` وجود داشته باشد.
+
+## دانلود PDF مقاله
+
+- route: `/api/pdf/content/{id}`
+- نام فایل: `{articleSlug}.pdf`
+- خطا: JSON با status `500` (نه متن خام)
 
 ## JSON-LD
 

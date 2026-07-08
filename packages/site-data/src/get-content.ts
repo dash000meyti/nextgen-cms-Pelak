@@ -4,7 +4,9 @@ import type {
   Article,
   ArticlePreview,
   Author,
+  Playlist,
   Topic,
+  Video,
 } from "@nextgen-cms/contract/types/article";
 import type { ContentGroup } from "@nextgen-cms/contract/types/content-group";
 import {
@@ -33,6 +35,12 @@ import {
   findPublicMemberBySlug,
 } from "@nextgen-cms/core/db/repositories/members-public";
 import { findMostRead } from "@nextgen-cms/core/db/repositories/most-read";
+import {
+  findAllPlaylistSlugs,
+  findAllPlaylists,
+  findPlaylistBySlug,
+  findVideosByPlaylistSlug,
+} from "@nextgen-cms/core/db/repositories/playlists";
 import {
   findContentGroupModuleSettings,
   findContentSettings,
@@ -363,3 +371,33 @@ export const getVideos = platformCache(
   [CACHE_TAGS.videos],
   findAllVideos,
 );
+
+export const getPlaylists = platformCache(
+  ["playlists-all"],
+  [CACHE_TAGS.playlists],
+  findAllPlaylists,
+);
+
+export const getAllPlaylistSlugs = platformCache(
+  ["playlist-slugs"],
+  [CACHE_TAGS.playlists],
+  findAllPlaylistSlugs,
+);
+
+export async function getPlaylistBySlug(
+  slug: string,
+): Promise<Playlist | undefined> {
+  return platformCache(
+    ["playlist", slug],
+    [CACHE_TAGS.playlists, CACHE_TAGS.playlist(slug)],
+    () => findPlaylistBySlug(slug),
+  )();
+}
+
+export async function getVideosByPlaylist(slug: string): Promise<Video[]> {
+  return platformCache(
+    ["videos-by-playlist", slug],
+    [CACHE_TAGS.videos, CACHE_TAGS.playlist(slug)],
+    () => findVideosByPlaylistSlug(slug),
+  )();
+}

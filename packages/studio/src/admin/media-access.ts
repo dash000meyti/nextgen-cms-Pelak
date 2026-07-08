@@ -6,6 +6,7 @@ import {
   contentPath,
   isContentGroupMediaPath,
   isMemberDraftPath,
+  isPlaylistMediaPath,
   isVideoMediaPath,
   memberAvatarPath,
   memberDraftPath,
@@ -43,6 +44,14 @@ function canAccessContentGroupFolder(
 
 function canAccessVideoFolder(session: MemberSession, folder: string): boolean {
   if (!isVideoMediaPath(folder)) return false;
+  return canAccessVideoModule(session);
+}
+
+function canAccessPlaylistFolder(
+  session: MemberSession,
+  folder: string,
+): boolean {
+  if (!isPlaylistMediaPath(folder)) return false;
   return canAccessVideoModule(session);
 }
 
@@ -98,6 +107,10 @@ export function canReadFolder(
     return canAccessVideoModule(session);
   }
 
+  if (normalized === normalizeFolderPath("playlists")) {
+    return canAccessVideoModule(session);
+  }
+
   for (const contentId of ownedContentIds) {
     const ownedPath = contentPath(contentId);
     if (normalized === ownedPath || normalized.startsWith(ownedPath)) {
@@ -110,6 +123,9 @@ export function canReadFolder(
   }
 
   if (canAccessVideoFolder(session, normalized)) {
+    return true;
+  }
+  if (canAccessPlaylistFolder(session, normalized)) {
     return true;
   }
 
@@ -159,6 +175,7 @@ export function getVirtualRootFolders(
       normalizeFolderPath("content"),
       normalizeFolderPath("content-group"),
       normalizeFolderPath("videos"),
+      normalizeFolderPath("playlists"),
     ];
   }
   const roots = [
@@ -170,6 +187,7 @@ export function getVirtualRootFolders(
   }
   if (canAccessVideoModule(session)) {
     roots.push(normalizeFolderPath("videos"));
+    roots.push(normalizeFolderPath("playlists"));
   }
   return roots;
 }

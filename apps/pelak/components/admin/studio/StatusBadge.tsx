@@ -1,3 +1,4 @@
+import type { VideoStatus } from "@nextgen-cms/contract/video-status";
 import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
 
 const LABELS: Record<ArticleStatus, string> = {
@@ -12,7 +13,11 @@ const STYLES: Record<ArticleStatus, string> = {
   archived: "bg-surface-2 text-ink-faint",
 };
 
-export function StatusBadge({ status }: { status: ArticleStatus }) {
+export function StatusBadge({
+  status,
+}: {
+  status: ArticleStatus | VideoStatus;
+}) {
   return (
     <span
       className={`inline-flex rounded px-2 py-0.5 text-xs font-medium ${STYLES[status]}`}

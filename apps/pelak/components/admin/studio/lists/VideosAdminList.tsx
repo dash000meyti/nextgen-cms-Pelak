@@ -1,11 +1,14 @@
 "use client";
 
 import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
+import type { VideoStatus } from "@nextgen-cms/contract/video-status";
 import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
+import Link from "next/link";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
 import { DocumentListThumbnail } from "@/components/admin/studio/DocumentListThumbnail";
 import { idColumn } from "@/components/admin/studio/document-list-columns";
 import { SectionSettingsLink } from "@/components/admin/studio/SectionSettingsLink";
+import { StatusBadge } from "@/components/admin/studio/StatusBadge";
 
 export type VideosAdminListRow = {
   id: number;
@@ -15,13 +18,22 @@ export type VideosAdminListRow = {
   thumbnailAlt: string | null;
   duration: string | null;
   publishedAt: string | null;
+  status: VideoStatus;
 };
 
 type VideosAdminListProps = {
   videos: VideosAdminListRow[];
+  status: VideoStatus | "all";
 };
 
-export function VideosAdminList({ videos }: VideosAdminListProps) {
+const STATUS_OPTIONS: { value: VideoStatus | "all"; label: string }[] = [
+  { value: "all", label: "همه" },
+  { value: "draft", label: "پیش‌نویس" },
+  { value: "published", label: "منتشرشده" },
+  { value: "archived", label: "بایگانی" },
+];
+
+export function VideosAdminList({ videos, status }: VideosAdminListProps) {
   const { sectionPageTitles } = useAdminMember();
   const labels = sectionAdminLabels(sectionPageTitles.video);
 
@@ -30,7 +42,31 @@ export function VideosAdminList({ videos }: VideosAdminListProps) {
       title={labels.listTitle}
       newHref="/admin/videos/new"
       newLabel={labels.newItem}
-      toolbar={<SectionSettingsLink href="/admin/videos/settings" />}
+      toolbar={
+        <div className="flex flex-wrap items-center gap-2">
+          {STATUS_OPTIONS.map((option) => {
+            const active = option.value === status;
+            const href =
+              option.value === "all"
+                ? "/admin/videos"
+                : `/admin/videos?status=${option.value}`;
+            return (
+              <Link
+                key={option.value}
+                href={href}
+                className={`rounded border px-2 py-1 text-xs ${
+                  active
+                    ? "border-accent bg-accent-soft text-accent"
+                    : "border-rule text-ink-muted hover:text-ink"
+                }`}
+              >
+                {option.label}
+              </Link>
+            );
+          })}
+          <SectionSettingsLink href="/admin/videos/settings/video" />
+        </div>
+      }
       rows={videos}
       rowKey={(row) => row.id}
       defaultSort={{ key: "publishedAt", direction: "asc" }}
@@ -64,6 +100,13 @@ export function VideosAdminList({ videos }: VideosAdminListProps) {
               </p>
             </div>
           ),
+        },
+        {
+          key: "status",
+          header: "وضعیت",
+          sortable: true,
+          sortValue: (row) => row.status,
+          render: (row) => <StatusBadge status={row.status} />,
         },
         {
           key: "duration",

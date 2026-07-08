@@ -19,6 +19,7 @@ export type CollectionType =
   | "author"
   | "member"
   | "topic"
+  | "playlist"
   | "contentGroup"
   | "video"
   | "settings";

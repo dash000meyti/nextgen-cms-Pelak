@@ -74,6 +74,15 @@ export function invalidateVideos() {
   updateTag(CACHE_TAGS.videos);
 }
 
+export function invalidatePlaylists() {
+  updateTag(CACHE_TAGS.playlists);
+}
+
+export function invalidatePlaylist(slug: string) {
+  updateTag(CACHE_TAGS.playlists);
+  updateTag(CACHE_TAGS.playlist(slug));
+}
+
 export function invalidateMessages() {
   updateTag(CACHE_TAGS.messages);
 }

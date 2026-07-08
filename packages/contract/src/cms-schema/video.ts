@@ -10,6 +10,29 @@ export const videoSchema = {
     { key: "description", label: "توضیحات", kind: "textarea" },
     { key: "duration", label: "مدت", kind: "text" },
     {
+      key: "status",
+      label: "وضعیت",
+      kind: "status",
+      required: true,
+      options: [
+        { value: "draft", label: "پیش‌نویس" },
+        { value: "published", label: "منتشرشده" },
+        { value: "archived", label: "بایگانی" },
+      ],
+    },
+    {
+      key: "linkSource",
+      label: "منبع لینک",
+      kind: "select",
+      required: true,
+      options: [
+        { value: "thumbnail", label: "تصویر بندانگشتی" },
+        { value: "aparat", label: "لینک آپارات" },
+      ],
+    },
+    { key: "externalLink", label: "لینک ویدیو", kind: "text" },
+    { key: "aparatUrl", label: "لینک آپارات", kind: "text" },
+    {
       key: "thumbnailSrc",
       label: "تصویر بندانگشتی",
       kind: "image",

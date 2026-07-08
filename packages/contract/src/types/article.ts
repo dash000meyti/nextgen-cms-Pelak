@@ -163,6 +163,18 @@ export type Video = {
   title: string;
   description: string;
   duration: string;
+  status: "draft" | "published" | "archived";
+  linkSource: "thumbnail" | "aparat";
+  externalLink: string;
+  aparatUrl?: string;
   thumbnail: ImageMeta;
   publishedAt: string;
+  playlists: Playlist[];
+};
+
+export type Playlist = {
+  slug: string;
+  name: string;
+  description: string;
+  cover: ImageMeta;
 };

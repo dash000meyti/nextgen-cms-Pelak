@@ -5,6 +5,7 @@ import {
   authors,
   contentGroups,
   members,
+  playlists,
   topics,
   videos,
 } from "@nextgen-cms/core/db/schema";
@@ -72,6 +73,18 @@ export async function slugExists(
       const rows = await db
         .select({ id: videos.id })
         .from(videos)
+        .where(where)
+        .limit(1);
+      return rows.length > 0;
+    }
+    case "playlist": {
+      const where =
+        excludeId != null
+          ? and(eq(playlists.slug, slug), ne(playlists.id, excludeId))
+          : eq(playlists.slug, slug);
+      const rows = await db
+        .select({ id: playlists.id })
+        .from(playlists)
         .where(where)
         .limit(1);
       return rows.length > 0;

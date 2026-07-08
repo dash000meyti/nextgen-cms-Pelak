@@ -19,6 +19,10 @@ import {
   findAllMembersAdmin,
   findMemberForAdmin,
 } from "@nextgen-cms/core/db/repositories/members-admin";
+import {
+  findAllPlaylistsAdmin,
+  findPlaylistById,
+} from "@nextgen-cms/core/db/repositories/playlists-admin";
 import { findAllRoles } from "@nextgen-cms/core/db/repositories/roles";
 import {
   findAllTopicsAdmin,
@@ -27,9 +31,11 @@ import {
 import {
   findAllVideosAdmin,
   findVideoById,
+  findVideoPlaylistIds,
 } from "@nextgen-cms/core/db/repositories/videos-admin";
-import { contentGroups, topics } from "@nextgen-cms/core/db/schema";
+import { contentGroups, playlists, topics } from "@nextgen-cms/core/db/schema";
 import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
+import type { VideoStatus } from "@nextgen-cms/core/db/schema/videos";
 import { canAccessMembersList } from "@nextgen-cms/studio/admin/member-access";
 import { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
@@ -210,15 +216,32 @@ export async function getContentGroupForAdmin(id: number) {
   });
 }
 
-export async function listVideosAdmin() {
+export async function listVideosAdmin(status?: VideoStatus | "all") {
   return withMemberAccess(async (memberId) => {
-    return findAllVideosAdmin(access(memberId));
+    return findAllVideosAdmin(access(memberId), {
+      status: status && status !== "all" ? status : undefined,
+    });
   });
 }
 
 export async function getVideoForAdmin(id: number) {
   return withMemberAccess(async (memberId) => {
-    return findVideoById(id, access(memberId));
+    const video = await findVideoById(id, access(memberId));
+    if (!video) return undefined;
+    const playlistIds = await findVideoPlaylistIds(video.id);
+    return { ...video, playlistIds };
+  });
+}
+
+export async function listPlaylistsAdmin() {
+  return withMemberAccess(async (memberId) => {
+    return findAllPlaylistsAdmin(access(memberId));
+  });
+}
+
+export async function getPlaylistForAdmin(id: number) {
+  return withMemberAccess(async (memberId) => {
+    return findPlaylistById(id, access(memberId));
   });
 }
 
@@ -278,6 +301,22 @@ export async function findContentGroupsForPicker(): Promise<PickerOption[]> {
   return rows.map((row) => ({
     id: row.id,
     label: row.title,
+    slug: row.slug,
+  }));
+}
+
+export async function findPlaylistsForPicker(): Promise<PickerOption[]> {
+  const session = await requireMember();
+  const allowed =
+    session.permissions.includes("modules.video.view") ||
+    session.permissions.includes("modules.video.create");
+  if (!allowed) {
+    await requirePermission("modules.video.view");
+  }
+  const rows = await db.select().from(playlists).orderBy(asc(playlists.name));
+  return rows.map((row) => ({
+    id: row.id,
+    label: row.name,
     slug: row.slug,
   }));
 }

@@ -1,11 +1,12 @@
 "use client";
 
+import type { VideoStatus } from "@nextgen-cms/contract/video-status";
 import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
 import Link from "next/link";
 import { StatusBadge } from "@/components/admin/studio/StatusBadge";
 
 type PublishBarProps = {
-  status: ArticleStatus;
+  status: ArticleStatus | VideoStatus;
   canPublish: boolean;
   viewHref: string;
   onPublish: () => void;

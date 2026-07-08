@@ -81,6 +81,10 @@ export function videoPath(videoId: number): string {
   return normalizeFolderPath(`videos/${videoId}`);
 }
 
+export function playlistPath(playlistId: number): string {
+  return normalizeFolderPath(`playlists/${playlistId}`);
+}
+
 export function isContentGroupMediaPath(relativePath: string): boolean {
   const normalized = normalizeRelativePath(relativePath);
   return /^content-group\/\d+/.test(normalized);
@@ -89,6 +93,11 @@ export function isContentGroupMediaPath(relativePath: string): boolean {
 export function isVideoMediaPath(relativePath: string): boolean {
   const normalized = normalizeRelativePath(relativePath);
   return /^videos\/\d+/.test(normalized);
+}
+
+export function isPlaylistMediaPath(relativePath: string): boolean {
+  const normalized = normalizeRelativePath(relativePath);
+  return /^playlists\/\d+/.test(normalized);
 }
 
 export function shouldSkipMediaPromote(relativePath: string): boolean {

@@ -1,5 +1,6 @@
 import { paginateItems, parsePageParam } from "@nextgen-cms/config/pagination";
 import {
+  getPlaylists,
   getVideoModuleSettings,
   getVideos,
 } from "@nextgen-cms/site-data/get-content";
@@ -9,6 +10,7 @@ import { SectionHeader } from "@/components/article/SectionHeader";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Container } from "@/components/layout/Container";
 import { ListPagination } from "@/components/ui/ListPagination";
+import { PlaylistsSection } from "@/components/video/PlaylistsSection";
 import { VideoCard } from "@/components/video/VideoCard";
 import { VideoCardGrid } from "@/components/video/VideoCardGrid";
 
@@ -27,9 +29,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function VideoPage({ searchParams }: VideoPageProps) {
   await requireFeatureModule("video");
   const params = await searchParams;
-  const [allVideos, settings] = await Promise.all([
+  const [allVideos, settings, playlists] = await Promise.all([
     getVideos(),
     getVideoModuleSettings(),
+    getPlaylists(),
   ]);
   const page = parsePageParam(params.page);
   const { items: videos, totalPages } = paginateItems(allVideos, {
@@ -53,6 +56,7 @@ export default async function VideoPage({ searchParams }: VideoPageProps) {
         ))}
       </VideoCardGrid>
       <ListPagination page={page} totalPages={totalPages} basePath="/video" />
+      <PlaylistsSection playlists={playlists} />
     </Container>
   );
 }

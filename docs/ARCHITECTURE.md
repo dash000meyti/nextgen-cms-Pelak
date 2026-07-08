@@ -120,7 +120,7 @@ sequenceDiagram
 فایل‌های آپلود در volume (`data/uploads/` یا `/data/uploads/`) نگه‌داری می‌شوند؛ متادیتا در جدول `media_assets`.
 
 - **staging:** `members/{memberId}/draft/` — قبل از ثبت entity (مقاله، گروه، ویدیو، عضو)
-- **نهایی:** `content/{id}/`, `content-group/{id}/`, `videos/{id}/`, `members/{id}/` (آواتار), `site/` (عمومی)
+- **نهایی:** `content/{id}/`, `content-group/{id}/`, `videos/{id}/`, `playlists/{id}/`, `members/{id}/` (آواتار), `site/` (عمومی)
 - **promote:** در save/create، URLهای استفاده‌شده از draft به فولدر entity منتقل می‌شوند (`promote-media.ts`)
 - **بایگانی مقاله:** فقط `status` در DB — فایل‌ها در `content/{id}/` می‌مانند
 - **حذف دائمی:** purge فولدر `content/{id}/`
@@ -140,7 +140,7 @@ sequenceDiagram
 
 ## Settings hub
 
-`/admin/settings` — ۷ تب مجوزمحور (personal, site, theme, roles, modules, messages, database). تنظیمات بخش‌ها خارج از هاب: محتوا (`/admin/content/settings` با تب‌های «محتوا» و «موضوعات»)، اعضا، مدیا، گروه محتوا، ویدیو. دادهٔ تنظیمات در `site_settings` با ستون‌های JSON additive؛ پرچم `show_on_homepage` روی جدول `topics`.
+`/admin/settings` — ۷ تب مجوزمحور (personal, site, theme, roles, modules, messages, database). تنظیمات بخش‌ها خارج از هاب: محتوا (`/admin/content/settings` با تب‌های «محتوا» و «موضوعات»)، اعضا، مدیا، گروه محتوا، ویدیو (`/admin/videos/settings/video`) و لیست پخش ویدیو (`/admin/videos/settings/playlists`). دادهٔ تنظیمات در `site_settings` با ستون‌های JSON additive؛ پرچم `show_on_homepage` روی جدول `topics`.
 
 ## Public writes (فرم‌ها)
 

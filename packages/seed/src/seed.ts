@@ -21,6 +21,7 @@ import { articles as mockArticles } from "./fixtures/articles";
 import { authors as mockAuthors } from "./fixtures/authors";
 import { contentGroups as mockContentGroups } from "./fixtures/content-groups";
 import { messagesSettingsFixture } from "./fixtures/messages-settings";
+import { playlists as mockPlaylists } from "./fixtures/playlists";
 import { defaultRolePermissions, systemRoles } from "./fixtures/rbac";
 import { siteConfig as mockSiteConfig } from "./fixtures/site-config";
 import {
@@ -77,7 +78,9 @@ if (force) {
     "article_topics",
     "article_authors",
     "articles",
+    "video_playlists",
     "videos",
+    "playlists",
     "content_groups",
     "topics",
     "authors",
@@ -291,18 +294,51 @@ for (const article of mockArticles) {
   });
 }
 
+const playlistIdBySlug = new Map<string, number>();
+for (const playlist of mockPlaylists) {
+  const result = db
+    .insert(schema.playlists)
+    .values({
+      slug: playlist.slug,
+      name: playlist.name,
+      description: playlist.description,
+      coverSrc: playlist.cover.src,
+      coverAlt: playlist.cover.alt,
+    })
+    .returning({ id: schema.playlists.id })
+    .all();
+  playlistIdBySlug.set(playlist.slug, result[0].id);
+}
+
 for (const video of mockVideos) {
-  db.insert(schema.videos)
+  const result = db
+    .insert(schema.videos)
     .values({
       slug: video.slug,
       title: video.title,
       description: video.description,
       duration: video.duration,
+      status: video.status,
+      linkSource: video.linkSource,
+      externalLink: video.externalLink,
+      aparatUrl: video.aparatUrl ?? null,
       thumbnailSrc: video.thumbnail.src,
       thumbnailAlt: video.thumbnail.alt,
       publishedAt: video.publishedAt,
     })
-    .run();
+    .returning({ id: schema.videos.id })
+    .all();
+  const videoId = result[0]?.id;
+  if (!videoId) continue;
+  if (video.playlists.length > 0) {
+    const links = video.playlists
+      .map((playlist) => playlistIdBySlug.get(playlist.slug))
+      .filter((id): id is number => typeof id === "number")
+      .map((playlistId) => ({ videoId, playlistId }));
+    if (links.length > 0) {
+      db.insert(schema.videoPlaylists).values(links).run();
+    }
+  }
 }
 
 const mostReadSlugs = [

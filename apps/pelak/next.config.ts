@@ -93,6 +93,18 @@ const routeRedirects = [
 const nextConfig: NextConfig = {
   reactCompiler: true,
   output: "standalone",
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "static.cdn.asset.aparat.com",
+      },
+      {
+        protocol: "https",
+        hostname: "static.cdn.asset.aparat.cloud",
+      },
+    ],
+  },
   serverExternalPackages: ["better-sqlite3", "playwright-core"],
   outputFileTracingIncludes: {
     "/api/pdf/content/[id]": ["./lib/pdf/fonts/**/*", "./public/images/**/*"],

@@ -13,7 +13,7 @@
 | صندوق پیام‌ها (ادمین) | `/admin/messages`, `packages/studio/src/cms/{queries,mutations}/messages.ts` | `docs/STUDIO.md` |
 | mutation admin | `packages/studio/src/cms/mutations/` | `admin-studio.mdc` · `hokmran-studio` |
 | تنظیمات هاب | `/admin/settings/*` (۷ تب) | `settings-tabs.ts` |
-| تنظیمات بخش | `/admin/content/settings`, `/admin/members/settings`, تب مدیا، `/admin/content-group/settings`, `/admin/videos/settings` | `docs/STUDIO.md` |
+| تنظیمات بخش | `/admin/content/settings`, `/admin/members/settings`, تب مدیا، `/admin/content-group/settings`, `/admin/videos/settings/video`, `/admin/videos/settings/playlists` | `docs/STUDIO.md` |
 | query admin | `packages/studio/src/cms/queries/` | `hokmran-studio` |
 | schema DB | `packages/core/src/db/schema/` | `data-layer.mdc` |
 | type دامنه | `packages/contract/src/types/` | `monorepo.mdc` |

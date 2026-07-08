@@ -27,7 +27,7 @@
 
 شامل:
 - صفحات ثابت (`/`, `/content`, `/content-group`, `/members`, …)
-- مقالات، نویسنده‌ها، موضوعات، گروه‌های محتوا
+- مقالات، نویسنده‌ها، موضوعات، لیست‌های پخش و گروه‌های محتوا
 - **URL مستقیم PDF** گروه‌های محتوا (فقط وقتی `pdfSrc` دارند)
 - `lastModified` از `publishedAt` برای مقالات و گروه‌های محتوا
 
@@ -98,4 +98,4 @@ PDF آپلودشده canonical است؛ route تولیدی `/api/pdf/content-gro
 - Twitter Card metadata
 - `og:url` / `og:site_name` یکسان در همهٔ انواع محتوا
 - hreflang در صورت نسخهٔ انگلیسی
-- `VideoObject` JSON-LD برای ماژول ویدیو
+- `VideoObject` JSON-LD برای ماژول ویدیو (با `contentUrl` روی `externalLink` و `thumbnailUrl` از thumbnail)

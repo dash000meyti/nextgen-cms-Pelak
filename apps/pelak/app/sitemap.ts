@@ -1,5 +1,6 @@
 import {
   getAllAuthorSlugs,
+  getAllPlaylistSlugs,
   getAllTopicSlugs,
   getContentGroups,
   getPublishedArticleSitemapEntries,
@@ -11,13 +12,19 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hokmran.example";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [articleEntries, authorSlugs, topicSlugs, contentGroups] =
-    await Promise.all([
-      getPublishedArticleSitemapEntries(),
-      getAllAuthorSlugs(),
-      getAllTopicSlugs(),
-      getContentGroups(),
-    ]);
+  const [
+    articleEntries,
+    authorSlugs,
+    topicSlugs,
+    playlistSlugs,
+    contentGroups,
+  ] = await Promise.all([
+    getPublishedArticleSitemapEntries(),
+    getAllAuthorSlugs(),
+    getAllTopicSlugs(),
+    getAllPlaylistSlugs(),
+    getContentGroups(),
+  ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     "",
@@ -52,6 +59,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const playlistRoutes = playlistSlugs.map((slug: string) => ({
+    url: `${baseUrl}/playlists/${slug}`,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
   const contentGroupRoutes = contentGroups.map((group) => ({
     url: `${baseUrl}/content-group/${group.slug}`,
     lastModified: group.publishedAt,
@@ -73,6 +86,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...articleRoutes,
     ...authorRoutes,
     ...topicRoutes,
+    ...playlistRoutes,
     ...contentGroupRoutes,
     ...contentGroupPdfRoutes,
   ];

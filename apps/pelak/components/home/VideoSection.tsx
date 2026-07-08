@@ -17,7 +17,13 @@ export function VideoSection({ videos }: VideoSectionProps) {
         <SectionTitle title="ویدیوها" />
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {videos.map((video) => (
-            <Link key={video.slug} href="/video" className="group space-y-3">
+            <Link
+              key={video.slug}
+              href={video.externalLink || "/video"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group space-y-3"
+            >
               <div className="px-5 sm:px-0">
                 <div className="relative aspect-video overflow-hidden rounded bg-rule">
                   <Image

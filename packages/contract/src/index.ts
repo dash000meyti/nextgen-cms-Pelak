@@ -12,3 +12,4 @@ export * from "./types/media";
 export * from "./types/member";
 export * from "./types/site";
 export * from "./types/theme";
+export * from "./video-status";

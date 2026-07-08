@@ -59,9 +59,12 @@
 | اعضا | `/admin/members/settings` | `settings.members` |
 | مدیا | تب «تنظیمات» در `/admin/media` | `settings.media` |
 | گروه محتوا | `/admin/content-group/settings` | `modules.contentGroup.edit` |
-| ویدیو | `/admin/videos/settings` | `modules.video.edit` |
+| ویدیو (تب تنظیمات) | `/admin/videos/settings/video` | `modules.video.edit` |
+| لیست پخش ویدیو (تب) | `/admin/videos/settings/playlists` | `modules.video.edit` |
 
 تنظیمات محتوا **۲ تب** دارد (`packages/studio/src/admin/content-settings-tabs.ts`): «محتوا» و «موضوعات». `/admin/content/settings` به تب محتوا redirect می‌شود. CRUD موضوع (`/admin/content/topics/new`, `.../edit`) جدا از تب‌هاست.
+
+تنظیمات ویدیو هم **۲ تب** دارد (`packages/studio/src/admin/video-settings-tabs.ts`): «تنظیمات» و «لیست پخش». `/admin/videos/settings` به تب تنظیمات redirect می‌شود. CRUD لیست پخش در مسیرهای `/admin/videos/playlists/new`, `/admin/videos/playlists/[id]/edit` انجام می‌شود.
 
 مسیرهای قدیم (`/admin/settings/content`, `/admin/settings/topics`, …) → redirect.
 
@@ -70,7 +73,7 @@
 | مسیر | نقش |
 |------|-----|
 | `/admin/content-group` | CRUD گروه‌های محتوا — `modules.contentGroup.*` |
-| `/admin/videos` | CRUD ویدیوها — `modules.video.*` |
+| `/admin/videos` | CRUD ویدیوها + فیلتر وضعیت (پیش‌نویس/منتشرشده/بایگانی) — `modules.video.*` |
 
 ## لایهٔ CMS (monorepo)
 
@@ -124,7 +127,7 @@ packages/core/src/db/repositories/ — نوشتن DB
 
 تنظیمات بخش ماژول (ستون‌های جدا):
 - `content_group_module_settings`: `pageTitle`, `itemsPerPage`, `showInMenu`
-- `video_module_settings`: `pageTitle`, `itemsPerPage`
+- `video_module_settings`: `pageTitle`, `itemsPerPage`, `showInMenu`
 - `media_settings`: `maxImageBytes` (پیش‌فرض 10MB), `maxPdfBytes` (پیش‌فرض 25MB), `allowedMime`, `pipeline`
 
 برچسب پیش‌فرض: `packages/contract/src/modules/labels.ts` + `modulePermissionGroups`
@@ -160,6 +163,7 @@ members/{memberId}/draft/  staging قبل از ثبت entity (private)
 content/{articleId}/       مدیا مقاله (public فقط وقتی status=published)
 content-group/{groupId}/   جلد + PDF گروه محتوا (public؛ یک PDF با نام SEO)
 videos/{videoId}/          بندانگشتی ویدیو (public)
+playlists/{playlistId}/    کاور لیست پخش (public)
 ```
 
 ### جریان آپلود

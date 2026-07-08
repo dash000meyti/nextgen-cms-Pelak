@@ -39,6 +39,13 @@ export {
   saveMessageStatus,
 } from "@nextgen-cms/studio/cms/mutations/message";
 export {
+  createPlaylist,
+  createPlaylistAndRedirect,
+  deletePlaylist,
+  type PlaylistFormData,
+  savePlaylist,
+} from "@nextgen-cms/studio/cms/mutations/playlist";
+export {
   type MutationResult,
   requireAdmin,
 } from "@nextgen-cms/studio/cms/mutations/require-admin";
@@ -70,8 +77,14 @@ export {
   type TopicFormData,
 } from "@nextgen-cms/studio/cms/mutations/topic";
 export {
+  archiveVideo,
   createVideo,
   createVideoAndRedirect,
+  publishVideo,
+  removeVideo,
+  resolveAparatFromUrl,
+  restoreVideoFromArchive,
   saveVideo,
+  unpublishVideo,
   type VideoFormData,
 } from "@nextgen-cms/studio/cms/mutations/video";

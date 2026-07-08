@@ -3,6 +3,7 @@ import {
   isContentGroupMediaPath,
   isMemberAvatarPath,
   isMemberDraftPath,
+  isPlaylistMediaPath,
   isSiteMediaPath,
   isVideoMediaPath,
   parseContentIdFromPath,
@@ -27,6 +28,9 @@ export function classifyUploadPath(relativePath: string): UploadServeDecision {
     return { access: "public" };
   }
   if (isVideoMediaPath(relativePath)) {
+    return { access: "public" };
+  }
+  if (isPlaylistMediaPath(relativePath)) {
     return { access: "public" };
   }
   const contentId = parseContentIdFromPath(relativePath);

@@ -1,7 +1,10 @@
 # syntax=docker/dockerfile:1
+# bookworm-slim: avoids Alpine APK DNS/CDN failures on some build hosts (e.g. Hamdocker).
 
-FROM node:22-alpine AS deps
-RUN apk add --no-cache python3 make g++
+FROM node:22-bookworm-slim AS deps
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ \
+  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/pelak/package.json ./apps/pelak/
@@ -13,15 +16,18 @@ COPY packages/studio/package.json ./packages/studio/
 COPY packages/seed/package.json ./packages/seed/
 RUN npm ci
 
-FROM node:22-alpine AS build
+FROM node:22-bookworm-slim AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build -w @nextgen-cms/pelak
 
-FROM node:22-alpine AS runner
-RUN apk add --no-cache wget su-exec chromium nss freetype harfbuzz ca-certificates ttf-freefont
+FROM node:22-bookworm-slim AS runner
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    wget gosu chromium ca-certificates fonts-freefont-ttf \
+  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -30,10 +36,10 @@ ENV DATABASE_URL=file:/data/pelak.sqlite
 ENV MIGRATIONS_DIR=/app/packages/core/drizzle/migrations
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
-ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
 
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+RUN groupadd --system --gid 1001 nodejs \
+  && useradd --system --uid 1001 --gid nodejs --shell /usr/sbin/nologin nextjs
 
 COPY --from=build /app/apps/pelak/public ./apps/pelak/public
 COPY --from=build /app/apps/pelak/lib/pdf/fonts ./apps/pelak/lib/pdf/fonts

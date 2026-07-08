@@ -179,6 +179,12 @@ npm run dev
 
 `npm run build` به DB نیاز ندارد.
 
+## Docker image
+
+- Base image: `node:22-bookworm-slim` (Debian) — برای پایداری build روی هاست‌هایی که DNS به mirrorهای Alpine (`dl-cdn.alpinelinux.org`) مشکل دارد.
+- native modules (`better-sqlite3`) در همان libc (glibc) کامپایل و اجرا می‌شوند.
+- PDF: `chromium` از مخزن Debian؛ مسیر پیش‌فرض `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium`.
+
 ## محدودیت حجم آپلود (Server Actions)
 
 آپلود مدیا از Server Action روی مسیرهای `/admin/*` انجام می‌شود. در `apps/pelak/next.config.ts`:

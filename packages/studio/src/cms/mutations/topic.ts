@@ -16,6 +16,7 @@ import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-per
 import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
 import { assertUniqueSlug } from "@nextgen-cms/studio/cms/queries/slug";
 import {
+  normalizeSlugInput,
   validateRequired,
   validateSlug,
 } from "@nextgen-cms/studio/cms/validation";
@@ -41,7 +42,7 @@ function handleMutationError(error: unknown): MutationResult {
 
 function parseFormData(data: TopicFormData): TopicWriteInput {
   return {
-    slug: data.slug.trim(),
+    slug: normalizeSlugInput(data.slug),
     name: data.name.trim(),
     description: data.description.trim(),
     showOnHomepage: data.showOnHomepage,

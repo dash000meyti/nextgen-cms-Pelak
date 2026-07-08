@@ -5,6 +5,7 @@ import {
 } from "@nextgen-cms/site-data/get-content";
 import { requireFeatureModule } from "@nextgen-cms/site-data/require-feature-module";
 import { notFound, permanentRedirect } from "next/navigation";
+import { encodeSlugSegment } from "@/lib/slug";
 
 type ShortLinkPageProps = {
   params: Promise<{ code: string }>;
@@ -18,11 +19,11 @@ export default async function ShortLinkPage({ params }: ShortLinkPageProps) {
   if (parsed.kind === "content") {
     const result = await getPublishedArticleById(parsed.id);
     if (!result) notFound();
-    permanentRedirect(`/content/${result.slug}`);
+    permanentRedirect(`/content/${encodeSlugSegment(result.slug)}`);
   }
 
   await requireFeatureModule("contentGroup");
   const group = await getContentGroupById(parsed.id);
   if (!group) notFound();
-  permanentRedirect(`/content-group/${group.slug}`);
+  permanentRedirect(`/content-group/${encodeSlugSegment(group.slug)}`);
 }

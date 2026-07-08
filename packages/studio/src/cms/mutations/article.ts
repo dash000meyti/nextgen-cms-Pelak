@@ -36,6 +36,7 @@ import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-per
 import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
 import { assertUniqueSlug } from "@nextgen-cms/studio/cms/queries/slug";
 import {
+  normalizeSlugInput,
   parseArticleBlocks,
   validateArticleBlocks,
   validateImageMeta,
@@ -81,7 +82,7 @@ function handleMutationError(error: unknown): MutationResult {
 
 function parseFormData(data: ArticleFormData): ArticleWriteInput {
   return {
-    slug: data.slug.trim(),
+    slug: normalizeSlugInput(data.slug),
     title: data.title.trim(),
     subtitle: data.subtitle.trim(),
     excerpt: data.excerpt.trim(),

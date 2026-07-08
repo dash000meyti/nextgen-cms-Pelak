@@ -14,9 +14,11 @@
 
 - اعتبارسنجی: `packages/studio/src/cms/validation/slug.ts`
 - الگو: حروف **فارسی یا لاتین**، اعداد، خط تیره — `[\p{Script=Arabic}a-z0-9]+(?:-…)*`
-- `slugifyTitle()` از عنوان فارسی نامک می‌سازد (فاصله/ZWNJ → `-`)
+- نرمال‌سازی canonical: `normalizeSlugInput()` (Unicode NFKC + lowercase + حذف کاراکترهای نامرئی + فاصله‌ها → `-` + collapse دَش‌ها + trim دَش ابتدا/انتها)
+- `slugifyTitle()` از عنوان فارسی نامک می‌سازد و از همان policy canonical استفاده می‌کند
 - نامک‌های رزرو (`admin`, `api`, `content-group`, …) همچنان لاتین و مسدود
-- URL عمومی: `/content/[slug]` — Next.js segment را encode می‌کند
+- URL عمومی: `/content/[slug]` و مسیرهای مشابه، segment را با `encodeURIComponent` تولید می‌کنند
+- ورودی routeهای داینامیک قبل از lookup با decode/normalize بررسی می‌شود؛ در صورت mismatch با slug canonical، ریدایرکت دائمی `301` انجام می‌شود
 
 ## Sitemap و robots
 
@@ -30,6 +32,7 @@
 - مقالات، نویسنده‌ها، موضوعات، لیست‌های پخش و گروه‌های محتوا
 - **URL مستقیم PDF** گروه‌های محتوا (فقط وقتی `pdfSrc` دارند)
 - `lastModified` از `publishedAt` برای مقالات و گروه‌های محتوا
+- segmentهای slug در sitemap به‌صورت `encodeURIComponent` ساخته می‌شوند
 
 `robots.txt` مسیرهای `/admin`، `/p/` و `/api/pdf/` را disallow می‌کند.
 

@@ -5,13 +5,18 @@ import {
   getVideosByPlaylist,
 } from "@nextgen-cms/site-data/get-content";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { SectionHeader } from "@/components/article/SectionHeader";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Container } from "@/components/layout/Container";
 import { ListPagination } from "@/components/ui/ListPagination";
 import { VideoCard } from "@/components/video/VideoCard";
 import { VideoCardGrid } from "@/components/video/VideoCardGrid";
+import {
+  decodeSlugSegment,
+  encodeSlugSegment,
+  findBySlugCandidates,
+} from "@/lib/slug";
 
 type PlaylistPageProps = {
   params: Promise<{ slug: string }>;
@@ -22,7 +27,10 @@ export async function generateMetadata({
   params,
 }: PlaylistPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const playlist = await getPlaylistBySlug(slug);
+  const { entity: playlist } = await findBySlugCandidates(
+    slug,
+    getPlaylistBySlug,
+  );
   if (!playlist) return { title: "لیست پخش یافت نشد" };
   return {
     title: playlist.name,
@@ -40,9 +48,16 @@ export default async function PlaylistPage({
     searchParams,
     getVideoModuleSettings(),
   ]);
-  const playlist = await getPlaylistBySlug(slug);
+  const decodedSlug = decodeSlugSegment(slug);
+  const { entity: playlist } = await findBySlugCandidates(
+    slug,
+    getPlaylistBySlug,
+  );
   if (!playlist) notFound();
-  const allVideos = await getVideosByPlaylist(slug);
+  if (decodedSlug !== playlist.slug) {
+    permanentRedirect(`/playlists/${encodeSlugSegment(playlist.slug)}`);
+  }
+  const allVideos = await getVideosByPlaylist(playlist.slug);
   const page = parsePageParam(query.page);
   const { items: videos, totalPages } = paginateItems(allVideos, {
     page,
@@ -71,7 +86,7 @@ export default async function PlaylistPage({
       <ListPagination
         page={page}
         totalPages={totalPages}
-        basePath={`/playlists/${slug}`}
+        basePath={`/playlists/${encodeSlugSegment(playlist.slug)}`}
       />
     </Container>
   );

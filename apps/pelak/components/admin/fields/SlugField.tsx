@@ -1,6 +1,9 @@
 "use client";
 
-import { slugifyTitle } from "@nextgen-cms/studio/cms/validation";
+import {
+  normalizeSlugInput,
+  slugifyTitle,
+} from "@nextgen-cms/studio/cms/validation";
 import { useEffect, useRef } from "react";
 
 type SlugFieldProps = {
@@ -41,7 +44,7 @@ export function SlugField({
         value={value}
         onChange={(e) => {
           touched.current = true;
-          onChange(e.target.value);
+          onChange(normalizeSlugInput(e.target.value));
         }}
         required={required}
         className="w-full rounded border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent"

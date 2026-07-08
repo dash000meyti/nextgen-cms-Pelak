@@ -5,13 +5,18 @@ import {
   getTopicBySlug,
 } from "@nextgen-cms/site-data/get-content";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArticleCard } from "@/components/article/ArticleCard";
 import { ArticleCardGrid } from "@/components/article/ArticleCardGrid";
 import { SectionHeader } from "@/components/article/SectionHeader";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Container } from "@/components/layout/Container";
 import { ListPagination } from "@/components/ui/ListPagination";
+import {
+  decodeSlugSegment,
+  encodeSlugSegment,
+  findBySlugCandidates,
+} from "@/lib/slug";
 
 type TopicPageProps = {
   params: Promise<{ slug: string }>;
@@ -22,7 +27,7 @@ export async function generateMetadata({
   params,
 }: TopicPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const topic = await getTopicBySlug(slug);
+  const { entity: topic } = await findBySlugCandidates(slug, getTopicBySlug);
   if (!topic) return { title: "موضوع یافت نشد" };
   return {
     title: topic.name,
@@ -40,10 +45,14 @@ export default async function TopicPage({
     searchParams,
     getContentSettings(),
   ]);
-  const topic = await getTopicBySlug(slug);
+  const decodedSlug = decodeSlugSegment(slug);
+  const { entity: topic } = await findBySlugCandidates(slug, getTopicBySlug);
   if (!topic) notFound();
+  if (decodedSlug !== topic.slug) {
+    permanentRedirect(`/topics/${encodeSlugSegment(topic.slug)}`);
+  }
 
-  const articles = await getArticlesByTopic(slug);
+  const articles = await getArticlesByTopic(topic.slug);
   const page = parsePageParam(query.page);
   const { items: pageArticles, totalPages } = paginateItems(articles, {
     page,
@@ -70,7 +79,7 @@ export default async function TopicPage({
       <ListPagination
         page={page}
         totalPages={totalPages}
-        basePath={`/topics/${slug}`}
+        basePath={`/topics/${encodeSlugSegment(topic.slug)}`}
       />
     </Container>
   );

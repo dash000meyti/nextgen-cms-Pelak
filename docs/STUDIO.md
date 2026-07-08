@@ -89,6 +89,13 @@ packages/core/src/db/repositories/ — نوشتن DB
 - Public فقط `@nextgen-cms/site-data`
 - Studio هرگز `components/home/` یا `components/article/` import نکند
 
+## سیاست slug (canonical)
+
+- منبع policy: `packages/studio/src/cms/validation/slug.ts`
+- ترتیب استاندارد در mutationهای slugدار: `normalizeSlugInput()` → `validateSlug()` → `assertUniqueSlug()` → write
+- `SlugField` در admin هم‌راستا با سرور، ورودی slug را همان لحظه canonical می‌کند (فاصله‌ها به `-`)
+- slug فارسی/یونیکد حفظ می‌شود (بدون transliteration اجباری)
+
 ## RBAC
 
 - مجوزها: `packages/contract/src/permissions.ts` — `resource.action` (مثلاً `settings.roles`)

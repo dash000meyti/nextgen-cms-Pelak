@@ -11,8 +11,13 @@ import {
   getSiteConfig,
 } from "@nextgen-cms/site-data/get-content";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArticleDetailView } from "@/components/article/ArticleDetailView";
+import {
+  decodeSlugSegment,
+  encodeSlugSegment,
+  findBySlugCandidates,
+} from "@/lib/slug";
 
 type ArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -22,7 +27,10 @@ export async function generateMetadata({
   params,
 }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const { entity: article } = await findBySlugCandidates(
+    slug,
+    getArticleBySlug,
+  );
 
   if (!article) return { title: "محتوا یافت نشد" };
 
@@ -32,7 +40,7 @@ export async function generateMetadata({
     title: article.title,
     description: article.excerpt,
     alternates: {
-      canonical: `${baseUrl}/content/${slug}`,
+      canonical: `${baseUrl}/content/${encodeSlugSegment(article.slug)}`,
     },
     openGraph: {
       title: article.title,
@@ -44,11 +52,18 @@ export async function generateMetadata({
 
 export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const decodedSlug = decodeSlugSegment(slug);
+  const { entity: article } = await findBySlugCandidates(
+    slug,
+    getArticleBySlug,
+  );
 
   if (!article) notFound();
+  if (decodedSlug !== article.slug) {
+    permanentRedirect(`/content/${encodeSlugSegment(article.slug)}`);
+  }
 
-  const related = await getRelatedArticles(slug, 4);
+  const related = await getRelatedArticles(article.slug, 4);
   const [
     currentContentGroup,
     siteConfig,
@@ -57,13 +72,13 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   ] = await Promise.all([
     getCurrentContentGroup(),
     getSiteConfig(),
-    getArticleShareMetaBySlug(slug),
+    getArticleShareMetaBySlug(article.slug),
     getContentGroupModuleSettings(),
   ]);
 
   const shareUrl = shareMeta
     ? buildContentShortPath(shareMeta.id)
-    : `/content/${slug}`;
+    : `/content/${encodeSlugSegment(article.slug)}`;
   const pdfDownloadUrl = shareMeta
     ? buildContentPdfPath(shareMeta.id)
     : undefined;

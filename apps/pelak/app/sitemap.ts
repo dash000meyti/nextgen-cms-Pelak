@@ -6,6 +6,7 @@ import {
   getPublishedArticleSitemapEntries,
 } from "@nextgen-cms/site-data/get-content";
 import type { MetadataRoute } from "next";
+import { encodeSlugSegment } from "@/lib/slug";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hokmran.example";
 
@@ -41,32 +42,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const articleRoutes = articleEntries.map((entry) => ({
-    url: `${baseUrl}/content/${entry.slug}`,
+    url: `${baseUrl}/content/${encodeSlugSegment(entry.slug)}`,
     lastModified: entry.publishedAt,
     changeFrequency: "weekly" as const,
     priority: 0.9,
   }));
 
   const authorRoutes = authorSlugs.map((slug: string) => ({
-    url: `${baseUrl}/members/${slug}`,
+    url: `${baseUrl}/members/${encodeSlugSegment(slug)}`,
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
 
   const topicRoutes = topicSlugs.map((slug: string) => ({
-    url: `${baseUrl}/topics/${slug}`,
+    url: `${baseUrl}/topics/${encodeSlugSegment(slug)}`,
     changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
 
   const playlistRoutes = playlistSlugs.map((slug: string) => ({
-    url: `${baseUrl}/playlists/${slug}`,
+    url: `${baseUrl}/playlists/${encodeSlugSegment(slug)}`,
     changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
 
   const contentGroupRoutes = contentGroups.map((group) => ({
-    url: `${baseUrl}/content-group/${group.slug}`,
+    url: `${baseUrl}/content-group/${encodeSlugSegment(group.slug)}`,
     lastModified: group.publishedAt,
     changeFrequency: "monthly" as const,
     priority: 0.7,

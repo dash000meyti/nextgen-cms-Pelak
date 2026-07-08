@@ -31,6 +31,7 @@ import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-per
 import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
 import { assertUniqueSlug } from "@nextgen-cms/studio/cms/queries/slug";
 import {
+  normalizeSlugInput,
   validateImageMeta,
   validateRequired,
   validateSlug,
@@ -88,7 +89,7 @@ function parseFormData(
   data: MemberFormData,
 ): Omit<MemberAdminWriteInput, "passwordHash"> & { password?: string } {
   return {
-    slug: data.slug.trim(),
+    slug: normalizeSlugInput(data.slug),
     name: data.name.trim(),
     username: data.username.trim(),
     displayRole: data.displayRole.trim(),

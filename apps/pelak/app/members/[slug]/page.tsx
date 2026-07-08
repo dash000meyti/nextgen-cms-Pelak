@@ -5,13 +5,18 @@ import {
 } from "@nextgen-cms/site-data/get-content";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArticleCard } from "@/components/article/ArticleCard";
 import { ArticleCardGrid } from "@/components/article/ArticleCardGrid";
 import { SectionTitle } from "@/components/article/SectionHeader";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Container } from "@/components/layout/Container";
 import { SocialLinks } from "@/components/ui/SocialLinks";
+import {
+  decodeSlugSegment,
+  encodeSlugSegment,
+  findBySlugCandidates,
+} from "@/lib/slug";
 
 type MemberPageProps = {
   params: Promise<{ slug: string }>;
@@ -21,10 +26,11 @@ export async function generateMetadata({
   params,
 }: MemberPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const [member, siteConfig] = await Promise.all([
-    getMemberBySlug(slug),
+  const [resolved, siteConfig] = await Promise.all([
+    findBySlugCandidates(slug, getMemberBySlug),
     getSiteConfig(),
   ]);
+  const member = resolved.entity;
   if (!member) return { title: `${siteConfig.memberLabel} یافت نشد` };
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hokmran.example";
@@ -33,7 +39,7 @@ export async function generateMetadata({
     title: member.name,
     description: member.bio,
     alternates: {
-      canonical: `${baseUrl}/members/${slug}`,
+      canonical: `${baseUrl}/members/${encodeSlugSegment(member.slug)}`,
     },
     openGraph: { title: member.name, description: member.bio },
   };
@@ -41,13 +47,18 @@ export async function generateMetadata({
 
 export default async function MemberPage({ params }: MemberPageProps) {
   const { slug } = await params;
-  const [member, articles, siteConfig] = await Promise.all([
-    getMemberBySlug(slug),
-    getArticlesByMember(slug),
-    getSiteConfig(),
-  ]);
+  const decodedSlug = decodeSlugSegment(slug);
+  const { entity: member } = await findBySlugCandidates(slug, getMemberBySlug);
 
   if (!member) notFound();
+  if (decodedSlug !== member.slug) {
+    permanentRedirect(`/members/${encodeSlugSegment(member.slug)}`);
+  }
+
+  const [articles, siteConfig] = await Promise.all([
+    getArticlesByMember(member.slug),
+    getSiteConfig(),
+  ]);
 
   const socials = member.social
     ? siteConfig.socialLinks.filter((link) =>

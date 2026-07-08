@@ -20,6 +20,7 @@ import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access
 import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-permission";
 import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
 import {
+  normalizeSlugInput,
   validateRequired,
   validateSlug,
 } from "@nextgen-cms/studio/cms/validation";
@@ -80,13 +81,15 @@ async function validateRoleForm(
   data: RoleFormData,
   options: { mode: "create" | "edit"; excludeId?: number },
 ): Promise<string | undefined> {
+  const normalizedSlug = normalizeSlugInput(data.slug);
+
   const nameError = validateRequired(data.name, "نام");
   if (nameError) return nameError;
 
-  const slugError = validateSlug(data.slug);
+  const slugError = validateSlug(normalizedSlug);
   if (slugError) return slugError;
 
-  if (await roleSlugExists(data.slug, options.excludeId)) {
+  if (await roleSlugExists(normalizedSlug, options.excludeId)) {
     return "این شناسه قبلاً استفاده شده است.";
   }
 
@@ -110,8 +113,9 @@ export async function createRole(data: RoleFormData): Promise<MutationResult> {
   if (error) return { ok: false, error };
 
   try {
+    const normalizedSlug = normalizeSlugInput(data.slug);
     const id = await insertRole({
-      slug: data.slug.trim(),
+      slug: normalizedSlug,
       name: data.name.trim(),
       description: data.description.trim(),
       isSystem: false,

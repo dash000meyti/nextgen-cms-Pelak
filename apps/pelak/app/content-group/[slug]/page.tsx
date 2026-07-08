@@ -11,7 +11,7 @@ import {
 import { requireFeatureModule } from "@nextgen-cms/site-data/require-feature-module";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArticleListItem } from "@/components/article/ArticleListItem";
 import { SectionTitle } from "@/components/article/SectionHeader";
 import { ContentGroupEditionNav } from "@/components/content-group/ContentGroupEditionNav";
@@ -20,6 +20,11 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Container } from "@/components/layout/Container";
 import { JalaliDate } from "@/components/ui/JalaliDate";
 import { ShareBar } from "@/components/ui/ShareBar";
+import {
+  decodeSlugSegment,
+  encodeSlugSegment,
+  findBySlugCandidates,
+} from "@/lib/slug";
 
 type ContentGroupPageProps = {
   params: Promise<{ slug: string }>;
@@ -49,10 +54,11 @@ export async function generateMetadata({
   params,
 }: ContentGroupPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const [group, siteConfig] = await Promise.all([
-    getContentGroupBySlug(slug),
+  const [resolved, siteConfig] = await Promise.all([
+    findBySlugCandidates(slug, getContentGroupBySlug),
     getSiteConfig(),
   ]);
+  const group = resolved.entity;
   if (!group) return { title: "گروه محتوا یافت نشد" };
 
   const pageUrl = `${baseUrl}/content-group/${group.slug}`;
@@ -93,14 +99,21 @@ export default async function ContentGroupPage({
 }: ContentGroupPageProps) {
   await requireFeatureModule("contentGroup");
   const { slug } = await params;
-  const [group, allSlugs, contentGroupModuleSettings, siteConfig] =
-    await Promise.all([
-      getContentGroupBySlug(slug),
-      getAllContentGroupSlugs(),
-      getContentGroupModuleSettings(),
-      getSiteConfig(),
-    ]);
+  const decodedSlug = decodeSlugSegment(slug);
+  const { entity: group } = await findBySlugCandidates(
+    slug,
+    getContentGroupBySlug,
+  );
   if (!group) notFound();
+  if (decodedSlug !== group.slug) {
+    permanentRedirect(`/content-group/${encodeSlugSegment(group.slug)}`);
+  }
+
+  const [allSlugs, contentGroupModuleSettings, siteConfig] = await Promise.all([
+    getAllContentGroupSlugs(),
+    getContentGroupModuleSettings(),
+    getSiteConfig(),
+  ]);
 
   const pageUrl = `${baseUrl}/content-group/${group.slug}`;
   const pdfUrl = group.pdfSrc ? absoluteUrl(group.pdfSrc) : undefined;
@@ -129,7 +142,10 @@ export default async function ContentGroupPage({
       : {}),
   };
 
-  const { prevSlug, nextSlug } = adjacentContentGroupSlugs(allSlugs, slug);
+  const { prevSlug, nextSlug } = adjacentContentGroupSlugs(
+    allSlugs,
+    group.slug,
+  );
 
   const [prevGroup, nextGroup] = await Promise.all([
     prevSlug != null ? getContentGroupBySlug(prevSlug) : undefined,

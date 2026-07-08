@@ -110,5 +110,7 @@ export const exampleSchema = {
 ## Slug
 
 - الگو: حروف فارسی یا لاتین، اعداد، خط تیره — `[\p{Script=Arabic}a-z0-9]+(?:-…)*`
+- نرمال‌سازی canonical قبل از validate/save: Unicode NFKC، lowercase، حذف کاراکترهای نامرئی (مثل ZWNJ در slug)، تبدیل whitespace به `-`، collapse دَش‌ها، trim دَش ابتدا/انتها
+- ورودی‌های دارای فاصله با همین policy به `-` تبدیل می‌شوند
 - یکتا: `assertUniqueSlug()` در mutation
 - جزئیات SEO: `docs/SEO.md`

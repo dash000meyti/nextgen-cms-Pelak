@@ -11,6 +11,11 @@ import { buildContentGroupPdfHtml } from "@/lib/pdf/html/content-group";
 import { renderHtmlToPdf } from "@/lib/pdf/render-html-pdf";
 import { resolveArticleBlocks } from "@/lib/pdf/resolve-blocks";
 import { getSiteBaseUrl, resolvePdfImageSrc } from "@/lib/pdf/resolve-image";
+import {
+  decodeSlugSegment,
+  encodeSlugSegment,
+  findBySlugCandidates,
+} from "@/lib/slug";
 
 export const dynamic = "force-dynamic";
 
@@ -25,13 +30,21 @@ export async function GET(
   await requireFeatureModule("contentGroup");
 
   const { slug } = await params;
-  if (!slug.trim()) notFound();
+  const decodedSlug = decodeSlugSegment(slug);
+  if (!decodedSlug.trim()) notFound();
 
-  const [group, siteConfig] = await Promise.all([
-    getContentGroupBySlug(slug),
+  const [resolved, siteConfig] = await Promise.all([
+    findBySlugCandidates(slug, getContentGroupBySlug),
     getSiteConfig(),
   ]);
+  const group = resolved.entity;
   if (!group) notFound();
+  if (decodedSlug !== group.slug) {
+    return NextResponse.redirect(
+      `/api/pdf/content-group/${encodeSlugSegment(group.slug)}`,
+      { status: 301 },
+    );
+  }
 
   const siteUrl = getSiteBaseUrl();
   const base = siteUrl.replace(/\/$/, "");

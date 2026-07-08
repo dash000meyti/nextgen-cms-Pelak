@@ -3,7 +3,7 @@ import {
   currentJalaliYear,
   todayIsoIran,
 } from "@nextgen-cms/core/platform/datetime";
-import { getContentGroupModuleSettings } from "@nextgen-cms/site-data/get-content";
+import { getContentGroupModuleSettings, getMediaSettings } from "@nextgen-cms/site-data/get-content";
 import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
 import type { ContentGroupFormData } from "@nextgen-cms/studio/cms/mutations/content-group";
 import { ContentGroupForm } from "@/components/admin/studio/ContentGroupForm";
@@ -11,6 +11,7 @@ import { ContentGroupForm } from "@/components/admin/studio/ContentGroupForm";
 export default async function NewContentGroupPage() {
   await requirePermission("modules.contentGroup.create");
   const settings = await getContentGroupModuleSettings();
+  const mediaSettings = await getMediaSettings();
   const period = settings.period;
   const labels = sectionAdminLabels(settings.pageTitle);
 
@@ -32,8 +33,8 @@ export default async function NewContentGroupPage() {
         mode="create"
         initial={EMPTY_FORM}
         contentGroupPeriod={period}
-        maxImageBytes={settings.maxImageBytes}
-        maxPdfBytes={settings.maxPdfBytes}
+        maxImageBytes={mediaSettings.maxImageBytes}
+        maxPdfBytes={mediaSettings.maxPdfBytes}
       />
     </div>
   );

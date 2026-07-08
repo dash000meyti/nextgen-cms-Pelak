@@ -18,9 +18,23 @@ export function clearMediaSettingsCache() {
   cached = null;
 }
 
-export async function getMaxUploadBytes(): Promise<number> {
+export async function getMaxImageBytes(): Promise<number> {
   const settings = await getMediaSettings();
-  return settings.maxBytes;
+  return settings.maxImageBytes;
+}
+
+export async function getMaxPdfBytes(): Promise<number> {
+  const settings = await getMediaSettings();
+  return settings.maxPdfBytes;
+}
+
+export async function resolveMaxBytesForMime(
+  mimeType: string,
+): Promise<number> {
+  const settings = await getMediaSettings();
+  if (mimeType === "application/pdf") return settings.maxPdfBytes;
+  if (mimeType.startsWith("image/")) return settings.maxImageBytes;
+  return settings.maxImageBytes;
 }
 
 export async function isMimeAllowed(mimeType: string): Promise<boolean> {

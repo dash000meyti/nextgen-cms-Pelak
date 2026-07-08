@@ -185,12 +185,12 @@ npm run dev
 
 ```ts
 experimental: {
-  proxyClientMaxBodySize: "30mb",  // باید ≥ maxPdfBytes گروه محتوا
+  proxyClientMaxBodySize: "30mb",  // باید ≥ maxPdfBytes تنظیمات مدیا
   serverActions: { bodySizeLimit: "30mb" },
 }
 ```
 
-اگر `maxPdfBytes` در `/admin/content-group/settings` افزایش یابد، هر دو مقدار config را هم بالاتر ببرید. جزئیات: `docs/SEO.md`.
+اگر `maxPdfBytes` در `/admin/media?tab=settings` افزایش یابد، هر دو مقدار config را هم بالاتر ببرید. جزئیات: `docs/SEO.md`.
 
 ## دستورات مفید
 

@@ -1,5 +1,5 @@
 import { sectionAdminLabels } from "@nextgen-cms/contract/modules/labels";
-import { getContentGroupModuleSettings } from "@nextgen-cms/site-data/get-content";
+import { getContentGroupModuleSettings, getMediaSettings } from "@nextgen-cms/site-data/get-content";
 import { requirePermission } from "@nextgen-cms/studio/admin/require-permission";
 import type { ContentGroupFormData } from "@nextgen-cms/studio/cms/mutations/content-group";
 import { getContentGroupForAdmin } from "@nextgen-cms/studio/cms/queries";
@@ -20,6 +20,7 @@ export default async function EditContentGroupPage({ params }: PageProps) {
   if (!group) notFound();
 
   const settings = await getContentGroupModuleSettings();
+  const mediaSettings = await getMediaSettings();
   const labels = sectionAdminLabels(settings.pageTitle);
 
   const initial: ContentGroupFormData = {
@@ -41,8 +42,8 @@ export default async function EditContentGroupPage({ params }: PageProps) {
         contentGroupId={contentGroupId}
         initial={initial}
         contentGroupPeriod={settings.period}
-        maxImageBytes={settings.maxImageBytes}
-        maxPdfBytes={settings.maxPdfBytes}
+        maxImageBytes={mediaSettings.maxImageBytes}
+        maxPdfBytes={mediaSettings.maxPdfBytes}
       />
     </div>
   );

@@ -72,8 +72,6 @@ export const DEFAULT_CONTENT_GROUP_MODULE_SETTINGS: ContentGroupModuleSettings =
     itemsPerPage: 12,
     showInMenu: true,
     groupByYear: false,
-    maxImageBytes: 10 * 1024 * 1024,
-    maxPdfBytes: 25 * 1024 * 1024,
   };
 
 export const DEFAULT_VIDEO_MODULE_SETTINGS: VideoModuleSettings = {
@@ -142,8 +140,6 @@ export function normalizeContentGroupModuleSettings(
     period,
     ...normalizeSectionListSettings(stored, defaults),
     groupByYear: stored?.groupByYear ?? defaults.groupByYear,
-    maxImageBytes: stored?.maxImageBytes ?? defaults.maxImageBytes,
-    maxPdfBytes: stored?.maxPdfBytes ?? defaults.maxPdfBytes,
   };
 }
 
@@ -166,7 +162,8 @@ export function normalizeVideoModuleSettings(
 }
 
 export const DEFAULT_MEDIA_SETTINGS: MediaSettings = {
-  maxBytes: 10 * 1024 * 1024,
+  maxImageBytes: 10 * 1024 * 1024,
+  maxPdfBytes: 25 * 1024 * 1024,
   allowedMime: [
     "image/jpeg",
     "image/png",
@@ -176,6 +173,39 @@ export const DEFAULT_MEDIA_SETTINGS: MediaSettings = {
   ],
   pipeline: { stripMetadata: false, generateWebp: false },
 };
+
+type LegacyMediaSettings = Partial<MediaSettings> & { maxBytes?: number };
+type LegacyContentGroupModuleSettings = Partial<ContentGroupModuleSettings> & {
+  maxImageBytes?: number;
+  maxPdfBytes?: number;
+};
+
+export function normalizeMediaSettings(
+  stored: LegacyMediaSettings | null | undefined,
+  legacyContentGroup?: LegacyContentGroupModuleSettings | null,
+): MediaSettings {
+  const defaults = DEFAULT_MEDIA_SETTINGS;
+  const maxImageBytes =
+    stored?.maxImageBytes ??
+    stored?.maxBytes ??
+    legacyContentGroup?.maxImageBytes ??
+    defaults.maxImageBytes;
+  const maxPdfBytes =
+    stored?.maxPdfBytes ??
+    legacyContentGroup?.maxPdfBytes ??
+    defaults.maxPdfBytes;
+  return {
+    maxImageBytes,
+    maxPdfBytes,
+    allowedMime: stored?.allowedMime ?? defaults.allowedMime,
+    pipeline: {
+      stripMetadata:
+        stored?.pipeline?.stripMetadata ?? defaults.pipeline.stripMetadata,
+      generateWebp:
+        stored?.pipeline?.generateWebp ?? defaults.pipeline.generateWebp,
+    },
+  };
+}
 
 export const DEFAULT_MEMBER_SETTINGS: MemberSettings = {
   defaultRoleId: 3,

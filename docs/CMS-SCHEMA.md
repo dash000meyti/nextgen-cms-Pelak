@@ -48,9 +48,14 @@ export const exampleSchema = {
 |------|---------|
 | `pageTitle` | هفته‌نامه |
 | `period` | seasonal |
+| `groupByYear` | false |
+
+تنظیمات مدیا (`MediaSettings` در `site_settings.media_settings`):
+
+| فیلد | پیش‌فرض |
+|------|---------|
 | `maxImageBytes` | 10 MB |
 | `maxPdfBytes` | 25 MB |
-| `groupByYear` | false |
 
 ## Settings schemas
 

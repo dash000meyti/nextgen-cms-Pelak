@@ -1,10 +1,10 @@
 import {
-  DEFAULT_MEDIA_SETTINGS,
   DEFAULT_MODULE_SETTINGS,
   featureModulesToModuleSettings,
   moduleSettingsToFeatureModules,
   normalizeContentGroupModuleSettings,
   normalizeContentSettings,
+  normalizeMediaSettings,
   normalizeMemberSettings,
   normalizeMessagesSettings,
   normalizeModuleSettings,
@@ -92,7 +92,11 @@ export function mapVideoModuleSettingsRow(
 }
 
 export function mapMediaSettingsRow(row: SiteSettingsRow): MediaSettings {
-  return parseJson<MediaSettings>(row.mediaSettings) ?? DEFAULT_MEDIA_SETTINGS;
+  const stored = parseJson<MediaSettings>(row.mediaSettings);
+  const legacyCg = parseJson<ContentGroupModuleSettings>(
+    row.contentGroupModuleSettings,
+  );
+  return normalizeMediaSettings(stored, legacyCg);
 }
 
 export function mapMemberSettingsRow(row: SiteSettingsRow): MemberSettings {

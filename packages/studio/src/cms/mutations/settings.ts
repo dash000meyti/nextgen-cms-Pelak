@@ -8,6 +8,7 @@ import {
 import {
   normalizeContentGroupModuleSettings,
   normalizeContentSettings,
+  normalizeMediaSettings,
   normalizeMemberSettings,
   normalizeMessagesSettings,
   normalizeModuleSettings,
@@ -107,7 +108,7 @@ export async function saveMediaSettings(data: MediaSettings) {
   if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
 
   try {
-    await updateMediaSettings(data);
+    await updateMediaSettings(normalizeMediaSettings(data));
     clearMediaSettingsCache();
     invalidateSiteConfig();
   } catch (error) {

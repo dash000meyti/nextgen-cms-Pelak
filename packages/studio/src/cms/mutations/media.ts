@@ -17,7 +17,6 @@ import {
   insertMediaAsset,
   softDeleteMediaAsset,
 } from "@nextgen-cms/core/db/repositories/media-assets";
-import { findContentGroupModuleSettings } from "@nextgen-cms/core/db/repositories/site-config";
 import { getExtensionForMimeType } from "@nextgen-cms/core/media/constants";
 import { resolveUploadFolder } from "@nextgen-cms/core/media/folders";
 import {
@@ -30,8 +29,8 @@ import {
   mediaReferenceSummary,
 } from "@nextgen-cms/core/media/references";
 import {
-  getMaxUploadBytes,
   isMimeAllowed,
+  resolveMaxBytesForMime,
 } from "@nextgen-cms/core/media/settings";
 import {
   removeMediaFile,
@@ -157,20 +156,8 @@ async function validateUploadAccess(
   return null;
 }
 
-async function resolveMaxUploadBytes(
-  uploadContext: MediaUploadContext,
-  mimeType: string,
-): Promise<number> {
-  if (uploadContext.contentGroupId != null) {
-    const settings = await findContentGroupModuleSettings();
-    if (mimeType === "application/pdf") {
-      return settings.maxPdfBytes;
-    }
-    if (mimeType.startsWith("image/")) {
-      return settings.maxImageBytes;
-    }
-  }
-  return getMaxUploadBytes();
+async function resolveMaxUploadBytes(mimeType: string): Promise<number> {
+  return resolveMaxBytesForMime(mimeType);
 }
 
 export async function uploadMedia(
@@ -208,7 +195,7 @@ export async function uploadMedia(
         : (context?.memberId ?? session.memberId),
   });
 
-  const maxBytes = await resolveMaxUploadBytes(uploadContext, file.type);
+  const maxBytes = await resolveMaxUploadBytes(file.type);
   if (file.size > maxBytes) {
     return {
       ok: false,

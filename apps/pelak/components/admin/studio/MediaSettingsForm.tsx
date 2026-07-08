@@ -51,17 +51,31 @@ export function MediaSettingsForm({ value }: MediaSettingsFormProps) {
     <div className="max-w-lg space-y-6">
       <FormMessage error={error} success={success} />
       <TextField
-        id="max-bytes"
-        label="حداکثر حجم آپلود (بایت)"
+        id="max-image-bytes"
+        label="حداکثر حجم تصویر (بایت)"
         type="number"
-        value={String(settings.maxBytes)}
+        value={String(settings.maxImageBytes)}
         onChange={(raw) =>
           setSettings({
             ...settings,
-            maxBytes: Number.parseInt(raw, 10) || settings.maxBytes,
+            maxImageBytes:
+              Number.parseInt(raw, 10) || settings.maxImageBytes,
           })
         }
-        hint={`معادل ${Math.round(settings.maxBytes / (1024 * 1024))} مگابایت`}
+        hint={`معادل ${Math.round(settings.maxImageBytes / (1024 * 1024))} مگابایت`}
+      />
+      <TextField
+        id="max-pdf-bytes"
+        label="حداکثر حجم PDF (بایت)"
+        type="number"
+        value={String(settings.maxPdfBytes)}
+        onChange={(raw) =>
+          setSettings({
+            ...settings,
+            maxPdfBytes: Number.parseInt(raw, 10) || settings.maxPdfBytes,
+          })
+        }
+        hint={`معادل ${Math.round(settings.maxPdfBytes / (1024 * 1024))} مگابایت`}
       />
       <div className="space-y-2">
         <p className="text-sm font-medium text-ink">فرمت‌های مجاز</p>

@@ -15,8 +15,6 @@ export type ModuleSettings = {
 export type ContentGroupModuleSettings = SectionListSettings & {
   period: ContentGroupPeriod;
   groupByYear: boolean;
-  maxImageBytes: number;
-  maxPdfBytes: number;
 };
 
 export type VideoModuleSettings = SectionListSettings;
@@ -38,7 +36,8 @@ export type LegacyModuleSettings = {
 };
 
 export type MediaSettings = {
-  maxBytes: number;
+  maxImageBytes: number;
+  maxPdfBytes: number;
   allowedMime: string[];
   pipeline: {
     stripMetadata: boolean;

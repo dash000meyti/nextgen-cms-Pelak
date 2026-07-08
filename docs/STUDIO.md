@@ -123,8 +123,9 @@ packages/core/src/db/repositories/ — نوشتن DB
 - `contentGroup` / `video` / `newsletter`: فعال/غیرفعال + `label` (نام منوی کنار)
 
 تنظیمات بخش ماژول (ستون‌های جدا):
-- `content_group_module_settings`: `period` (`yearly|seasonal|monthly|weekly`), `maxImageBytes` (پیش‌فرض 10MB), `maxPdfBytes` (پیش‌فرض 25MB)
+- `content_group_module_settings`: `period` (`yearly|seasonal|monthly|weekly`), `groupByYear`
 - `video_module_settings`: `pageTitle`, `itemsPerPage`
+- `media_settings`: `maxImageBytes` (پیش‌فرض 10MB), `maxPdfBytes` (پیش‌فرض 25MB), `allowedMime`, `pipeline`
 
 برچسب پیش‌فرض: `packages/contract/src/modules/labels.ts` + `modulePermissionGroups`
 
@@ -146,7 +147,7 @@ packages/core/src/db/repositories/ — نوشتن DB
 
 - آپلود: `packages/studio/src/cms/mutations/media.ts`
 - promote یکپارچه: `packages/core/src/media/promote-media.ts`
-- تنظیمات: تب «تنظیمات» در `/admin/media` — max size، MIME، pipeline flags
+- تنظیمات: تب «تنظیمات» در `/admin/media` — `maxImageBytes`, `maxPdfBytes`, MIME، pipeline flags
 - serve: `GET /uploads/[[...path]]` — `packages/core/src/media/serve-access.ts`
 - پیش‌فرض‌ها: `packages/core/src/media/constants.ts` (fallback اگر DB خالی)
 

@@ -78,9 +78,9 @@ PDF آپلودشده canonical است؛ route تولیدی `/api/pdf/content-gro
 - `isPartOf` → `Periodical` با نام `pageTitle`
 - `associatedMedia` → PDF (در صورت وجود)
 
-## محدودیت حجم آپلود (گروه محتوا)
+## محدودیت حجم آپلود
 
-تنظیم در `/admin/content-group/settings`:
+تنظیم در `/admin/media?tab=settings` (`MediaSettings`):
 
 | فیلد | پیش‌فرض |
 |------|---------|

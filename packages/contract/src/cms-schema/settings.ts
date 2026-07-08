@@ -58,8 +58,14 @@ export const mediaSettingsSchema = {
   singleton: true,
   fields: [
     {
-      key: "maxBytes",
-      label: "حداکثر حجم (بایت)",
+      key: "maxImageBytes",
+      label: "حداکثر حجم تصویر (بایت)",
+      kind: "number",
+      required: true,
+    },
+    {
+      key: "maxPdfBytes",
+      label: "حداکثر حجم PDF (بایت)",
       kind: "number",
       required: true,
     },

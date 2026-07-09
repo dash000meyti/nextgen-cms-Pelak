@@ -42,8 +42,7 @@ docker compose -f docker-compose.yml <command>
 | `DATABASE_URL` | خیر | entrypoint آن را به `file:/data/pelak.sqlite` override می‌کند |
 | `SNAPSHOT_BEFORE_MIGRATE` | خیر | `1` = قبل از migrate یک snapshot کامل (DB + uploads) گرفته می‌شود. پیش‌فرض: فقط بکاپ DB |
 | `SNAPSHOT_MAX_BYTES` | خیر | حداکثر حجم آرشیو آپلودی در `/api/admin/database/import-snapshot` (پیش‌فرض: بدون محدودیت) |
-| `PLAYWRIGHT_BROWSERS_PATH` | خیر | مسیر browser bundle Playwright (پیش‌فرض Docker: `/ms-playwright`) |
-| `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` | خیر | override مسیر Chromium (معمولاً لازم نیست؛ Playwright bundle خودکار پیدا می‌شود) |
+| `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` | خیر | مسیر Chromium برای تولید PDF. در Docker به `/usr/bin/chromium` (Chromium نصب‌شده با apt) تنظیم شده است. |
 
 ## استقرار اولیه
 
@@ -193,7 +192,7 @@ npm run dev
 
 - Base image: `node:22-bookworm-slim` (Debian) — برای پایداری build روی هاست‌هایی که DNS به mirrorهای Alpine (`dl-cdn.alpinelinux.org`) مشکل دارد.
 - native modules (`better-sqlite3`) در همان libc (glibc) کامپایل و اجرا می‌شوند.
-- PDF: Playwright Chromium bundle در `/ms-playwright`. نسخهٔ نصب browser از روی `playwright-core` نصب‌شده استخراج می‌شود (`playwright@$(node -p "require('playwright-core/package.json').version")`) تا با runtime هماهنگ بماند. **هرگز نسخه را hardcode نکنید** — mismatch باعث خطای `Executable doesn't exist at /ms-playwright/chromium_headless_shell-<rev>/...` می‌شود چون هر نسخهٔ Playwright به revision متفاوتی از Chromium نیاز دارد.
+- PDF: Chromium از مخزن apt دبیان نصب می‌شود (`apt-get install chromium`) و `playwright-core` از طریق `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium` به آن اشاره می‌کند. **از دانلود bundle مرورگر Playwright استفاده نمی‌کنیم** چون هاست build (ایران) از `cdn.playwright.dev` (CDN گوگل Chrome-for-Testing) با خطای 403 «not available in your location» مسدود است. apt به‌طور خودکار وابستگی‌های سیستمی Chromium را هم نصب می‌کند.
 - runtime dirهای Chromium برای user غیر root باید writable باشند (`HOME`, `XDG_CONFIG_HOME`, `XDG_CACHE_HOME`).
 
 ### خطای Chromium/Crashpad (PDF)

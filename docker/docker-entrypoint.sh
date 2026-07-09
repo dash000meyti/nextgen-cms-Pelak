@@ -40,8 +40,10 @@ fi
 echo "Verifying Chromium for PDF generation..."
 if ! gosu nextjs node --input-type=module -e "
 import { chromium } from 'playwright-core';
+const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined;
 const browser = await chromium.launch({
   headless: true,
+  ...(executablePath ? { executablePath } : {}),
   args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
 });
 await browser.close();

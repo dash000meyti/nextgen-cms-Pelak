@@ -26,7 +26,7 @@ RUN npm run build -w @nextgen-cms/pelak
 FROM node:22-bookworm-slim AS runner
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-    wget gosu ca-certificates fonts-freefont-ttf \
+    wget gosu ca-certificates fonts-freefont-ttf chromium \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
@@ -39,12 +39,16 @@ ENV HOSTNAME=0.0.0.0
 ENV HOME=/home/nextjs
 ENV XDG_CONFIG_HOME=/home/nextjs/.config
 ENV XDG_CACHE_HOME=/home/nextjs/.cache
-ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+# PDF rendering launches Chromium via playwright-core. The build host is
+# geo-blocked from cdn.playwright.dev (Google Chrome-for-Testing CDN), so we
+# use Debian's apt Chromium instead of the Playwright download and point
+# playwright-core at it. render-html-pdf.ts also probes /usr/bin/chromium.
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
 
 RUN groupadd --system --gid 1001 nodejs \
   && useradd --system --uid 1001 --gid nodejs --shell /usr/sbin/nologin nextjs
-RUN mkdir -p /home/nextjs/.config /home/nextjs/.cache /tmp/chromium /ms-playwright \
-  && chown -R nextjs:nodejs /home/nextjs /tmp/chromium /ms-playwright
+RUN mkdir -p /home/nextjs/.config /home/nextjs/.cache /tmp/chromium \
+  && chown -R nextjs:nodejs /home/nextjs /tmp/chromium
 
 COPY --from=build /app/apps/pelak/public ./apps/pelak/public
 COPY --from=build /app/apps/pelak/lib/pdf/fonts ./apps/pelak/lib/pdf/fonts
@@ -64,13 +68,6 @@ COPY --from=build /app/packages/seed/src ./packages/seed/src
 COPY --from=build /app/tsconfig.base.json ./tsconfig.base.json
 COPY --from=deps /app/node_modules ./node_modules
 COPY docker/docker-entrypoint.sh ./docker-entrypoint.sh
-
-# Install the Chromium build that matches the runtime playwright-core version.
-# Deriving the version from node_modules keeps the browser revision in sync
-# with the lockfile; a mismatch causes "Executable doesn't exist" at launch.
-RUN PLAYWRIGHT_VERSION="$(node -p "require('./node_modules/playwright-core/package.json').version")" \
-  && npx --yes "playwright@${PLAYWRIGHT_VERSION}" install --with-deps chromium \
-  && chown -R nextjs:nodejs /ms-playwright
 
 RUN chmod +x ./docker-entrypoint.sh
 

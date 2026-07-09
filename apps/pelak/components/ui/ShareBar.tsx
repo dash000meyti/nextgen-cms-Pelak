@@ -15,6 +15,21 @@ function toAbsoluteUrl(shareUrl: string) {
   return `${window.location.origin}${shareUrl}`;
 }
 
+function pdfUrlPath(url: string): string {
+  if (url.startsWith("http")) {
+    try {
+      return new URL(url).pathname;
+    } catch {
+      return url;
+    }
+  }
+  return url;
+}
+
+function isGeneratedPdfUrl(url: string): boolean {
+  return pdfUrlPath(url).startsWith("/api/pdf/");
+}
+
 function LinkIcon({ size = 14 }: { size?: number }) {
   return (
     <svg
@@ -83,6 +98,16 @@ export function ShareBar({
   const [downloading, setDownloading] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
 
+  const staticPdfUrl =
+    pdfDownloadUrl && !isGeneratedPdfUrl(pdfDownloadUrl)
+      ? pdfDownloadUrl
+      : undefined;
+  const generatedPdfUrl =
+    pdfDownloadUrl && isGeneratedPdfUrl(pdfDownloadUrl)
+      ? pdfDownloadUrl
+      : undefined;
+  const downloadFilename = pdfFilename ?? "download.pdf";
+
   useEffect(() => {
     setAbsoluteShareUrl(toAbsoluteUrl(shareUrl));
   }, [shareUrl]);
@@ -97,14 +122,14 @@ export function ShareBar({
     }
   }
 
-  async function handlePdfDownload() {
-    if (!pdfDownloadUrl || downloading) return;
+  async function handleGeneratedPdfDownload() {
+    if (!generatedPdfUrl || downloading) return;
 
     setPdfError(null);
     setDownloading(true);
 
     try {
-      const response = await fetch(pdfDownloadUrl);
+      const response = await fetch(generatedPdfUrl);
       if (!response.ok) {
         const message = await readPdfErrorMessage(response);
         setPdfError(message);
@@ -115,7 +140,7 @@ export function ShareBar({
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = pdfFilename ?? "download.pdf";
+      anchor.download = downloadFilename;
       anchor.click();
       URL.revokeObjectURL(url);
     } catch {
@@ -128,10 +153,20 @@ export function ShareBar({
   const buttonClass =
     "rounded-full border border-rule text-xs text-ink-muted transition-colors hover:border-accent hover:text-accent disabled:opacity-50 disabled:pointer-events-none";
 
-  const pdfButton = pdfDownloadUrl ? (
+  const pdfButton = staticPdfUrl ? (
+    <a
+      href={staticPdfUrl}
+      download={downloadFilename}
+      aria-label={`دانلود PDF: ${title}`}
+      className={`${buttonClass} flex flex-col items-center gap-1 px-3 py-2 text-center`}
+    >
+      <DownloadIcon />
+      PDF
+    </a>
+  ) : generatedPdfUrl ? (
     <button
       type="button"
-      onClick={handlePdfDownload}
+      onClick={handleGeneratedPdfDownload}
       disabled={downloading}
       aria-label={`دانلود PDF: ${title}`}
       className={`${buttonClass} flex flex-col items-center gap-1 px-3 py-2 text-center`}
@@ -141,10 +176,20 @@ export function ShareBar({
     </button>
   ) : null;
 
-  const pdfButtonInline = pdfDownloadUrl ? (
+  const pdfButtonInline = staticPdfUrl ? (
+    <a
+      href={staticPdfUrl}
+      download={downloadFilename}
+      aria-label={`دانلود PDF: ${title}`}
+      className={`${buttonClass} inline-flex items-center gap-1.5 px-4 py-1.5`}
+    >
+      <DownloadIcon />
+      دانلود PDF
+    </a>
+  ) : generatedPdfUrl ? (
     <button
       type="button"
-      onClick={handlePdfDownload}
+      onClick={handleGeneratedPdfDownload}
       disabled={downloading}
       aria-label={`دانلود PDF: ${title}`}
       className={`${buttonClass} inline-flex items-center gap-1.5 px-4 py-1.5`}

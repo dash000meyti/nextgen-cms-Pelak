@@ -43,7 +43,7 @@ export function CurrentContentGroupHero({
             </ul>
           </div>
 
-          <div className="self-center py-10 md:py-0">
+          <div className="self-center">
             <div className="flex items-center justify-between px-2 gap-2 text-base md:text-lg">
               <p className="min-w-0 font-sans leading-none text-ink-muted">
                 تعداد محتوا:
@@ -52,7 +52,10 @@ export function CurrentContentGroupHero({
                 {group.articleCount.toLocaleString("fa-IR")}
               </span>
             </div>
-            <Link href={`/content-group/${group.slug}`} className="block">
+            <Link
+              href={`/content-group/${group.slug}`}
+              className="block py-4 md:py-0"
+            >
               <div
                 className={`${contentGroupCoverFrameClass} mx-auto w-full max-w-[220px] sm:max-w-[260px] md:max-w-none`}
               >

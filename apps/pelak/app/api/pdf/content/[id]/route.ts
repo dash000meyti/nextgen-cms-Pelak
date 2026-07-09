@@ -19,13 +19,15 @@ type ContentPdfRouteProps = {
 };
 
 function pdfErrorResponse(message: string, status = 500) {
-  return new NextResponse(message, {
-    status,
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "private, no-store",
+  return NextResponse.json(
+    { error: "PDF generation failed", message },
+    {
+      status,
+      headers: {
+        "Cache-Control": "private, no-store",
+      },
     },
-  });
+  );
 }
 
 export async function GET(_request: Request, { params }: ContentPdfRouteProps) {

@@ -1,4 +1,5 @@
 import { buildContentGroupShortPath } from "@nextgen-cms/contract/short-links";
+import { sanitizePdfFilename } from "@nextgen-cms/core/media/content-group-pdf";
 import {
   getAllContentGroupSlugs,
   getContentGroupBySlug,
@@ -187,6 +188,7 @@ export default async function ContentGroupPage({
             title={group.title}
             shareUrl={buildContentGroupShortPath(group.id)}
             pdfDownloadUrl={group.pdfSrc ?? undefined}
+            pdfFilename={`${sanitizePdfFilename(group.title)}.pdf`}
           />
         </div>
       </div>

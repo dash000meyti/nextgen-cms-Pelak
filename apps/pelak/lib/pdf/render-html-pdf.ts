@@ -6,12 +6,21 @@ let browserPromise: Promise<Browser> | null = null;
 
 function resolveChromiumExecutable(): string | undefined {
   const configured = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?.trim();
-  if (configured) return configured;
+  if (configured) {
+    try {
+      accessSync(configured);
+      return configured;
+    } catch {
+      console.warn(
+        `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH not found: ${configured}`,
+      );
+    }
+  }
 
   const candidates = [
-    "/usr/lib/chromium/chromium",
-    "/usr/bin/chromium-browser",
     "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+    "/usr/lib/chromium/chromium",
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   ];
 
@@ -32,6 +41,7 @@ function chromiumArgs(): string[] {
     "--no-sandbox",
     "--disable-setuid-sandbox",
     "--disable-dev-shm-usage",
+    "--disable-gpu",
     "--disable-crash-reporter",
     "--disable-breakpad",
   ];
@@ -40,7 +50,11 @@ function chromiumArgs(): string[] {
 async function getBrowser(): Promise<Browser> {
   if (!browserPromise) {
     const executablePath = resolveChromiumExecutable();
-    const attemptedExecutable = executablePath ?? "(playwright default)";
+    const attemptedExecutable =
+      executablePath ??
+      (process.env.PLAYWRIGHT_BROWSERS_PATH?.trim()
+        ? `playwright bundle (${process.env.PLAYWRIGHT_BROWSERS_PATH})`
+        : "(playwright default)");
     browserPromise = chromium
       .launch({
         headless: true,
@@ -55,6 +69,10 @@ async function getBrowser(): Promise<Browser> {
       })
       .catch((error) => {
         browserPromise = null;
+        console.error(
+          `Chromium launch failed (executable: ${attemptedExecutable}):`,
+          error,
+        );
         throw new Error(
           `Chromium launch failed for PDF generation (executable: ${attemptedExecutable}). ` +
             "Chrome/Chromium را نصب کنید یا PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH را تنظیم کنید.",

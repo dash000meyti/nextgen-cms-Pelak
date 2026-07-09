@@ -26,7 +26,7 @@ RUN npm run build -w @nextgen-cms/pelak
 FROM node:22-bookworm-slim AS runner
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-    wget gosu chromium ca-certificates fonts-freefont-ttf \
+    wget gosu ca-certificates fonts-freefont-ttf \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
@@ -39,12 +39,12 @@ ENV HOSTNAME=0.0.0.0
 ENV HOME=/home/nextjs
 ENV XDG_CONFIG_HOME=/home/nextjs/.config
 ENV XDG_CACHE_HOME=/home/nextjs/.cache
-ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/lib/chromium/chromium
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 RUN groupadd --system --gid 1001 nodejs \
   && useradd --system --uid 1001 --gid nodejs --shell /usr/sbin/nologin nextjs
-RUN mkdir -p /home/nextjs/.config /home/nextjs/.cache /tmp/chromium \
-  && chown -R nextjs:nodejs /home/nextjs /tmp/chromium
+RUN mkdir -p /home/nextjs/.config /home/nextjs/.cache /tmp/chromium /ms-playwright \
+  && chown -R nextjs:nodejs /home/nextjs /tmp/chromium /ms-playwright
 
 COPY --from=build /app/apps/pelak/public ./apps/pelak/public
 COPY --from=build /app/apps/pelak/lib/pdf/fonts ./apps/pelak/lib/pdf/fonts
@@ -64,6 +64,9 @@ COPY --from=build /app/packages/seed/src ./packages/seed/src
 COPY --from=build /app/tsconfig.base.json ./tsconfig.base.json
 COPY --from=deps /app/node_modules ./node_modules
 COPY docker/docker-entrypoint.sh ./docker-entrypoint.sh
+
+RUN npx playwright@1.52.0 install --with-deps chromium \
+  && chown -R nextjs:nodejs /ms-playwright
 
 RUN chmod +x ./docker-entrypoint.sh
 

@@ -54,6 +54,7 @@ export default async function ContentPreviewPage({ params }: PreviewPageProps) {
   const shareUrl = buildContentShortPath(articleId);
   const pdfDownloadUrl =
     status === "published" ? buildContentPdfPath(articleId) : undefined;
+  const pdfFilename = status === "published" ? `${slug}.pdf` : undefined;
 
   return (
     <>
@@ -62,6 +63,7 @@ export default async function ContentPreviewPage({ params }: PreviewPageProps) {
         article={article}
         shareUrl={shareUrl}
         pdfDownloadUrl={pdfDownloadUrl}
+        pdfFilename={pdfFilename}
         related={related}
         currentContentGroup={currentContentGroup}
         contentGroupPageTitle={contentGroupModuleSettings.pageTitle}

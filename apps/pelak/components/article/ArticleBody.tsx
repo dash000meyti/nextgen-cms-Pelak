@@ -51,9 +51,15 @@ type ArticleBodyProps = {
 };
 
 const HEADING_CLASS: Record<HeadingLevel, string> = {
-  2: "mt-5 mb-5 font-heading text-lg leading-normal text-ink md:text-xl",
-  3: "mt-5 mb-4 font-heading text-base leading-normal text-ink md:text-lg",
-  4: "mt-4 mb-3 font-heading text-sm leading-normal text-ink md:text-base",
+  2: "mt-5 mb-5 font-heading text-lg leading-normal text-ink md:text-xl border-s-4 border-accent ps-4 pt-2",
+  3: "mt-5 mb-4 font-heading text-base leading-normal text-ink md:text-lg border-s-4 border-accent/70 ps-4 pt-2",
+  4: "mt-4 mb-3 font-heading text-sm leading-normal text-ink md:text-base border-s-4 border-accent/45 ps-4 pt-1",
+};
+
+const HEADING_TAG: Record<HeadingLevel, "h2" | "h3" | "h4"> = {
+  2: "h2",
+  3: "h3",
+  4: "h4",
 };
 
 export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
@@ -70,34 +76,12 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
 
         if (block.type === "heading") {
           const level = block.level;
+          const Tag = HEADING_TAG[level] ?? "h2";
           const className = HEADING_CLASS[level] ?? HEADING_CLASS[2];
-          if (level === 3) {
-            return (
-              <h3
-                key={key}
-                className={`${className} border-s-4 border-accent ps-4 pt-2`}
-              >
-                {block.content}
-              </h3>
-            );
-          }
-          if (level === 4) {
-            return (
-              <h4
-                key={key}
-                className={`${className} border-s-4 border-accent ps-4 pt-1`}
-              >
-                {block.content}
-              </h4>
-            );
-          }
           return (
-            <h2
-              key={key}
-              className={`${className} border-s-4 border-accent ps-4 pt-2`}
-            >
+            <Tag key={key} className={className}>
               {block.content}
-            </h2>
+            </Tag>
           );
         }
 

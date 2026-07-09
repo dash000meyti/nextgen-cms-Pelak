@@ -18,6 +18,7 @@ type ArticleDetailViewProps = {
   article: Article;
   shareUrl: string;
   pdfDownloadUrl?: string;
+  pdfFilename?: string;
   related: ArticlePreview[];
   currentContentGroup: ContentGroupSummary;
   contentGroupPageTitle: string;
@@ -29,6 +30,7 @@ export function ArticleDetailView({
   article,
   shareUrl,
   pdfDownloadUrl,
+  pdfFilename,
   related,
   currentContentGroup,
   contentGroupPageTitle,
@@ -68,6 +70,7 @@ export function ArticleDetailView({
             title={article.title}
             shareUrl={shareUrl}
             pdfDownloadUrl={pdfDownloadUrl}
+            pdfFilename={pdfFilename}
           />
           <ArticleBody blocks={article.body} />
           <AuthorList
@@ -85,6 +88,7 @@ export function ArticleDetailView({
                 title={article.title}
                 shareUrl={shareUrl}
                 pdfDownloadUrl={pdfDownloadUrl}
+                pdfFilename={pdfFilename}
                 variant="sidebar"
               />
             </div>

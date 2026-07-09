@@ -38,6 +38,26 @@ export const exampleSchema = {
 | `select` | dropdown |
 | `json` | JSON خام |
 
+## Article schema
+
+فیلدهای ثابت در `packages/contract/src/cms-schema/article.ts`:
+
+| فیلد | kind | توضیح |
+|------|------|--------|
+| `title` | text | عنوان |
+| `slug` | slug | نامک یکتا — مسیر عمومی `/content/{slug}` |
+| `subtitle` | text | زیرعنوان |
+| `excerpt` | textarea | چکیده |
+| `status` | status | `draft` / `published` / `archived` |
+| `publishedAt` | date | تاریخ انتشار (اختیاری تا زمان انتشار) |
+| `heroSrc` / `heroAlt` / `heroCaption` / `heroCredit` | image / text | تصویر شاخص |
+| `readingMinutes` | number | زمان مطالعه |
+| `contentGroupIds` | reference (multiple) | گروه‌های محتوا |
+| `memberIds` / `topicIds` | reference (multiple) | اعضا / موضوعات |
+| `isFeatured` / `isEditorsPick` | boolean | پرچم‌های نمایشی |
+| `body` | blocks | بدنهٔ مقاله |
+| `relatedSlugs` | textarea | محتوای مرتبط |
+
 ## Content group schema
 
 فیلدهای ثابت در `packages/contract/src/cms-schema/content-group.ts`:

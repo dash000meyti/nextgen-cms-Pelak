@@ -18,6 +18,16 @@ type ContentPdfRouteProps = {
   params: Promise<{ id: string }>;
 };
 
+function pdfErrorResponse(message: string, status = 500) {
+  return new NextResponse(message, {
+    status,
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "private, no-store",
+    },
+  });
+}
+
 export async function GET(_request: Request, { params }: ContentPdfRouteProps) {
   const { id: idParam } = await params;
   const id = Number.parseInt(idParam, 10);
@@ -26,43 +36,45 @@ export async function GET(_request: Request, { params }: ContentPdfRouteProps) {
   const result = await getPublishedArticleById(id);
   if (!result) notFound();
 
-  const [siteConfig, memberSettings] = await Promise.all([
-    getSiteConfig(),
-    getMemberSettings(),
-  ]);
-
-  const siteUrl = getSiteBaseUrl();
-  const base = siteUrl.replace(/\/$/, "");
-  const articleUrl = `${base}/content/${result.slug}`;
-
-  const [blocks, heroSrc, logoSrc, authors] = await Promise.all([
-    resolveArticleBlocks(result.article.body, siteUrl),
-    resolvePdfImageSrc(result.article.heroImage.src, siteUrl),
-    resolvePdfImageSrc(siteConfig.logo, siteUrl),
-    Promise.all(
-      result.article.authors.map(async (author) => ({
-        name: author.name,
-        role: author.role,
-        bio: author.bio,
-        avatarSrc: await resolvePdfImageSrc(author.avatar.src, siteUrl),
-      })),
-    ),
-  ]);
-
-  const authorsLine = formatPdfAuthors(result.article.authors);
-  const dateLine = formatPdfDate(result.article.publishedAt);
-  const readingLine =
-    result.article.readingMinutes > 0
-      ? `${result.article.readingMinutes.toLocaleString("fa-IR")} دقیقه مطالعه`
-      : "";
-  const metaParts = [authorsLine, dateLine, readingLine].filter(Boolean);
+  const { article, slug } = result;
 
   try {
+    const [siteConfig, memberSettings] = await Promise.all([
+      getSiteConfig(),
+      getMemberSettings(),
+    ]);
+
+    const siteUrl = getSiteBaseUrl();
+    const base = siteUrl.replace(/\/$/, "");
+    const articleUrl = `${base}/content/${slug}`;
+
+    const [blocks, heroSrc, logoSrc, authors] = await Promise.all([
+      resolveArticleBlocks(article.body, siteUrl),
+      resolvePdfImageSrc(article.heroImage.src, siteUrl),
+      resolvePdfImageSrc(siteConfig.logo, siteUrl),
+      Promise.all(
+        article.authors.map(async (author) => ({
+          name: author.name,
+          role: author.role,
+          bio: author.bio,
+          avatarSrc: await resolvePdfImageSrc(author.avatar.src, siteUrl),
+        })),
+      ),
+    ]);
+
+    const authorsLine = formatPdfAuthors(article.authors);
+    const dateLine = formatPdfDate(article.publishedAt);
+    const readingLine =
+      article.readingMinutes > 0
+        ? `${article.readingMinutes.toLocaleString("fa-IR")} دقیقه مطالعه`
+        : "";
+    const metaParts = [authorsLine, dateLine, readingLine].filter(Boolean);
+
     const html = await buildArticlePdfHtml({
-      title: result.article.title,
-      subtitle: result.article.subtitle,
+      title: article.title,
+      subtitle: article.subtitle,
       authors,
-      publishedAt: result.article.publishedAt,
+      publishedAt: article.publishedAt,
       siteName: siteConfig.name,
       siteUrl: base,
       canonicalUrl: articleUrl,
@@ -77,7 +89,7 @@ export async function GET(_request: Request, { params }: ContentPdfRouteProps) {
     });
 
     const pdf = await renderHtmlToPdf(html);
-    const filename = `${result.slug}.pdf`;
+    const filename = `${slug}.pdf`;
 
     return new NextResponse(new Uint8Array(pdf), {
       headers: {
@@ -87,19 +99,9 @@ export async function GET(_request: Request, { params }: ContentPdfRouteProps) {
       },
     });
   } catch (error) {
-    console.error("PDF generation failed:", error);
-    return NextResponse.json(
-      {
-        error: "PDF generation failed",
-        message:
-          error instanceof Error ? error.message : "PDF generation failed",
-      },
-      {
-        status: 500,
-        headers: {
-          "Cache-Control": "private, no-store",
-        },
-      },
-    );
+    const message =
+      error instanceof Error ? error.message : "تولید PDF با خطا مواجه شد.";
+    console.error(`PDF generation failed (id=${id}, slug=${slug}):`, error);
+    return pdfErrorResponse(message);
   }
 }

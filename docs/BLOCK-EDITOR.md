@@ -87,7 +87,7 @@ type BlockMeta = {
 
 ## رندر عمومی
 
-`apps/pelak/components/article/ArticleBody.tsx` همهٔ انواع را رندر می‌کند. PDF: `lib/pdf/html/blocks.ts` + `lib/pdf/resolve-blocks.ts`. آپارات: `lib/aparat.ts`.
+`apps/pelak/components/article/ArticleBody.tsx` همهٔ انواع را رندر می‌کند. عناوین h2/h3/h4 بردر سمت شروع دارند با شدت متفاوت (`border-accent` → `/70` → `/45`). PDF: `lib/pdf/html/blocks.ts` + `lib/pdf/resolve-blocks.ts` + `lib/pdf/html/styles.ts`. آپارات: `lib/aparat.ts`.
 
 ### پیش‌نمایش ادمین و تصاویر draft
 

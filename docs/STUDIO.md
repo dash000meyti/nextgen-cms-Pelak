@@ -150,7 +150,8 @@ packages/core/src/db/repositories/ — نوشتن DB
 ## Publish workflow
 
 - `draft` → ذخیره پیش‌نویس
-- «انتشار» → `published` + `publishedAt` (شمسی/ISO از `todayIsoIran()`)
+- «انتشار» → ابتدا ذخیرهٔ فرم (شامل `publishedAt` در صورت تنظیم)، سپس `published` + `publishedAt` (شمسی/ISO از `todayIsoIran()` اگر خالی باشد)
+- فرم محتوا (`ArticleForm`) فیلد «تاریخ انتشار» دارد — مشابه گروه محتوا و ویدیو؛ برای مقالات قدیمی تاریخ پارسال را دستی تنظیم کنید (فهرست گروه محتوا بر اساس `publishedAt DESC` مرتب می‌شود)
 - «ارسال به بایگانی» → `archived` و redirect به لیست بایگانی همان بخش (`?status=archived`)
 - «بازگردانی از بایگانی» → `draft` و redirect به لیست پیش‌نویس (`?status=draft`)
 - «حذف دائمی» فقط برای `archived` مجاز است و کاربر در همان لیست بایگانی می‌ماند

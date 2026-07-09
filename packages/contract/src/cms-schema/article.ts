@@ -24,6 +24,7 @@ export const articleSchema = {
               : "بایگانی",
       })),
     },
+    { key: "publishedAt", label: "تاریخ انتشار", kind: "date" },
     { key: "heroSrc", label: "تصویر شاخص", kind: "image", required: true },
     { key: "heroAlt", label: "متن جایگزین تصویر", kind: "text" },
     { key: "heroCaption", label: "زیرنویس تصویر", kind: "text" },

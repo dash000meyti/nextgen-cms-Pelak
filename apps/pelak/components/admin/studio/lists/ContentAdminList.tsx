@@ -145,6 +145,21 @@ export function ContentAdminList({ articles, status }: ContentAdminListProps) {
           render: (row) => <StatusBadge status={row.status} />,
         },
         {
+          key: "publishedAt",
+          header: "تاریخ انتشار",
+          sortable: true,
+          sortValue: (row) =>
+            row.publishedAt ? new Date(row.publishedAt) : null,
+          render: (row) =>
+            row.publishedAt
+              ? new Date(row.publishedAt).toLocaleDateString("fa-IR", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+              : "—",
+        },
+        {
           key: "updated",
           header: "به‌روزرسانی",
           sortable: true,

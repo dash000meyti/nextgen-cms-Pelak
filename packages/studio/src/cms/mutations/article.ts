@@ -24,6 +24,10 @@ import type { ArticleStatus } from "@nextgen-cms/core/db/schema/articles";
 import { promoteArticleMedia } from "@nextgen-cms/core/media/promote-article-media";
 import { purgeMediaForContent } from "@nextgen-cms/core/media/purge-folder";
 import {
+  parseJalaliInput,
+  todayIsoIran,
+} from "@nextgen-cms/core/platform/datetime";
+import {
   canDeleteArticle,
   canEditArticle,
   canPublishContent,
@@ -81,13 +85,22 @@ function handleMutationError(error: unknown): MutationResult {
 }
 
 function parseFormData(data: ArticleFormData): ArticleWriteInput {
+  let publishedAt = data.publishedAt?.trim() || null;
+  if (publishedAt) {
+    try {
+      publishedAt = parseJalaliInput(publishedAt);
+    } catch {
+      // keep as-is if already ISO
+    }
+  }
+
   return {
     slug: normalizeSlugInput(data.slug),
     title: data.title.trim(),
     subtitle: data.subtitle.trim(),
     excerpt: data.excerpt.trim(),
     status: data.status,
-    publishedAt: data.publishedAt,
+    publishedAt,
     readingMinutes: data.readingMinutes || 5,
     heroSrc: data.heroSrc.trim(),
     heroAlt: data.heroAlt.trim(),
@@ -295,7 +308,7 @@ export async function publishArticle(id: number): Promise<MutationResult> {
   if (!existing) return { ok: false, error: "محتوا یافت نشد." };
   if (!canEditArticle(session, existing)) return permissionDeniedResult();
 
-  const publishedAt = existing.publishedAt ?? new Date().toISOString();
+  const publishedAt = existing.publishedAt ?? todayIsoIran();
 
   try {
     const memberIds = await existingMemberIds(existing);

@@ -82,12 +82,14 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   const pdfDownloadUrl = shareMeta
     ? buildContentPdfPath(shareMeta.id)
     : undefined;
+  const pdfFilename = shareMeta ? `${article.slug}.pdf` : undefined;
 
   return (
     <ArticleDetailView
       article={article}
       shareUrl={shareUrl}
       pdfDownloadUrl={pdfDownloadUrl}
+      pdfFilename={pdfFilename}
       related={related}
       currentContentGroup={currentContentGroup}
       contentGroupPageTitle={contentGroupModuleSettings.pageTitle}

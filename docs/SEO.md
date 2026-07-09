@@ -77,7 +77,8 @@
 
 - route: `/api/pdf/content/{id}`
 - نام فایل: `{articleSlug}.pdf`
-- خطا: JSON با status `500` (نه متن خام)
+- UI: `ShareBar` با `fetch` + blob دانلود می‌کند؛ در خطا پیام فارسی نمایش داده می‌شود (نه فایل `.json`)
+- خطای سرور: `text/plain` با status `500` (نه JSON)
 
 ## JSON-LD
 

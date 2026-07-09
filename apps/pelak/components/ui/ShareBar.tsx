@@ -6,6 +6,7 @@ type ShareBarProps = {
   title: string;
   shareUrl: string;
   pdfDownloadUrl?: string;
+  pdfFilename?: string;
   variant?: "inline" | "sidebar";
 };
 
@@ -51,14 +52,36 @@ function DownloadIcon({ size = 14 }: { size?: number }) {
   );
 }
 
+async function readPdfErrorMessage(response: Response): Promise<string> {
+  const contentType = response.headers.get("content-type") ?? "";
+  if (contentType.includes("application/json")) {
+    try {
+      const data = (await response.json()) as { message?: string };
+      if (data.message) return data.message;
+    } catch {
+      // fall through
+    }
+  }
+  try {
+    const text = await response.text();
+    if (text.trim()) return text.trim();
+  } catch {
+    // fall through
+  }
+  return "تولید PDF با خطا مواجه شد.";
+}
+
 export function ShareBar({
   title,
   shareUrl,
   pdfDownloadUrl,
+  pdfFilename,
   variant = "inline",
 }: ShareBarProps) {
   const [copied, setCopied] = useState(false);
   const [absoluteShareUrl, setAbsoluteShareUrl] = useState(shareUrl);
+  const [downloading, setDownloading] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
 
   useEffect(() => {
     setAbsoluteShareUrl(toAbsoluteUrl(shareUrl));
@@ -74,33 +97,61 @@ export function ShareBar({
     }
   }
 
+  async function handlePdfDownload() {
+    if (!pdfDownloadUrl || downloading) return;
+
+    setPdfError(null);
+    setDownloading(true);
+
+    try {
+      const response = await fetch(pdfDownloadUrl);
+      if (!response.ok) {
+        const message = await readPdfErrorMessage(response);
+        setPdfError(message);
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = pdfFilename ?? "download.pdf";
+      anchor.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setPdfError("دانلود PDF انجام نشد.");
+    } finally {
+      setDownloading(false);
+    }
+  }
+
   const buttonClass =
-    "rounded-full border border-rule text-xs text-ink-muted transition-colors hover:border-accent hover:text-accent";
+    "rounded-full border border-rule text-xs text-ink-muted transition-colors hover:border-accent hover:text-accent disabled:opacity-50 disabled:pointer-events-none";
 
   const pdfButton = pdfDownloadUrl ? (
-    <a
-      href={pdfDownloadUrl}
-      type="application/pdf"
-      download
+    <button
+      type="button"
+      onClick={handlePdfDownload}
+      disabled={downloading}
       aria-label={`دانلود PDF: ${title}`}
       className={`${buttonClass} flex flex-col items-center gap-1 px-3 py-2 text-center`}
     >
       <DownloadIcon />
-      PDF
-    </a>
+      {downloading ? "…" : "PDF"}
+    </button>
   ) : null;
 
   const pdfButtonInline = pdfDownloadUrl ? (
-    <a
-      href={pdfDownloadUrl}
-      type="application/pdf"
-      download
+    <button
+      type="button"
+      onClick={handlePdfDownload}
+      disabled={downloading}
       aria-label={`دانلود PDF: ${title}`}
       className={`${buttonClass} inline-flex items-center gap-1.5 px-4 py-1.5`}
     >
       <DownloadIcon />
-      دانلود PDF
-    </a>
+      {downloading ? "در حال دانلود…" : "دانلود PDF"}
+    </button>
   ) : null;
 
   if (variant === "sidebar") {
@@ -123,26 +174,32 @@ export function ShareBar({
           </button>
           {pdfButton}
         </div>
+        {pdfError ? (
+          <p className="max-w-32 text-center text-xs text-accent">{pdfError}</p>
+        ) : null}
       </nav>
     );
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <span className="text-xs font-medium tracking-wide text-ink-muted uppercase">
-        اشتراک‌گذاری
-      </span>
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={handleCopy}
-          className={`${buttonClass} inline-flex items-center gap-1.5 px-4 py-1.5`}
-        >
-          <LinkIcon />
-          {copied ? "کپی شد" : "کپی لینک"}
-        </button>
-        {pdfButtonInline}
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-xs font-medium tracking-wide text-ink-muted uppercase">
+          اشتراک‌گذاری
+        </span>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleCopy}
+            className={`${buttonClass} inline-flex items-center gap-1.5 px-4 py-1.5`}
+          >
+            <LinkIcon />
+            {copied ? "کپی شد" : "کپی لینک"}
+          </button>
+          {pdfButtonInline}
+        </div>
       </div>
+      {pdfError ? <p className="text-xs text-accent">{pdfError}</p> : null}
     </div>
   );
 }

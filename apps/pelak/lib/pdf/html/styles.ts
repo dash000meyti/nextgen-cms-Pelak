@@ -91,6 +91,24 @@ export const pdfBaseStyles = `
     border-right: 3px solid var(--accent);
   }
 
+  .body h3 {
+    font-weight: 700;
+    font-size: 14pt;
+    line-height: 1.45;
+    margin: 18px 0 8px;
+    padding-right: 12px;
+    border-right: 3px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+
+  .body h4 {
+    font-weight: 700;
+    font-size: 12pt;
+    line-height: 1.45;
+    margin: 16px 0 8px;
+    padding-right: 12px;
+    border-right: 3px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+
   .body blockquote {
     margin: 14px 0;
     padding: 8px 16px 8px 0;

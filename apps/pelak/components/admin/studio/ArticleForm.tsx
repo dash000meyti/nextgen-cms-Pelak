@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { BlockEditor } from "@/components/admin/blocks/BlockEditor";
 import { ImageField } from "@/components/admin/fields/ImageField";
+import { JalaliDateField } from "@/components/admin/fields/JalaliDateField";
 import { ReferencePicker } from "@/components/admin/fields/ReferencePicker";
 import { SlugField } from "@/components/admin/fields/SlugField";
 import { TextareaField } from "@/components/admin/fields/TextareaField";
@@ -140,6 +141,11 @@ export function ArticleForm({
     if (!confirmed) return;
     setError(null);
     runMutation(async () => {
+      const saveResult = await saveArticleAndStay(articleId, form);
+      if (!saveResult.ok) {
+        setError(saveResult.error);
+        return;
+      }
       const result = await publishArticle(articleId);
       if (!result.ok) {
         setError(result.error);
@@ -212,6 +218,17 @@ export function ArticleForm({
           required
         />
       </div>
+
+      <JalaliDateField
+        id="publishedAt"
+        label="تاریخ انتشار"
+        value={form.publishedAt ?? ""}
+        onChange={(publishedAt) => update("publishedAt", publishedAt || null)}
+      />
+      <p className="-mt-4 text-xs text-ink-faint">
+        برای مقالات قدیمی، تاریخ پارسال را تنظیم کنید — در فهرست گروه محتوا بر
+        اساس این تاریخ مرتب می‌شود.
+      </p>
 
       <TextField
         id="subtitle"

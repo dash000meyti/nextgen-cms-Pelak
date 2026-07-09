@@ -112,6 +112,11 @@ const nextConfig: NextConfig = {
       "./lib/pdf/fonts/**/*",
       "./public/images/**/*",
     ],
+    "/api/pdf/video/[slug]": ["./lib/pdf/fonts/**/*", "./public/images/**/*"],
+    "/api/pdf/playlist/[slug]": [
+      "./lib/pdf/fonts/**/*",
+      "./public/images/**/*",
+    ],
   },
   experimental: {
     authInterrupts: true,

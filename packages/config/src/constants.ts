@@ -14,6 +14,7 @@ export const CACHE_TAGS = {
   member: (slug: string) => `member:${slug}`,
   topic: (slug: string) => `topic:${slug}`,
   contentGroup: (slug: string) => `content-group:${slug}`,
+  video: (slug: string) => `video:${slug}`,
   playlist: (slug: string) => `playlist:${slug}`,
   message: (id: number) => `message:${id}`,
 } as const;

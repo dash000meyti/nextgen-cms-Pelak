@@ -1,4 +1,5 @@
 import { paginateItems, parsePageParam } from "@nextgen-cms/config/pagination";
+import { buildPlaylistPdfPath } from "@nextgen-cms/contract/short-links";
 import {
   getPlaylistBySlug,
   getVideoModuleSettings,
@@ -10,6 +11,7 @@ import { SectionHeader } from "@/components/article/SectionHeader";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Container } from "@/components/layout/Container";
 import { ListPagination } from "@/components/ui/ListPagination";
+import { ShareBar } from "@/components/ui/ShareBar";
 import { VideoCard } from "@/components/video/VideoCard";
 import { VideoCardGrid } from "@/components/video/VideoCardGrid";
 import {
@@ -76,6 +78,16 @@ export default async function PlaylistPage({
         <SectionHeader
           title={playlist.name}
           description={playlist.description}
+        />
+      </div>
+      <div className="mt-4">
+        <ShareBar
+          title={playlist.name}
+          shareUrl={`/playlists/${encodeSlugSegment(playlist.slug)}`}
+          pdfDownloadUrl={buildPlaylistPdfPath(
+            encodeSlugSegment(playlist.slug),
+          )}
+          pdfFilename={`${playlist.slug}.pdf`}
         />
       </div>
       <VideoCardGrid>

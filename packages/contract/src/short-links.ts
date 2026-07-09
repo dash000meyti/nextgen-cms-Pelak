@@ -18,6 +18,14 @@ export function buildContentGroupPdfPath(slug: string): string {
   return `/api/pdf/content-group/${slug}`;
 }
 
+export function buildVideoPdfPath(slug: string): string {
+  return `/api/pdf/video/${slug}`;
+}
+
+export function buildPlaylistPdfPath(slug: string): string {
+  return `/api/pdf/playlist/${slug}`;
+}
+
 export function parseShortLinkCode(code: string): ShortLinkTarget | null {
   const contentMatch = /^c(\d+)$/.exec(code);
   if (contentMatch) {

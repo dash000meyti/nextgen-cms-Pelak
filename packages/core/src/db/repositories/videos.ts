@@ -39,3 +39,24 @@ export async function countVideos() {
     .where(eq(videos.status, "published"));
   return rows[0]?.total ?? 0;
 }
+
+export async function findVideoBySlug(slug: string) {
+  const rows = await db
+    .select()
+    .from(videos)
+    .where(eq(videos.slug, slug))
+    .limit(1);
+  const row = rows[0];
+  if (!row || row.status !== "published") return undefined;
+
+  const links = await db
+    .select({ playlist: playlists })
+    .from(videoPlaylists)
+    .innerJoin(playlists, eq(playlists.id, videoPlaylists.playlistId))
+    .where(eq(videoPlaylists.videoId, row.id));
+
+  return mapVideoRow({
+    row,
+    playlists: links.map((link) => mapPlaylistRow(link.playlist)),
+  });
+}

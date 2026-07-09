@@ -18,9 +18,13 @@ function resolveChromiumExecutable(): string | undefined {
   }
 
   const candidates = [
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
     "/usr/bin/chromium",
     "/usr/bin/chromium-browser",
     "/usr/lib/chromium/chromium",
+    "/opt/google/chrome/chrome",
+    "/usr/bin/google-chrome-stable",
+    "/usr/bin/google-chrome",
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   ];
 

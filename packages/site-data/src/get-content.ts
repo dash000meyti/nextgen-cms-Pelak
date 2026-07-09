@@ -57,7 +57,10 @@ import {
   findAllTopics,
   findTopicBySlug,
 } from "@nextgen-cms/core/db/repositories/topics";
-import { findAllVideos } from "@nextgen-cms/core/db/repositories/videos";
+import {
+  findAllVideos,
+  findVideoBySlug,
+} from "@nextgen-cms/core/db/repositories/videos";
 
 /* ---------- Site config ---------- */
 
@@ -399,5 +402,13 @@ export async function getVideosByPlaylist(slug: string): Promise<Video[]> {
     ["videos-by-playlist", slug],
     [CACHE_TAGS.videos, CACHE_TAGS.playlist(slug)],
     () => findVideosByPlaylistSlug(slug),
+  )();
+}
+
+export async function getVideoBySlug(slug: string): Promise<Video | undefined> {
+  return platformCache(
+    ["video", slug],
+    [CACHE_TAGS.videos, CACHE_TAGS.video(slug)],
+    () => findVideoBySlug(slug),
   )();
 }

@@ -1,3 +1,4 @@
+import { buildVideoPdfPath } from "@nextgen-cms/contract/short-links";
 import type { Video } from "@nextgen-cms/contract/types/article";
 import Image from "next/image";
 import Link from "next/link";
@@ -48,6 +49,13 @@ export function VideoCard({ video }: VideoCardProps) {
           <p className="text-xs text-ink-muted">{video.duration}</p>
         </div>
       </Link>
+      <a
+        href={buildVideoPdfPath(video.slug)}
+        download={`${video.slug}.pdf`}
+        className="inline-flex items-center gap-1 text-xs text-ink-muted transition-colors hover:text-accent"
+      >
+        دانلود PDF
+      </a>
     </article>
   );
 }

@@ -65,7 +65,11 @@ COPY --from=build /app/tsconfig.base.json ./tsconfig.base.json
 COPY --from=deps /app/node_modules ./node_modules
 COPY docker/docker-entrypoint.sh ./docker-entrypoint.sh
 
-RUN npx playwright@1.52.0 install --with-deps chromium \
+# Install the Chromium build that matches the runtime playwright-core version.
+# Deriving the version from node_modules keeps the browser revision in sync
+# with the lockfile; a mismatch causes "Executable doesn't exist" at launch.
+RUN PLAYWRIGHT_VERSION="$(node -p "require('./node_modules/playwright-core/package.json').version")" \
+  && npx --yes "playwright@${PLAYWRIGHT_VERSION}" install --with-deps chromium \
   && chown -R nextjs:nodejs /ms-playwright
 
 RUN chmod +x ./docker-entrypoint.sh

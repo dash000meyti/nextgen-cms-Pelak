@@ -123,6 +123,14 @@ docker compose -f docker-compose.yml up -d
 
 ریستور قبل از جایگزینی، یک نسخه پشتیبان از DB فعلی (`pelak-*.sqlite`) و uploads فعلی (`uploads-*/`) در `/data/backups` می‌گیرد و در صورت خطا rollback می‌کند.
 
+> ساختار آرشیو: `manifest.json` عمداً **اولین** ورودی آرشیو است (metadata-first) تا حتی در انتقال ناقص زودتر اعتبارسنجی شود. آرشیو باید یک `tar.gz` باشد که `manifest.json`، `pelak.sqlite` و `uploads/` را در ریشه دارد. اگر آرشیو را روی macOS باز کرده و دوباره فشرده کرده‌اید (مثلاً با Archive Utility)، ممکن است همه‌چیز داخل یک پوشهٔ wrapper قرار گیرد؛ ریستور این حالت را هم پشتیبانی می‌کند، ولی بهتر است فایل دانلودشده را بدون باز/فشرده‌سازی مجدد مستقیماً بازیابی کنید.
+
+#### خطای «آرشیو شامل manifest.json نیست»
+
+- فایل را دستکاری/باز-و-بسته نکنید؛ همان `tar.gz` دانلودشده را بازیابی کنید.
+- صحت فایل را بررسی کنید: `tar -tzf <file.tar.gz> | head` باید `manifest.json` را نشان دهد.
+- اگر از رابط وب روی هاست جدید ریستور می‌کنید و یک reverse proxy (nginx) در مسیر است، محدودیت حجم بدنه را افزایش دهید (`client_max_body_size`) تا آپلود قطع نشود؛ آپلود قطع‌شده باعث ناقص‌ماندن آرشیو می‌شود.
+
 ### Rollback / Restore (DB-only، سریع)
 
 1. سرویس را متوقف کنید.
@@ -185,17 +193,18 @@ npm run dev
 
 - Base image: `node:22-bookworm-slim` (Debian) — برای پایداری build روی هاست‌هایی که DNS به mirrorهای Alpine (`dl-cdn.alpinelinux.org`) مشکل دارد.
 - native modules (`better-sqlite3`) در همان libc (glibc) کامپایل و اجرا می‌شوند.
-- PDF: Playwright Chromium bundle در `/ms-playwright` (نصب با `npx playwright install --with-deps chromium` در image).
+- PDF: Playwright Chromium bundle در `/ms-playwright`. نسخهٔ نصب browser از روی `playwright-core` نصب‌شده استخراج می‌شود (`playwright@$(node -p "require('playwright-core/package.json').version")`) تا با runtime هماهنگ بماند. **هرگز نسخه را hardcode نکنید** — mismatch باعث خطای `Executable doesn't exist at /ms-playwright/chromium_headless_shell-<rev>/...` می‌شود چون هر نسخهٔ Playwright به revision متفاوتی از Chromium نیاز دارد.
 - runtime dirهای Chromium برای user غیر root باید writable باشند (`HOME`, `XDG_CONFIG_HOME`, `XDG_CACHE_HOME`).
 
 ### خطای Chromium/Crashpad (PDF)
 
 اگر خطایی مشابه `Chromium launch failed for PDF generation` یا `chrome_crashpad_handler --database is required` دیدید:
 
-1. container را rebuild کنید: `docker compose -f docker-compose.yml up -d --build`
-2. در لاگ startup دنبال `Chromium verification OK` بگردید؛ اگر `WARNING` دیدید، `PLAYWRIGHT_BROWSERS_PATH` و دسترسی `/ms-playwright` را بررسی کنید.
-3. برای override دستی: `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` را روی binary واقعی Chromium تنظیم کنید.
-4. writable بودن مسیرهای `HOME/.config` و `HOME/.cache` را بررسی کنید.
+1. container را rebuild کنید: `docker compose -f docker-compose.yml up -d --build` (نصب browser باید بدون cache انجام شود تا نسخهٔ درست دانلود شود).
+2. اگر خطا `Executable doesn't exist at /ms-playwright/chromium_headless_shell-<rev>/...` بود، revision نصب‌شده با نسخهٔ `playwright-core` هماهنگ نیست. مطمئن شوید Dockerfile نسخه را از `playwright-core` استخراج می‌کند و آن را hardcode نکرده. بعد از هر `npm update` برای `playwright-core`، rebuild لازم است.
+3. در لاگ startup دنبال `Chromium verification OK` بگردید؛ اگر `WARNING` دیدید، `PLAYWRIGHT_BROWSERS_PATH` و دسترسی `/ms-playwright` را بررسی کنید.
+4. برای override دستی: `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` را روی binary واقعی Chromium تنظیم کنید.
+5. writable بودن مسیرهای `HOME/.config` و `HOME/.cache` را بررسی کنید.
 
 ## محدودیت حجم آپلود (Server Actions)
 

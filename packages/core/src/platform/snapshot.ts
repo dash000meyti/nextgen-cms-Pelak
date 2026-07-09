@@ -179,10 +179,13 @@ function buildStagingDir(manifest: SnapshotManifest): string {
   return staging;
 }
 
+// manifest.json is intentionally FIRST so it lands at the head of the archive:
+// it is validated before the bulk payload and stays recoverable even if a
+// transfer is truncated mid-stream.
 const SNAPSHOT_ENTRY_NAMES = [
+  SNAPSHOT_MANIFEST_NAME,
   "pelak.sqlite",
   "uploads",
-  SNAPSHOT_MANIFEST_NAME,
 ];
 
 export async function writeSnapshotBundle(
@@ -242,12 +245,51 @@ export function streamSnapshotBundle(): {
   return { stream: out, manifest };
 }
 
-export function readManifestFromDir(dir: string): SnapshotManifest {
-  const manifestPath = join(dir, SNAPSHOT_MANIFEST_NAME);
-  if (!existsSync(manifestPath)) {
-    throw new Error("آرشیو شامل manifest.json نیست؛ snapshot معتبر نیست.");
+/**
+ * Locate the directory that holds `manifest.json`. Handles the common case
+ * where an archive was unpacked and re-packed inside a wrapper folder (e.g.
+ * macOS Archive Utility), which nests every entry one level deep.
+ */
+function locateManifestDir(dir: string): string | null {
+  if (existsSync(join(dir, SNAPSHOT_MANIFEST_NAME))) return dir;
+  let entries: import("node:fs").Dirent[];
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return null;
   }
-  const raw = readFileSync(manifestPath, "utf-8");
+  for (const entry of entries) {
+    if (
+      entry.isDirectory() &&
+      existsSync(join(dir, entry.name, SNAPSHOT_MANIFEST_NAME))
+    ) {
+      return join(dir, entry.name);
+    }
+  }
+  return null;
+}
+
+/** Resolve the snapshot root (dir containing manifest.json) or throw. */
+export function resolveSnapshotRoot(dir: string): string {
+  const found = locateManifestDir(dir);
+  if (found) return found;
+  let contents: string[] = [];
+  try {
+    contents = readdirSync(dir).slice(0, 20);
+  } catch {
+    // dir unreadable — fall through to generic message
+  }
+  const hint = contents.length
+    ? ` محتوای آرشیو: ${contents.join("، ")}`
+    : " (آرشیو خالی یا استخراج‌نشده است)";
+  throw new Error(
+    `آرشیو شامل manifest.json نیست؛ snapshot معتبر نیست.${hint}`,
+  );
+}
+
+export function readManifestFromDir(dir: string): SnapshotManifest {
+  const root = resolveSnapshotRoot(dir);
+  const raw = readFileSync(join(root, SNAPSHOT_MANIFEST_NAME), "utf-8");
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw);
@@ -286,10 +328,23 @@ export async function streamExtractSnapshotBundle(
 ): Promise<SnapshotManifest> {
   mkdirSync(tempDir, { recursive: true });
   await new Promise<void>((resolve, reject) => {
+    // `gzip: true` handles gzipped bundles; node-tar also tolerates a plain
+    // tar here (e.g. if a proxy stripped the gzip layer during download).
     const extractStream = tarExtract({ cwd: tempDir, gzip: true });
-    input.on("error", reject);
-    extractStream.on("error", reject);
-    extractStream.on("end", () => resolve());
+    let settled = false;
+    const done = (error?: unknown) => {
+      if (settled) return;
+      settled = true;
+      if (error) reject(error);
+      else resolve();
+    };
+    input.on("error", done);
+    extractStream.on("error", done);
+    // Wait for "close": node-tar flushes all entries to disk before it fires,
+    // so manifest.json is guaranteed present. Resolving on "end" (input
+    // consumed) can race ahead of the on-disk writes on slow volumes.
+    extractStream.on("close", () => done());
+    extractStream.on("finish", () => done());
     input.pipe(extractStream);
   });
   return readManifestFromDir(tempDir);
@@ -310,9 +365,10 @@ export function backupUploadsDir(): string | null {
 export async function restoreSnapshotFromTemp(
   tempDir: string,
 ): Promise<SnapshotRestoreResult> {
-  const manifest = readManifestFromDir(tempDir);
-  const tempDbPath = join(tempDir, "pelak.sqlite");
-  const tempUploadsPath = join(tempDir, "uploads");
+  const root = resolveSnapshotRoot(tempDir);
+  const manifest = readManifestFromDir(root);
+  const tempDbPath = join(root, "pelak.sqlite");
+  const tempUploadsPath = join(root, "uploads");
 
   // Preflight: validate the sqlite file in the bundle.
   if (!existsSync(tempDbPath)) {

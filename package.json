@@ -24,6 +24,7 @@
     "db:migrate-media-paths": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:migrate-media-paths -w @nextgen-cms/core",
     "db:migrate-content-group-uploads": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:migrate-content-group-uploads -w @nextgen-cms/core",
     "db:promote-article-media": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:promote-article-media -w @nextgen-cms/core",
+    "db:relink-article-relations": "DATABASE_URL=file:../../data/pelak.sqlite npm run db:relink-article-relations -w @nextgen-cms/core",
     "db:setup": "npm run db:migrate && FIRST_BOOT=1 npm run db:seed",
     "ci:check": "bash scripts/ci-check.sh",
     "release": "node scripts/release.mjs"

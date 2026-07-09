@@ -20,6 +20,8 @@ export function AuthorList({
   membersLabel,
   variant = "default",
 }: AuthorListProps) {
+  if (authors.length === 0) return null;
+
   const isSidebar = variant === "sidebar";
   const headingLabel = authors.length === 1 ? memberLabel : membersLabel;
 

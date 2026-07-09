@@ -90,7 +90,6 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
       pdfDownloadUrl={pdfDownloadUrl}
       related={related}
       currentContentGroup={currentContentGroup}
-      linkedContentGroup={article.contentGroups?.[0]}
       contentGroupPageTitle={contentGroupModuleSettings.pageTitle}
       siteConfig={siteConfig}
     />

@@ -20,7 +20,6 @@ type ArticleDetailViewProps = {
   pdfDownloadUrl?: string;
   related: ArticlePreview[];
   currentContentGroup: ContentGroupSummary;
-  linkedContentGroup?: ContentGroupSummary;
   contentGroupPageTitle: string;
   siteConfig: SiteConfig;
   unoptimized?: boolean;
@@ -32,7 +31,6 @@ export function ArticleDetailView({
   pdfDownloadUrl,
   related,
   currentContentGroup,
-  linkedContentGroup,
   contentGroupPageTitle,
   siteConfig,
   unoptimized = false,
@@ -102,14 +100,12 @@ export function ArticleDetailView({
               membersLabel={siteConfig.membersLabel}
               variant="sidebar"
             />
-            {linkedContentGroup ? (
-              <div className="w-full sticky top-[18dvh] z-10">
-                <ContentGroupPromoBanner
-                  group={linkedContentGroup}
-                  contentGroupPageTitle={contentGroupPageTitle}
-                />
-              </div>
-            ) : null}
+            <div className="w-full sticky top-[18dvh] z-10">
+              <ContentGroupPromoBanner
+                group={currentContentGroup}
+                contentGroupPageTitle={contentGroupPageTitle}
+              />
+            </div>
           </aside>
         </div>
       </Container>

@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_MEMBER_AVATAR_SRC } from "@nextgen-cms/contract/media/member-avatar";
 import type { Member } from "@nextgen-cms/contract/types/member";
 import { savePersonalSettings } from "@nextgen-cms/studio/cms/mutations/member";
 import { useRouter } from "next/navigation";
@@ -24,7 +25,6 @@ export function PersonalSettingsForm({ member }: PersonalSettingsFormProps) {
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState(member.bio);
   const [avatarSrc, setAvatarSrc] = useState(member.avatar.src);
-  const [avatarAlt, setAvatarAlt] = useState(member.avatar.alt);
 
   function handleSave() {
     setError(null);
@@ -37,7 +37,7 @@ export function PersonalSettingsForm({ member }: PersonalSettingsFormProps) {
         password: password || undefined,
         bio,
         avatarSrc,
-        avatarAlt,
+        avatarAlt: name,
       });
       if (!result.ok) {
         setError(result.error);
@@ -94,10 +94,11 @@ export function PersonalSettingsForm({ member }: PersonalSettingsFormProps) {
           id="personal-avatar"
           label="آواتار"
           src={avatarSrc}
-          alt={avatarAlt}
+          alt={name}
           onSrcChange={setAvatarSrc}
-          onAltChange={setAvatarAlt}
-          required
+          onAltChange={() => {}}
+          hideAlt
+          emptyPreviewSrc={DEFAULT_MEMBER_AVATAR_SRC}
         />
       </div>
 

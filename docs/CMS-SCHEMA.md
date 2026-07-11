@@ -74,6 +74,25 @@ export const exampleSchema = {
 
 ارتباط مقاله↔گروه **چند‌به‌چند** است؛ در schema مقاله فیلد `contentGroupIds` (reference به `contentGroup`, multiple).
 
+## Member schema
+
+فیلدهای ثابت در `packages/contract/src/cms-schema/member.ts`:
+
+| فیلد | kind | توضیح |
+|------|------|--------|
+| `name` | text | نام |
+| `slug` | slug | نامک یکتا — مسیر عمومی `/members/{slug}` |
+| `username` | text | نام کاربری (یکتا) |
+| `email` | text | ایمیل (اختیاری) |
+| `displayRole` | text | سمت نمایشی |
+| `bio` | textarea | بیوگرافی |
+| `avatarSrc` | image | آواتار **اختیاری**؛ خالی → نمایش `/images/man.jpg` |
+| `roleId` | select | نقش سیستمی |
+| `isActive` | boolean | فعال |
+| `social*` | text | شبکه‌های اجتماعی |
+
+`avatarAlt` ورودی جدا نیست؛ هنگام ذخیره از `name` مشتق می‌شود. هلپر نمایش: `resolveMemberAvatar` در `packages/contract/src/media/member-avatar.ts`.
+
 تنظیمات ماژول (`ContentGroupModuleSettings` در `site_settings.content_group_module_settings`):
 
 | فیلد | پیش‌فرض |

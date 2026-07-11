@@ -15,7 +15,7 @@ npm install
 npm run db:setup && npm run dev   # http://localhost:3134
 ```
 
-Admin: `/admin/login` — ورود با نام کاربری و رمز عبور از seed یا `.env.local`
+Admin: `/admin/login` — ورود با نام کاربری و رمز عبور از seed یا `.env.local`. پس از ورود، دکمهٔ مدیریت (آیکون grid) در هدر سایت نمایش داده می‌شود.
 
 ## Mental model (فارسی)
 

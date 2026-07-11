@@ -1,3 +1,4 @@
+import { resolveMemberAvatar } from "@nextgen-cms/contract/media/member-avatar";
 import type { Author } from "@nextgen-cms/contract/types/article";
 import { db } from "@nextgen-cms/core/db";
 import { mapAuthorRow } from "@nextgen-cms/core/db/mappers/author";
@@ -51,7 +52,7 @@ function mapMemberToPublicAuthor(
     name: member.name,
     role: member.displayRole,
     bio: member.bio,
-    avatar: { src: member.avatarSrc, alt: member.avatarAlt },
+    avatar: resolveMemberAvatar(member.avatarSrc, member.name),
     ...(Object.keys(social).length > 0 ? { social } : {}),
     articleCount,
   };

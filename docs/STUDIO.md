@@ -175,7 +175,7 @@ packages/core/src/db/repositories/ — نوشتن DB
 
 ```
 site/                      دارایی عمومی سایت (public)
-members/{memberId}/        آواتار عضو (public)
+members/{memberId}/        آواتار عضو (public؛ اختیاری — خالی → `/images/man.jpg`)
 members/{memberId}/draft/  staging قبل از ثبت entity (private)
 content/{articleId}/       مدیا مقاله (public فقط وقتی status=published)
 content-group/{groupId}/   جلد + PDF گروه محتوا (public؛ یک PDF با نام SEO)
@@ -192,6 +192,12 @@ playlists/{playlistId}/    کاور لیست پخش (public)
 5. **حذف دائمی**: `purgeMediaForContent` — پاکسازی `content/{id}/`
 
 Media picker: entity نساخته → فولدر draft عضو؛ entity ساخته → فولدر همان entity.
+
+### آواتار عضو
+
+- در فرم عضو و تنظیمات شخصی، `avatarSrc` اختیاری است؛ فیلد «متن جایگزین» نمایش داده نمی‌شود (`ImageField` با `hideAlt`).
+- هنگام ذخیره، `avatarAlt` برابر نام عضو ست می‌شود.
+- بدون آپلود، نمایش عمومی و لیست ادمین از `/images/man.jpg` استفاده می‌کنند (`resolveMemberAvatar`).
 
 ### گروه محتوا — PDF
 
@@ -231,8 +237,9 @@ npm run db:migrate-media-paths   # یک‌بار: shared/، content/draft/، arc
 
 ## Auth
 
-- `apps/pelak/proxy.ts` — JWT verify
-- `getMemberSession()` در layout و mutations
+- `apps/pelak/proxy.ts` — JWT verify (gate اصلی `/admin/*`)
+- `getMemberSession()` در admin layout و mutations
+- root `app/layout.tsx` می‌تواند `getMemberSession()` را برای **ناوبری شرطی** در public shell بخواند (مثلاً `AdminLink` در هدر) — فقط prop boolean؛ RBAC و `permissions[]` در هدر expose نشود
 
 ## افزودن document type
 

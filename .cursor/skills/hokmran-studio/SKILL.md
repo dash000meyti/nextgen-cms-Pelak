@@ -45,6 +45,7 @@ description: راهنمای Studio CMS و افزودن document type در پلت
 ## Media
 
 `ImageField` + `uploadMedia` → URL `/uploads/{uuid}.ext`
+آواتار عضو: اختیاری؛ بدون alt در فرم؛ خالی → `/images/man.jpg` (`resolveMemberAvatar`)
 تنظیمات: تب «تنظیمات» در `/admin/media`
 
 ## قوانین

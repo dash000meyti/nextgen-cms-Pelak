@@ -8,6 +8,7 @@
 |-----------|--------|------------|
 | صفحه public | `apps/pelak/app/` | `hokmran-page` |
 | کامپوننت UI | `apps/pelak/components/` | `hokmran-component` · `docs/UI-BOUNDARY.md` |
+| لینک مدیریت در هدر (کاربر واردشده) | `apps/pelak/app/layout.tsx`, `components/layout/{SiteHeader,AdminLink}.tsx`, `getMemberSession()` | `hokmran-component` · `docs/UI-BOUNDARY.md` · `docs/STUDIO.md` (Auth) |
 | داده public | `packages/site-data/src/get-content.ts` | `data-layer.mdc` |
 | فرم عمومی (نوشتن پیام) | `packages/site-data/src/messages-actions.ts` (`submitMessage`) | `docs/CMS-SCHEMA.md` |
 | صندوق پیام‌ها (ادمین) | `/admin/messages`, `packages/studio/src/cms/{queries,mutations}/messages.ts` | `docs/STUDIO.md` |

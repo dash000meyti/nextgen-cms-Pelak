@@ -1,5 +1,6 @@
 "use client";
 
+import { resolveMemberAvatar } from "@nextgen-cms/contract/media/member-avatar";
 import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import { DocumentList } from "@/components/admin/studio/DocumentList";
 import { idColumn } from "@/components/admin/studio/document-list-columns";
@@ -61,18 +62,19 @@ export function MembersAdminList({ members, canEdit }: MembersAdminListProps) {
           className: "w-16",
           headerClassName: "w-16 p-0",
           cellClassName: "w-16 p-0",
-          render: (row) => (
-            <div className="size-16 overflow-hidden bg-surface-2">
-              {row.avatarSrc ? (
-                // biome-ignore lint/performance/noImgElement: admin upload URLs may be session-gated
+          render: (row) => {
+            const avatar = resolveMemberAvatar(row.avatarSrc, row.name);
+            return (
+              <div className="size-16 overflow-hidden bg-surface-2">
+                {/* biome-ignore lint/performance/noImgElement: admin upload URLs may be session-gated */}
                 <img
-                  src={row.avatarSrc}
-                  alt={row.avatarAlt || row.name}
+                  src={avatar.src}
+                  alt={avatar.alt}
                   className="size-full object-cover"
                 />
-              ) : null}
-            </div>
-          ),
+              </div>
+            );
+          },
         },
         idColumn<MembersAdminListRow>(),
         {

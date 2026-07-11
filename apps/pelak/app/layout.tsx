@@ -12,6 +12,7 @@ import {
   getThemeTokens,
   getVideoModuleSettings,
 } from "@nextgen-cms/site-data/get-content";
+import { getMemberSession } from "@nextgen-cms/studio/admin/session";
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -72,6 +73,7 @@ export default async function RootLayout({
     contentGroupSettings,
     videoSettings,
     moduleSettings,
+    session,
   ] = await Promise.all([
     getSiteConfig(),
     getThemeTokens(),
@@ -82,6 +84,7 @@ export default async function RootLayout({
     getContentGroupModuleSettings(),
     getVideoModuleSettings(),
     getModuleSettings(),
+    getMemberSession(),
   ]);
 
   const currentContentGroup = featureModules.contentGroup
@@ -115,6 +118,7 @@ export default async function RootLayout({
               siteConfig={siteConfig}
               searchArticles={searchArticles}
               currentContentGroupLabel={currentContentGroup?.title ?? ""}
+              showAdminLink={session !== null}
             />
             <main className="flex-1">{children}</main>
             <SiteFooter siteConfig={siteConfig} />

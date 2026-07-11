@@ -18,6 +18,10 @@ type ImageFieldProps = {
   onCaptionChange?: (value: string) => void;
   onCreditChange?: (value: string) => void;
   showCaption?: boolean;
+  /** Hide the alt text input (e.g. member avatar derives alt from name). */
+  hideAlt?: boolean;
+  /** Shown in preview when `src` is empty. */
+  emptyPreviewSrc?: string;
   required?: boolean;
   uploadContext?: MediaUploadContext;
   maxBytes?: number;
@@ -38,6 +42,8 @@ export function ImageField({
   onCaptionChange,
   onCreditChange,
   showCaption = false,
+  hideAlt = false,
+  emptyPreviewSrc,
   required,
   uploadContext,
   maxBytes,
@@ -107,14 +113,16 @@ export function ImageField({
     </div>
   );
 
+  const previewSrc = src || emptyPreviewSrc || "";
+
   const preview = (
     <div
       className={`relative w-full overflow-hidden rounded border border-rule bg-paper ${previewAspectClass ?? "aspect-video"}`}
     >
-      {src ? (
+      {previewSrc ? (
         // biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs
         <img
-          src={src}
+          src={previewSrc}
           alt={alt || label || "پیش‌نمایش تصویر"}
           className="h-full w-full object-cover"
         />
@@ -135,13 +143,15 @@ export function ImageField({
         onChange={onSrcChange}
         required={required}
       />
-      <TextField
-        id={`${id}-alt`}
-        label="متن جایگزین"
-        value={alt}
-        onChange={onAltChange}
-        required={required}
-      />
+      {hideAlt ? null : (
+        <TextField
+          id={`${id}-alt`}
+          label="متن جایگزین"
+          value={alt}
+          onChange={onAltChange}
+          required={required}
+        />
+      )}
       {showCaption && onCaptionChange ? (
         <TextField
           id={`${id}-caption`}
@@ -196,10 +206,10 @@ export function ImageField({
           </div>
           {previewAspectClass ? preview : null}
           {fields}
-          {src && !previewAspectClass ? (
+          {previewSrc && !previewAspectClass ? (
             // biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs
             <img
-              src={src}
+              src={previewSrc}
               alt={alt || label || "پیش‌نمایش"}
               className="max-h-40 rounded border border-rule"
             />

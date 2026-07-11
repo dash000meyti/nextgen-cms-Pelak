@@ -32,7 +32,6 @@ import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-a
 import { assertUniqueSlug } from "@nextgen-cms/studio/cms/queries/slug";
 import {
   normalizeSlugInput,
-  validateImageMeta,
   validateRequired,
   validateSlug,
 } from "@nextgen-cms/studio/cms/validation";
@@ -95,7 +94,7 @@ function parseFormData(
     displayRole: data.displayRole.trim(),
     bio: data.bio.trim(),
     avatarSrc: data.avatarSrc.trim(),
-    avatarAlt: data.avatarAlt.trim(),
+    avatarAlt: data.name.trim(),
     socialTwitter: data.socialTwitter.trim() || null,
     socialTelegram: data.socialTelegram.trim() || null,
     socialInstagram: data.socialInstagram.trim() || null,
@@ -128,13 +127,6 @@ async function validateMemberInput(
     options.excludeId,
   );
   if (uniqueError) return uniqueError;
-
-  const avatarError = validateImageMeta(
-    input.avatarSrc,
-    input.avatarAlt,
-    "تصویر",
-  );
-  if (avatarError) return avatarError;
 
   if (input.email) {
     if (await memberEmailExists(input.email, options.excludeId)) {
@@ -259,13 +251,10 @@ export async function savePersonalSettings(
   const password = input.password;
   const bio = input.bio.trim();
   const avatarSrc = input.avatarSrc.trim();
-  const avatarAlt = input.avatarAlt.trim();
+  const avatarAlt = name;
 
   const nameError = validateRequired(name, "نام");
   if (nameError) return { ok: false, error: nameError };
-
-  const avatarError = validateImageMeta(avatarSrc, avatarAlt, "آواتار");
-  if (avatarError) return { ok: false, error: avatarError };
 
   const member = await findMemberById(session.memberId);
   if (!member) {

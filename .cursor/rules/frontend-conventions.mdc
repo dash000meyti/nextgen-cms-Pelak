@@ -10,6 +10,7 @@ alwaysApply: false
 
 - کامپوننت‌ها فقط `props` — بدون import DB/fixture
 - داده در **صفحات** از `@nextgen-cms/site-data` — نه در کامپوننت‌ها
+- **استثنا:** فقط `app/layout.tsx` مجاز است `getMemberSession()` را برای prop boolean (مثلاً `showAdminLink`) بخواند — جزئیات `docs/UI-BOUNDARY.md`
 - Server Component پیش‌فرض؛ `"use client"` فقط برای state/event
 - بدون UI library — Tailwind v4 + SVG inline
 - `ui/` primitives · `admin/` استودیو · `home|article/` سایت · `layout/` shell

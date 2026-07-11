@@ -56,6 +56,7 @@ flowchart TB
 - build بدون migrate/seed
 - public → `@nextgen-cms/site-data`؛ admin → `@nextgen-cms/studio`
 - کامپوننت فقط props — بدون import مستقیم DB/fixture
+- public shell (`app/layout.tsx`) می‌تواند `getMemberSession()` را برای UI شرطی (مثلاً لینک مدیریت در هدر) بخواند و فقط prop boolean به کامپوننت بدهد
 - migration additive-only — DB canonical: `pelak.sqlite`
 - RTL (`lang="fa"`, `dir="rtl"`)، Tailwind v4، بدون UI library خارجی (فعلاً)
 - RBAC: `settings.*` / `content.*` / `members.*` / `media.*` / `messages.*` / `modules.*` — skill `hokmran-rbac`

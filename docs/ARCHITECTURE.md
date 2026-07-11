@@ -62,6 +62,12 @@ flowchart LR
 
 > `packages/studio` package منطق admin است — appهای جداگانهٔ `apps/site` و `apps/studio` حذف شده‌اند.
 
+## Public ↔ Admin navigation
+
+- کوکی session (`hokmran_admin_session`) بین سایت عمومی و `/admin` مشترک است.
+- اعضای لاگین‌شده دکمهٔ مدیریت (`AdminLink`) در `SiteHeader` می‌بینند — discoverability، نه authorization.
+- دسترسی واقعی: `proxy.ts` + `getMemberSession()` در admin layout + RBAC در صفحات/mutations.
+
 ## Upgrade path (production)
 
 ```mermaid
@@ -121,6 +127,7 @@ sequenceDiagram
 
 - **staging:** `members/{memberId}/draft/` — قبل از ثبت entity (مقاله، گروه، ویدیو، عضو)
 - **نهایی:** `content/{id}/`, `content-group/{id}/`, `videos/{id}/`, `playlists/{id}/`, `members/{id}/` (آواتار), `site/` (عمومی)
+- **آواتار عضو بدون آپلود:** نمایش با `/images/man.jpg` (ثابت در `apps/pelak/public/images/`؛ `resolveMemberAvatar`)
 - **promote:** در save/create، URLهای استفاده‌شده از draft به فولدر entity منتقل می‌شوند (`promote-media.ts`)
 - **بایگانی مقاله:** فقط `status` در DB — فایل‌ها در `content/{id}/` می‌مانند
 - **حذف دائمی:** purge فولدر `content/{id}/`

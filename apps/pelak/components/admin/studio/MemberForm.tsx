@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_MEMBER_AVATAR_SRC } from "@nextgen-cms/contract/media/member-avatar";
 import { memberAvatarPath } from "@nextgen-cms/core/media/path-policy";
 import { useAdminMember } from "@nextgen-cms/studio/admin/admin-member-context";
 import {
@@ -201,11 +202,12 @@ export function MemberForm({
         id="avatar"
         label="تصویر"
         src={form.avatarSrc}
-        alt={form.avatarAlt}
+        alt={form.name}
         onSrcChange={(avatarSrc) => update("avatarSrc", avatarSrc)}
-        onAltChange={(avatarAlt) => update("avatarAlt", avatarAlt)}
+        onAltChange={() => {}}
+        hideAlt
+        emptyPreviewSrc={DEFAULT_MEMBER_AVATAR_SRC}
         uploadContext={uploadContext}
-        required
       />
 
       <div className="grid gap-6 lg:grid-cols-3">

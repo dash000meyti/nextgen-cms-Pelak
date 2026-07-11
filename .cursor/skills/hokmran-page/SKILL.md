@@ -46,6 +46,7 @@ export default function XPage() {
 
 - Server Component پیش‌فرض. client فقط در کامپوننت جدا.
 - SiteHeader/SiteFooter در `app/layout.tsx` — تکرار نکن.
+- root layout می‌تواند prop مشتق از session (مثلاً `showAdminLink`) به `SiteHeader` بدهد — جزئیات `docs/UI-BOUNDARY.md`.
 - accessor → props به کامپوننت (`components/home|article/`).
 
 ## ۵. اعتبارسنجی

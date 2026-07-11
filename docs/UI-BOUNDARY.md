@@ -11,7 +11,7 @@ apps/pelak/components/
   home/       بخش‌های صفحهٔ اصلی
   article/    کارت/لیست/هدر مقاله
   content-group/      گروه‌های محتوا (ماژول)
-  layout/     shell — Container, SiteHeader, Breadcrumbs
+  layout/     shell — Container, SiteHeader, AdminLink, Breadcrumbs
   theme/      ThemeProvider, tokens runtime
   contact/    فرم تماس
 ```
@@ -31,6 +31,14 @@ apps/pelak/components/
 - Server Component پیش‌فرض؛ `"use client"` فقط برای state/event
 - بدون UI library خارجی — Tailwind v4 + SVG inline
 - `packages/studio` package منطق admin است — **نه** app حذف‌شدهٔ `apps/studio`
+
+## Public shell (`layout/`)
+
+- `SiteHeader` و `SiteFooter` فقط در root `app/layout.tsx` mount می‌شوند — admin shell جداگانه در `app/admin/(panel)/layout.tsx` دارد.
+- ناحیهٔ utility هدر (سمت چپ در RTL): `AdminLink` (شرطی) · `ThemeToggle` · `SearchTrigger`.
+- **استثنای session (ناوبری):** root layout می‌تواند `getMemberSession()` از `@nextgen-cms/studio/admin/session` را **فقط برای UI شرطی** بخواند و prop boolean مثل `showAdminLink` به `SiteHeader` بدهد. کامپوننت‌های `layout/` همچنان props-only — بدون import session/DB.
+- `AdminLink` Server Component است؛ وقتی `showAdminLink` true باشد به `/admin` لینک می‌دهد. authorization واقعی در `proxy.ts` و RBAC admin انجام می‌شود.
+- `utilityLinks` در `SiteConfig` (CMS) لینک‌های استاتیک است — جدا از لینک session-driven مدیریت.
 
 ## package UI آینده
 

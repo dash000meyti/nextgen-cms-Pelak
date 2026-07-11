@@ -1,6 +1,7 @@
 import type { ArticlePreview } from "@nextgen-cms/contract/types/article";
 import type { SiteConfig } from "@nextgen-cms/contract/types/site";
 import Link from "next/link";
+import { AdminLink } from "@/components/layout/AdminLink";
 import { Container } from "@/components/layout/Container";
 import { Logo } from "@/components/layout/Logo";
 import { MobileNav } from "@/components/layout/MobileNav";
@@ -11,12 +12,14 @@ type SiteHeaderProps = {
   siteConfig: SiteConfig;
   searchArticles: ArticlePreview[];
   currentContentGroupLabel: string;
+  showAdminLink?: boolean;
 };
 
 export function SiteHeader({
   siteConfig,
   searchArticles,
   currentContentGroupLabel,
+  showAdminLink = false,
 }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-rule bg-paper/80 backdrop-blur-sm supports-backdrop-filter:bg-paper/75">
@@ -50,6 +53,7 @@ export function SiteHeader({
         />
 
         <div className="z-0 flex flex-1 items-center justify-end gap-1.5 sm:gap-2 md:gap-3">
+          {showAdminLink ? <AdminLink /> : null}
           <ThemeToggle />
           <SearchTrigger articles={searchArticles} />
         </div>

@@ -1,3 +1,4 @@
+import { resolveMemberAvatar } from "@nextgen-cms/contract/media/member-avatar";
 import type { Author } from "@nextgen-cms/contract/types/article";
 import type { AuthorRow } from "@nextgen-cms/core/db/schema/authors";
 
@@ -12,7 +13,7 @@ export function mapAuthorRow(row: AuthorRow, articleCount = 0): Author {
     name: row.name,
     role: row.role,
     bio: row.bio,
-    avatar: { src: row.avatarSrc, alt: row.avatarAlt },
+    avatar: resolveMemberAvatar(row.avatarSrc, row.name),
     ...(Object.keys(social).length > 0 ? { social } : {}),
     articleCount,
   };

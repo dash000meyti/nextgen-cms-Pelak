@@ -105,6 +105,7 @@ npm run ci:check     # lint + build + migrate dry-run
 | `docs/STUDIO.md` | ادمین، settings، RBAC |
 | `docs/UI-BOUNDARY.md` | ساختار کامپوننت + roadmap UI |
 | `docs/CMS-SCHEMA.md` | schema-driven CMS |
+| `docs/BLOCK-EDITOR.md` | ادیتور بدنهٔ مقاله (WYSIWYG سطح A) |
 | `docs/ONBOARDING.md` | شروع dev |
 | `docs/MIGRATION-POLICY.md` | semver + DB |
 | `docs/DEPLOYMENT.md` | Docker |

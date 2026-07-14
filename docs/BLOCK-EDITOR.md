@@ -1,36 +1,40 @@
 # Block Editor — حکمران
 
-ادیتور بدنهٔ مقاله، مبتنی بر **رجیستری بلوک** و قابل‌گسترش. مسیر: `apps/pelak/components/admin/blocks/`.
+ادیتور بدنهٔ مقاله، مبتنی بر **رجیستری بلوک** و مدل **WYSIWYG سطح A** (تایپوگرافی سایت روی `textarea`/`input` بدون‌بردر؛ کروم فقط روی hover). مسیر: `apps/pelak/components/admin/blocks/`.
 
 ## انواع بلوک
 
-| type | شکل داده | گروه |
-|------|----------|------|
-| `paragraph` | `{ type, content }` | text |
-| `heading` | `{ type, level: 2\|3\|4, content }` | text |
-| `quote` | `{ type, content, attribution? }` | text |
-| `list` | `{ type, variant: "bullet"\|"ordered", items: string[] }` | text |
-| `question` | `{ type, content, answer? }` | text |
-| `image` | `{ type, image: ImageMeta }` | media |
-| `video` | `{ type, src, caption? }` — آپارات | media |
-| `button` | `{ type, label, href, variant?: "primary"\|"outline" }` | interactive |
+| type | شکل داده | گروه | الگوی ادیتور |
+|------|----------|------|--------------|
+| `paragraph` | `{ type, content }` | text | ورودی تمام‌عرض شبیه سایت |
+| `heading` | `{ type, level: 2\|3\|4, content }` | text | ورودی تمام‌عرض + `HEADING_CLASS` |
+| `quote` | `{ type, content, attribution? }` | text | پوستهٔ `blockquote` سایت |
+| `list` | `{ type, variant: "bullet"\|"ordered", items: string[] }` | text | `ul`/`ol` سایت + input بدون‌بردر |
+| `question` | `{ type, content, answer? }` | interactive | ورودی داخل پوستهٔ پرسش (شبیه نقل‌قول) |
+| `image` | `{ type, image: ImageMeta }` | media | پیش‌نمایش aspect-video (مثل ویدیو) با کنترل روی قاب؛ زیرنویس/اعتبار زیر تصویر |
+| `video` | `{ type, src, caption? }` — آپارات | media | پیش‌نمایش aspect-video با لینک روی قاب؛ زیرنویس زیر قاب (مثل تصویر) |
+| `button` | `{ type, label, href, variant?: "primary"\|"outline" }` | interactive | متن داخل دکمهٔ واقعی؛ لینک روبه‌رو |
 
 تایپ کانونیکال: `ArticleBlock` در `packages/contract/src/types/article.ts`.
+
+کلاس‌های مشترک رندر سایت و ادیتور: `apps/pelak/components/article/blockStyles.ts`.
 
 ## معماری
 
 ```mermaid
 flowchart TB
-  Shell["BlockEditor.tsx<br/>shell + sticky toolbar"] --> DragList["BlockDragList.tsx<br/>DnD + insertion zones + scroll-into-view"]
-  DragList --> Wrapper["BlockWrapper.tsx<br/>card frame + header + 2-step delete"]
-  Wrapper --> Editor["block.Editor"]
-  Wrapper --> Settings["block.Settings (optional)<br/>inline in header"]
+  Shell["BlockEditor.tsx<br/>shell + sticky insert bar"] --> DragList["BlockDragList.tsx<br/>DnD + insertion zones"]
+  DragList --> Wrapper["BlockWrapper.tsx<br/>hover chrome + content"]
+  Wrapper --> Row["flex row p-1"]
+  Row --> Chrome["Settings col + BlockToolbar col"]
+  Row --> Editor["block.Editor flex-1"]
   Registry["blockRegistry.tsx"] --> Editor
-  Registry --> Settings
-  Registry --> Toolbar["BlockToolbar.tsx<br/>drag handle / transform / move"]
-  Registry --> InsertMenu["BlockInsertMenu.tsx<br/>+ menu"]
-  DragList --> Zone["InsertionZone.tsx<br/>+ between blocks (pulses on drag)"]
-  Zone --> InsertMenu
+  Registry --> Settings["block.Settings"]
+  Registry --> Toolbar["BlockToolbar.tsx<br/>drag / up / transform / down"]
+  Registry --> InsertMenu["BlockInsertMenu.tsx"]
+  DragList --> Zone["InsertionZone.tsx"]
+  Styles["blockStyles.ts"] --> Editor
+  Styles --> Public["ArticleBody.tsx"]
 ```
 
 ### رجیستری
@@ -45,37 +49,52 @@ type BlockMeta = {
   Icon: BlockIcon;          // inline SVG
   createDefault: () => ArticleBlock;
   Editor: BlockEditorComponent;
-  Settings?: BlockSettingsComponent;  // کنترل‌های inline در هدر (مثل سطح heading)
-  convertibleTo: BlockType[];         // تبدیل نوع
+  Settings?: BlockSettingsComponent;  // در ستون کروم Settings
+  convertibleTo: BlockType[];
 };
 ```
 
 هیچ منطقی در shell به نوع خاص گره نخورده — همه‌چیز از رجیستری می‌آید.
 
-### چیدمان کارت (BlockWrapper)
+### چیدمان (BlockWrapper) — hover chrome
+
+در **idle** کارت بدون border/background/padding است و محتوا شبیه رندر سایت دیده می‌شود.
+
+روی **hover** یا **focus-within** همان بلوک، کروم داخل ردیف محتوا (`flex` + `p-1`) دیده می‌شود:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│ [drag│transform│▲▼]   …   [Settings]  icon  label  🗑 │  ← هدر (in-flow)
-├─────────────────────────────────────────────────────────┤
-│  block.Editor                                           │
-└─────────────────────────────────────────────────────────┘
+┌─ BlockWrapper (p-1 flex row) ─────────────────────────────┐
+│ Settings col │ Toolbar col │ Content (flex-1 min-w-0)     │
+│ label·delete │ drag        │  outline نازک روی ورودی     │
+│ (+Settings   │ (+ ▲ ⇄ ▼    │                              │
+│  on hover    │  on handle  │  block.Editor                │
+│  overlay)    │  hover)     │                              │
+└──────────────┴─────────────┴──────────────────────────────┘
 ```
 
-- نوار ابزار (drag handle / transform / move) در **ابتدای** هدر — در جریان، نه absolute.
-- `Settings` (اختیاری) و icon/label/delete در **انتهای** هدر.
-- **حذف دو مرحله‌ای**: کلیک اول → دکمه قرمز (armed)؛ کلیک دوم → حذف. پس از ۳ ثانیه یا blur خودکار disarm می‌شود.
-- `data-block-key` روی کارت برای `scrollIntoView`.
+- ترتیب در ردیف (RTL start→end): Settings → Toolbar → محتوا.
+- ترتیب Toolbar عمودی: **drag → بالا → transform → پایین**؛ footprint فقط drag است و اکشن‌ها با hover/`focus-within` روی Toolbar به‌صورت overlay باز می‌شوند بدون رشد layout.
+- ستون Settings: ابتدا فقط لیبل·حذف؛ `Settings` با hover/`focus-within` به‌صورت overlay بدون رشد layout.
+- بدون ring دور کل بلوک؛ روی `BlockPlainTextarea` / `BlockPlainInput` در hover گروه یا `focus-visible`، outline نازک `accent` (۱px).
+- لیبل نوع، حذف دو‌مرحله‌ای، و `Settings` در ستون Settings؛ فقط روی hover/`focus-within` chrome کل ستون visible.
+- `focus-within` برای قابل‌استفاده ماندن منوی transform و دکمه‌ها با کیبورد — بدون state جداگانهٔ «انتخاب‌شده».
+- **حذف دو مرحله‌ای**: کلیک اول → مسلح؛ کلیک دوم → حذف. پس از ۳ ثانیه یا blur، disarm.
+- `data-block-key` برای `scrollIntoView`.
+- در ادیتور، مارجین عمودی heading/quote/list صفر می‌شود (`!mt-0 !mb-0` / `!my-0`) تا ورودی‌ها نزدیک باشند؛ مارجین سایت از `blockStyles` دست‌نخورده می‌ماند.
+
+### WYSIWYG سطح A
+
+- ورودی‌های متنی از `BlockPlainTextarea` / `BlockPlainInput` (بدون border/bg فرم؛ outline فقط روی hover/focus).
+- کلاس‌ها از `blockStyles.ts` — همان منبع `ArticleBody`.
+- بلوک‌های media و دکمه: `grid sm:grid-cols-2` — نیمهٔ نمایش شبیه سایت، نیمهٔ تنظیمات با فیلدهای فرم. پرسش مثل نقل‌قول داخل همان پوسته ویرایش می‌شود.
 
 ### تعامل
 
-- **درگ‌اند‌دراپ native** (HTML5) — بدون کتاب‌خانه. drag handle در نوار ابزار؛ drop روی insertion zoneها.
-- **+ بین بلوک‌ها** — `InsertionZone` ناحیه‌ای نازک (~۲۰px) که روی hover علامت `+` نشان می‌دهد و منوی `BlockInsertMenu` را باز می‌کند. هنگام درگ، یک خط accent‌رنگ چشمک‌زن (`animate-block-drop-blink`) هدف drop را نشان می‌دهد.
-- **تبدیل نوع** — `convertBlock(source, target)` متن اصلی را حفظ می‌کند؛ منوی transform در `BlockToolbar`.
-- **حرکت با پیکان** — `BlockDragList` پس از move/drop بلوک را `scrollIntoView` می‌کند تا در دید بماند.
-- **سطح heading** — Pills مستقیم در `HeadingSettings` داخل هدر کارت. سه دکمه در inserter بالا: عنوان (h2) / زیرعنوان (h3) / ریزعنوان (h4) با آیکون عدد فارسی.
-- **تنظیمات inline** — `ListSettings` (bullet/ordered) و `ButtonSettings` (primary/outline) نیز در هدر.
-- **لیست** — Enter برای افزودن مورد، Backspace روی مورد خالی برای حذف.
+- **درگ‌اند‌دراپ native** — drag handle در Toolbar؛ drop روی insertion zoneها.
+- **+ بین بلوک‌ها** — `InsertionZone` روی hover علامت `+`؛ هنگام درگ خط accent چشمک‌زن.
+- **تبدیل نوع** — `convertBlock`؛ منوی transform در Toolbar.
+- **حرکت با پیکان** — پس از move/drop، `scrollIntoView`.
+- **لیست** — Enter افزودن مورد، Backspace روی مورد خالی حذف.
 
 ### RTL
 
@@ -83,27 +102,26 @@ type BlockMeta = {
 
 ## ذخیره‌سازی
 
-`articles.body` در SQLite به‌صورت JSON آرایه‌ای از `ArticleBlock`. دادهٔ قدیمی (مثل `heading` بدون `level`) با `normalizeArticleBlock` در زمان خواندن نرمال می‌شود — **migration DB لازم نیست**.
+`articles.body` در SQLite به‌صورت JSON آرایه‌ای از `ArticleBlock`. دادهٔ قدیمی با `normalizeArticleBlock` نرمال می‌شود — **migration DB لازم نیست**.
 
 ## رندر عمومی
 
-`apps/pelak/components/article/ArticleBody.tsx` همهٔ انواع را رندر می‌کند. عناوین h2/h3/h4 بردر سمت شروع دارند با شدت متفاوت (`border-accent` → `/70` → `/45`). PDF: `lib/pdf/html/blocks.ts` + `lib/pdf/resolve-blocks.ts` + `lib/pdf/html/styles.ts`. آپارات: `lib/aparat.ts`.
+`apps/pelak/components/article/ArticleBody.tsx` از `blockStyles.ts` مصرف می‌کند. PDF: `lib/pdf/html/blocks.ts` + `lib/pdf/resolve-blocks.ts` + `lib/pdf/html/styles.ts`. آپارات: `lib/aparat.ts`.
 
 ### پیش‌نمایش ادمین و تصاویر draft
 
-تصاویر آپلودی زیر `/uploads/content/{id}/…` تا زمان انتشار private هستند و فقط با session ادمین سرو می‌شوند (رجوع به `packages/core/src/media/serve-access.ts`). `next/image` تصاویر را از طریق optimizer **بدون cookie** fetch می‌کند → برای draft ها 403 می‌شود.
-
-به همین دلیل `ArticleDetailView` یک prop `unoptimized` دارد که در صفحهٔ پیش‌نمایش (`app/admin/(preview)/content/[id]/preview`) وقتی `status !== "published"` فعال می‌شود؛ آن‌گاه تصاویر مستقیم توسط browser (با cookie) fetch می‌شوند و در preview draft دیده می‌شوند. صفحهٔ عمومی (`app/content/[slug]`) این prop را پاس نمی‌دهد و همان optimizer را استفاده می‌کند.
+تصاویر آپلودی زیر `/uploads/content/{id}/…` تا زمان انتشار private هستند. `ArticleDetailView` prop `unoptimized` دارد که در پیش‌نمایش draft فعال می‌شود. جزئیات قبلی در همین سند حفظ شده: `next/image` بدون cookie → برای draft از مسیر مستقیم browser استفاده می‌شود.
 
 ## افزودن نوع بلوک جدید
 
-1. **Contract** — عضو جدید در `ArticleBlock` (+ `BlockType` خودکار) در `packages/contract/src/types/article.ts`. اگر دادهٔ قدیمی ممکن است ناقص باشد، در `normalizeArticleBlock` پوششش بده.
-2. **استValidators** — `validateArticleBlocks` و `parseArticleBlocks` در `packages/studio/src/cms/validation/common.ts`.
-3. **رجیستری + کامپوننت** — فایل `apps/pelak/components/admin/blocks/blocks/FooBlock.tsx` + رکورد در `blockRegistry.tsx` (شامل `createDefault`، `Editor`، `convertibleTo`، و در صورت نیاز `Settings` برای کنترل‌های inline در هدر).
-4. **رندر** — `ArticleBody.tsx` (و `lib/pdf/html/blocks.ts` + `resolve-blocks.ts` اگر لازم).
-5. **Seed (اختیاری)** — fixture در `packages/seed/src/fixtures/articles.ts`.
-6. **آیکون** — افزودن به `blocks/icons.tsx` اگر نوع آیکون جدید می‌خواهد.
-7. `npm run ci:check`.
+1. **Contract** — عضو جدید در `ArticleBlock` در `packages/contract/src/types/article.ts` (+ `normalizeArticleBlock` در صورت نیاز).
+2. **Validators** — `validateArticleBlocks` / `parseArticleBlocks` در `packages/studio/src/cms/validation/common.ts`.
+3. **رجیستری + کامپوننت** — `blocks/FooBlock.tsx` + رکورد در `blockRegistry.tsx`. برای text و پرسش: ورودی بدون‌بردر داخل پوستهٔ `blockStyles.ts`. برای media/دکمه: دو ستون نمایش\|تنظیمات.
+4. **استایل مشترک** — ثابت‌های کلاس را در `blockStyles.ts` اضافه کن و در `ArticleBody` و Editor مصرف کن.
+5. **رندر** — `ArticleBody.tsx` (+ PDF در صورت نیاز).
+6. **Seed (اختیاری)** — `packages/seed/src/fixtures/articles.ts`.
+7. **آیکون** — `blocks/icons.tsx` در صورت نیاز.
+8. `npm run ci:check`.
 
 ## اسناد مرتبط
 

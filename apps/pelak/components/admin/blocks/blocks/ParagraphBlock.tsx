@@ -1,6 +1,7 @@
 "use client";
 
-import { TextareaField } from "@/components/admin/fields/TextareaField";
+import { EDITOR_PARAGRAPH_CLASS } from "@/components/article/blockStyles";
+import { BlockPlainTextarea } from "../BlockPlainTextarea";
 import type { BlockEditorProps } from "../blockTypes";
 
 export function ParagraphBlock({
@@ -11,12 +12,13 @@ export function ParagraphBlock({
   if (rawBlock.type !== "paragraph") return null;
   const block = rawBlock;
   return (
-    <TextareaField
+    <BlockPlainTextarea
       id={`block-paragraph-${blockId}`}
       value={block.content}
-      onChange={(content) => onChange({ ...block, content })}
-      rows={5}
+      onChange={(e) => onChange({ ...block, content: e.target.value })}
+      rows={3}
       placeholder="متن پاراگراف…"
+      className={EDITOR_PARAGRAPH_CLASS}
     />
   );
 }

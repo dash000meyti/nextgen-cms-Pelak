@@ -26,8 +26,10 @@ type ImageFieldProps = {
   uploadContext?: MediaUploadContext;
   maxBytes?: number;
   previewAspectClass?: string;
-  /** Two-column layout: preview + upload on the start side, fields on the end side. */
+  /** Two-column layout: preview on the start side, upload + fields on the end side. */
   twoColumn?: boolean;
+  /** Drop outer card chrome (for WYSIWYG block editor). */
+  bare?: boolean;
 };
 
 export function ImageField({
@@ -49,6 +51,7 @@ export function ImageField({
   maxBytes,
   previewAspectClass,
   twoColumn = false,
+  bare = false,
 }: ImageFieldProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -115,7 +118,28 @@ export function ImageField({
 
   const previewSrc = src || emptyPreviewSrc || "";
 
-  const preview = (
+  const preview = bare ? (
+    <figure className="my-0 w-full overflow-hidden">
+      {previewSrc ? (
+        // biome-ignore lint/performance/noImgElement: admin preview of arbitrary upload URLs
+        <img
+          src={previewSrc}
+          alt={alt || label || "پیش‌نمایش تصویر"}
+          className="h-auto w-full rounded object-contain"
+        />
+      ) : (
+        <div className="flex aspect-video w-full items-center justify-center rounded border border-dashed border-rule bg-surface-2 text-xs text-ink-faint">
+          پیش‌نمایش تصویر
+        </div>
+      )}
+      {showCaption && (caption || credit) ? (
+        <figcaption className="mt-3 space-y-1 text-base leading-relaxed text-ink-muted">
+          {caption ? <p>{caption}</p> : null}
+          {credit ? <p className="opacity-80">{credit}</p> : null}
+        </figcaption>
+      ) : null}
+    </figure>
+  ) : (
     <div
       className={`relative w-full overflow-hidden rounded border border-rule bg-paper ${previewAspectClass ?? "aspect-video"}`}
     >
@@ -172,7 +196,13 @@ export function ImageField({
   );
 
   return (
-    <div className="space-y-3 rounded border border-rule bg-surface-2 p-4">
+    <div
+      className={
+        bare
+          ? "space-y-3"
+          : "space-y-3 rounded border border-rule bg-surface-2 p-4"
+      }
+    >
       {uploadContext ? (
         <MediaPickerModal
           open={pickerOpen}
@@ -190,11 +220,11 @@ export function ImageField({
 
       {twoColumn ? (
         <div className="grid gap-4 sm:grid-cols-[1fr_1fr]">
-          <div className="space-y-2">
-            {preview}
+          <div className="min-w-0">{preview}</div>
+          <div className="min-w-0 space-y-3">
             {uploadButtons}
+            {fields}
           </div>
-          {fields}
         </div>
       ) : (
         <>

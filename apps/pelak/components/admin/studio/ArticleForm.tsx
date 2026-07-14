@@ -182,7 +182,7 @@ export function ArticleForm({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       {dialog}
       {mode === "edit" && articleId ? (
         <PublishBar
@@ -201,7 +201,7 @@ export function ArticleForm({
 
       <FormMessage error={error} success={success} />
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <TextField
           id="title"
           label="عنوان"
@@ -219,31 +219,63 @@ export function ArticleForm({
         />
       </div>
 
-      <JalaliDateField
-        id="publishedAt"
-        label="تاریخ انتشار"
-        value={form.publishedAt ?? ""}
-        onChange={(publishedAt) => update("publishedAt", publishedAt || null)}
-      />
-      <p className="-mt-4 text-xs text-ink-faint">
-        برای مقالات قدیمی، تاریخ پارسال را تنظیم کنید — در فهرست گروه محتوا بر
-        اساس این تاریخ مرتب می‌شود.
-      </p>
+      <div className="grid gap-4 lg:grid-cols-[1.4fr_minmax(0,8rem)_auto_auto] lg:items-end">
+        <div className="min-w-0 space-y-1">
+          <JalaliDateField
+            id="publishedAt"
+            label="تاریخ انتشار"
+            value={form.publishedAt ?? ""}
+            onChange={(publishedAt) =>
+              update("publishedAt", publishedAt || null)
+            }
+          />
+          <p className="text-xs text-ink-faint">
+            مقالات قدیمی: تاریخ پارسال — مرتب‌سازی گروه محتوا بر اساس این تاریخ.
+          </p>
+        </div>
+        <TextField
+          id="readingMinutes"
+          label="زمان مطالعه (دقیقه)"
+          value={String(form.readingMinutes)}
+          onChange={(value) =>
+            update("readingMinutes", Number.parseInt(value, 10) || 5)
+          }
+        />
+        <label className="flex h-10 items-center gap-2 text-sm text-ink lg:pb-0.5">
+          <input
+            type="checkbox"
+            checked={form.isFeatured}
+            onChange={(e) => update("isFeatured", e.target.checked)}
+            className="accent-accent"
+          />
+          محتوای ویژه
+        </label>
+        <label className="flex h-10 items-center gap-2 text-sm text-ink lg:pb-0.5">
+          <input
+            type="checkbox"
+            checked={form.isEditorsPick}
+            onChange={(e) => update("isEditorsPick", e.target.checked)}
+            className="accent-accent"
+          />
+          انتخاب سردبیر
+        </label>
+      </div>
 
-      <TextField
-        id="subtitle"
-        label="زیرعنوان"
-        value={form.subtitle}
-        onChange={(subtitle) => update("subtitle", subtitle)}
-      />
-
-      <TextareaField
-        id="excerpt"
-        label="چکیده"
-        value={form.excerpt}
-        onChange={(excerpt) => update("excerpt", excerpt)}
-        rows={3}
-      />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <TextField
+          id="subtitle"
+          label="زیرعنوان"
+          value={form.subtitle}
+          onChange={(subtitle) => update("subtitle", subtitle)}
+        />
+        <TextareaField
+          id="excerpt"
+          label="چکیده"
+          value={form.excerpt}
+          onChange={(excerpt) => update("excerpt", excerpt)}
+          rows={2}
+        />
+      </div>
 
       <ImageField
         id="hero"
@@ -258,39 +290,12 @@ export function ArticleForm({
         onCreditChange={(heroCredit) => update("heroCredit", heroCredit)}
         showCaption
         required
+        twoColumn
+        previewAspectClass="aspect-video"
         uploadContext={uploadContext}
       />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <TextField
-          id="readingMinutes"
-          label="زمان مطالعه (دقیقه)"
-          value={String(form.readingMinutes)}
-          onChange={(value) =>
-            update("readingMinutes", Number.parseInt(value, 10) || 5)
-          }
-        />
-        <label className="flex items-center gap-2 text-sm text-ink">
-          <input
-            type="checkbox"
-            checked={form.isFeatured}
-            onChange={(e) => update("isFeatured", e.target.checked)}
-            className="accent-accent"
-          />
-          محتوای ویژه
-        </label>
-        <label className="flex items-center gap-2 text-sm text-ink">
-          <input
-            type="checkbox"
-            checked={form.isEditorsPick}
-            onChange={(e) => update("isEditorsPick", e.target.checked)}
-            className="accent-accent"
-          />
-          انتخاب سردبیر
-        </label>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-3">
         <ReferencePicker
           label="اعضا"
           options={members}
@@ -306,17 +311,16 @@ export function ArticleForm({
           onChange={(topicIds) => update("topicIds", topicIds)}
           multiple
         />
+        <ReferencePicker
+          label="گروه محتوا"
+          options={contentGroups}
+          selectedIds={form.contentGroupIds}
+          onChange={(contentGroupIds) =>
+            update("contentGroupIds", contentGroupIds)
+          }
+          multiple
+        />
       </div>
-
-      <ReferencePicker
-        label="گروه محتوا"
-        options={contentGroups}
-        selectedIds={form.contentGroupIds}
-        onChange={(contentGroupIds) =>
-          update("contentGroupIds", contentGroupIds)
-        }
-        multiple
-      />
 
       <BlockEditor
         value={form.body}
@@ -338,10 +342,10 @@ export function ArticleForm({
               .filter(Boolean),
           )
         }
-        rows={3}
+        rows={2}
       />
 
-      <div className="flex flex-wrap gap-3 border-t border-rule pt-6">
+      <div className="flex flex-wrap gap-3 border-t border-rule pt-4">
         <button
           type="button"
           onClick={handleSave}

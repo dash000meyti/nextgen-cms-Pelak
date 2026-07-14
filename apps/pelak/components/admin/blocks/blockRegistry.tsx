@@ -97,7 +97,7 @@ const registry: Record<BlockType, BlockMeta> = {
   },
   video: {
     type: "video",
-    label: "ویدیو (آپارات)",
+    label: "آپارات",
     group: "media",
     Icon: VideoIcon,
     createDefault: () => ({ type: "video", src: "", caption: "" }),

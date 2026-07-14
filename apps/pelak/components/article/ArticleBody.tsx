@@ -1,11 +1,25 @@
-import type {
-  ArticleBlock,
-  HeadingLevel,
-} from "@nextgen-cms/contract/types/article";
+import type { ArticleBlock } from "@nextgen-cms/contract/types/article";
 import type { TextDirection } from "@nextgen-cms/contract/types/site";
 import { getSiteConfig } from "@nextgen-cms/site-data/get-content";
 import { articleParagraphClassName } from "@nextgen-cms/site-data/typography";
 import { buildAparatEmbedSrc } from "@/lib/aparat";
+import {
+  BUTTON_WRAP_CLASS,
+  buttonVariantClass,
+  FIGURE_CAPTION_CLASS,
+  FIGURE_CLASS,
+  FIGURE_IMG_CLASS,
+  HEADING_CLASS,
+  HEADING_TAG,
+  LIST_CLASS,
+  QUESTION_ANSWER_CLASS,
+  QUESTION_HEADER_CLASS,
+  QUESTION_ICON_CLASS,
+  QUESTION_SHELL_CLASS,
+  QUOTE_CLASS,
+  VIDEO_FIGURE_CLASS,
+  VIDEO_FRAME_CLASS,
+} from "./blockStyles";
 
 type IconProps = { className?: string };
 
@@ -50,18 +64,6 @@ type ArticleBodyProps = {
   dir?: TextDirection;
 };
 
-const HEADING_CLASS: Record<HeadingLevel, string> = {
-  2: "mt-5 mb-5 font-heading text-lg leading-normal text-ink md:text-xl border-s-4 border-accent ps-4 pt-2",
-  3: "mt-5 mb-4 font-heading text-base leading-normal text-ink md:text-lg border-s-4 border-accent/70 ps-4 pt-2",
-  4: "mt-4 mb-3 font-heading text-sm leading-normal text-ink md:text-base border-s-4 border-accent/45 ps-4 pt-1",
-};
-
-const HEADING_TAG: Record<HeadingLevel, "h2" | "h3" | "h4"> = {
-  2: "h2",
-  3: "h3",
-  4: "h4",
-};
-
 export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
   const siteConfig = await getSiteConfig();
   const paragraphClassName = articleParagraphClassName(siteConfig, dir);
@@ -87,10 +89,7 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
 
         if (block.type === "quote") {
           return (
-            <blockquote
-              key={key}
-              className="my-4 border-s-4 border-accent bg-accent-soft/60 py-2 ps-5 text-lg leading-relaxed text-ink"
-            >
+            <blockquote key={key} className={QUOTE_CLASS}>
               <p className="font-heading">{block.content}</p>
               {block.attribution ? (
                 <footer className="mt-2 text-xs font-sans text-ink-muted">
@@ -103,19 +102,19 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
 
         if (block.type === "image") {
           return (
-            <figure key={key} className="my-8 w-full overflow-hidden">
+            <figure key={key} className={FIGURE_CLASS}>
               {/* biome-ignore lint/performance/noImgElement: must preserve original image ratio without known dimensions */}
               <img
                 src={block.image.src}
                 alt={block.image.alt}
-                className="h-auto w-full rounded object-contain"
+                className={FIGURE_IMG_CLASS}
                 loading="lazy"
               />
               {block.image.caption ? (
-                <figcaption className="mt-3 space-y-1 text-xs leading-relaxed text-ink-muted">
+                <figcaption className={FIGURE_CAPTION_CLASS}>
                   <p>{block.image.caption}</p>
                   {block.image.credit ? (
-                    <p className="text-xs opacity-80">{block.image.credit}</p>
+                    <p className="opacity-80">{block.image.credit}</p>
                   ) : null}
                 </figcaption>
               ) : null}
@@ -127,8 +126,8 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
           const embedSrc = buildAparatEmbedSrc(block.src);
           if (!embedSrc) return null;
           return (
-            <figure key={key} className="my-8 w-full overflow-hidden rounded">
-              <div className="relative aspect-video w-full overflow-hidden rounded bg-black">
+            <figure key={key} className={VIDEO_FIGURE_CLASS}>
+              <div className={VIDEO_FRAME_CLASS}>
                 <iframe
                   src={embedSrc}
                   title={`ویدیو آپارات ${index}`}
@@ -139,7 +138,7 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
                 />
               </div>
               {block.caption ? (
-                <figcaption className="mt-3 text-xs leading-relaxed text-ink-muted">
+                <figcaption className={FIGURE_CAPTION_CLASS}>
                   {block.caption}
                 </figcaption>
               ) : null}
@@ -152,10 +151,7 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
           const listClass =
             block.variant === "ordered" ? "list-decimal" : "list-disc";
           return (
-            <ListTag
-              key={key}
-              className={`my-4 space-y-2 ps-6 text-base leading-relaxed text-ink ${listClass}`}
-            >
+            <ListTag key={key} className={`${LIST_CLASS} ${listClass}`}>
               {block.items
                 .filter((item) => item.trim())
                 .map((item, itemIndex) => (
@@ -170,12 +166,9 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
           const hasAnswer = Boolean(block.answer);
           if (!hasAnswer) {
             return (
-              <div
-                key={key}
-                className="my-4 w-full overflow-hidden rounded-lg border border-rule"
-              >
-                <div className="flex w-full items-center gap-3 bg-accent-soft/60 py-2 ps-3 pe-5 text-lg leading-relaxed text-ink">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-accent text-paper">
+              <div key={key} className={QUESTION_SHELL_CLASS}>
+                <div className={QUESTION_HEADER_CLASS}>
+                  <span className={QUESTION_ICON_CLASS}>
                     <QuestionMarkIcon className="h-5 w-5" />
                   </span>
                   <p className="m-0 flex-1 font-heading">{block.content}</p>
@@ -184,37 +177,27 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
             );
           }
           return (
-            <details
-              key={key}
-              open
-              className="group my-4 w-full overflow-hidden rounded-lg border border-rule"
-            >
-              <summary className="flex cursor-pointer list-none items-center gap-3 bg-accent-soft/60 py-2 ps-3 pe-5 text-lg leading-relaxed text-ink [&::-webkit-details-marker]:hidden">
+            <details key={key} open className={`group ${QUESTION_SHELL_CLASS}`}>
+              <summary
+                className={`${QUESTION_HEADER_CLASS} cursor-pointer list-none [&::-webkit-details-marker]:hidden`}
+              >
                 <span className="flex h-9 w-9 shrink-0 flex-col items-center justify-center rounded bg-accent text-paper">
                   <QuestionMarkIcon className="h-4 w-4" />
                   <ChevronIcon className="h-3 w-3 transition-transform group-open:rotate-180" />
                 </span>
                 <span className="flex-1 font-heading">{block.content}</span>
               </summary>
-              <p className="m-0 border-t border-rule bg-surface-2 px-5 py-3 text-base leading-relaxed text-ink">
-                {block.answer}
-              </p>
+              <p className={QUESTION_ANSWER_CLASS}>{block.answer}</p>
             </details>
           );
         }
 
         if (block.type === "button") {
-          const isOutline = block.variant === "outline";
           return (
-            <div key={key} className="my-5 w-full">
+            <div key={key} className={BUTTON_WRAP_CLASS}>
               <a
                 href={block.href}
-                className={[
-                  "inline-flex items-center rounded-md px-6 py-2.5 text-sm font-medium transition-colors",
-                  isOutline
-                    ? "border border-accent text-accent hover:bg-accent-soft"
-                    : "bg-accent text-paper hover:bg-accent-hover",
-                ].join(" ")}
+                className={buttonVariantClass(block.variant)}
               >
                 {block.label}
               </a>

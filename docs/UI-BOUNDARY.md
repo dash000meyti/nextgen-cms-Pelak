@@ -20,7 +20,7 @@ apps/pelak/components/
 |------|------------|-------|
 | `ui/` | site + admin | `packages/ui` (design system) |
 | `admin/` | `/admin` فقط | `packages/ui/admin` |
-| `admin/blocks/` | ادیتور بدنهٔ مقاله | رجیستری بلوک — جزئیات `docs/BLOCK-EDITOR.md` |
+| `admin/blocks/` | ادیتور بدنهٔ مقاله | WYSIWYG سطح A + hover chrome — `docs/BLOCK-EDITOR.md` |
 | `home/`, `article/` | site عمومی | `packages/ui` یا app-local |
 | `layout/` | هر دو | app-local (brand-specific) |
 

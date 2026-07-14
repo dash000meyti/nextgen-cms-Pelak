@@ -1,7 +1,8 @@
 "use client";
 
 import type { HeadingLevel } from "@nextgen-cms/contract/types/article";
-import { TextareaField } from "@/components/admin/fields/TextareaField";
+import { HEADING_CLASS } from "@/components/article/blockStyles";
+import { BlockPlainTextarea } from "../BlockPlainTextarea";
 import type { BlockEditorProps, BlockSettingsProps } from "../blockTypes";
 
 const LEVELS: Array<{ level: HeadingLevel; label: string }> = [
@@ -22,7 +23,7 @@ function pillClass(active: boolean): string {
 export function HeadingSettings({ block, onChange }: BlockSettingsProps) {
   if (block.type !== "heading") return null;
   return (
-    <fieldset className="flex items-center gap-1" aria-label="سطح عنوان">
+    <fieldset className="flex flex-col gap-1" aria-label="سطح عنوان">
       <legend className="sr-only">سطح عنوان</legend>
       {LEVELS.map(({ level, label }) => {
         const active = block.level === level;
@@ -49,13 +50,18 @@ export function HeadingBlock({
 }: BlockEditorProps) {
   if (rawBlock.type !== "heading") return null;
   const block = rawBlock;
+  const className = [
+    HEADING_CLASS[block.level] ?? HEADING_CLASS[2],
+    "!mt-0 !mb-0",
+  ].join(" ");
   return (
-    <TextareaField
+    <BlockPlainTextarea
       id={`block-heading-${blockId}`}
       value={block.content}
-      onChange={(content) => onChange({ ...block, content })}
-      rows={2}
+      onChange={(e) => onChange({ ...block, content: e.target.value })}
+      rows={1}
       placeholder="متن عنوان…"
+      className={className}
     />
   );
 }

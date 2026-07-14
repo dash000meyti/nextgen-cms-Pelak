@@ -7,6 +7,7 @@ import { HeadingBlock, HeadingSettings } from "./blocks/HeadingBlock";
 import { ImageBlock } from "./blocks/ImageBlock";
 import { ListBlock, ListSettings } from "./blocks/ListBlock";
 import { ParagraphBlock } from "./blocks/ParagraphBlock";
+import { ProseSettings } from "./blocks/ProseSettings";
 import { QuestionBlock } from "./blocks/QuestionBlock";
 import { QuoteBlock } from "./blocks/QuoteBlock";
 import { TableBlock, TableSettings } from "./blocks/TableBlock";
@@ -49,7 +50,7 @@ const registry: Record<BlockType, BlockMeta> = {
     Icon: ParagraphIcon,
     createDefault: () => ({ type: "paragraph", content: "" }),
     Editor: ParagraphBlock,
-    convertibleTo: ["heading", "quote", "list", "question"],
+    Settings: ProseSettings,
   },
   heading: {
     type: "heading",
@@ -59,7 +60,6 @@ const registry: Record<BlockType, BlockMeta> = {
     createDefault: () => ({ type: "heading", level: 2, content: "" }),
     Editor: HeadingBlock,
     Settings: HeadingSettings,
-    convertibleTo: ["paragraph", "quote", "list", "question"],
   },
   quote: {
     type: "quote",
@@ -68,7 +68,7 @@ const registry: Record<BlockType, BlockMeta> = {
     Icon: QuoteIcon,
     createDefault: () => ({ type: "quote", content: "", attribution: "" }),
     Editor: QuoteBlock,
-    convertibleTo: ["paragraph", "heading", "list", "question"],
+    Settings: ProseSettings,
   },
   list: {
     type: "list",
@@ -78,7 +78,6 @@ const registry: Record<BlockType, BlockMeta> = {
     createDefault: () => ({ type: "list", variant: "bullet", items: [""] }),
     Editor: ListBlock,
     Settings: ListSettings,
-    convertibleTo: ["paragraph", "heading", "quote", "question"],
   },
   question: {
     type: "question",
@@ -87,7 +86,7 @@ const registry: Record<BlockType, BlockMeta> = {
     Icon: QuestionIcon,
     createDefault: () => ({ type: "question", content: "", answer: "" }),
     Editor: QuestionBlock,
-    convertibleTo: ["paragraph", "heading", "quote", "list"],
+    Settings: ProseSettings,
   },
   image: {
     type: "image",
@@ -99,7 +98,6 @@ const registry: Record<BlockType, BlockMeta> = {
       image: { src: "", alt: "", caption: "", credit: "" },
     }),
     Editor: ImageBlock,
-    convertibleTo: [],
   },
   video: {
     type: "video",
@@ -108,7 +106,6 @@ const registry: Record<BlockType, BlockMeta> = {
     Icon: VideoIcon,
     createDefault: () => ({ type: "video", src: "", caption: "" }),
     Editor: VideoBlock,
-    convertibleTo: [],
   },
   table: {
     type: "table",
@@ -122,7 +119,6 @@ const registry: Record<BlockType, BlockMeta> = {
     }),
     Editor: TableBlock,
     Settings: TableSettings,
-    convertibleTo: [],
   },
   button: {
     type: "button",
@@ -137,7 +133,6 @@ const registry: Record<BlockType, BlockMeta> = {
     }),
     Editor: ButtonBlock,
     Settings: ButtonSettings,
-    convertibleTo: [],
   },
 };
 
@@ -147,6 +142,46 @@ export function getBlockMeta(type: BlockType): BlockMeta {
 
 export function createBlock(type: BlockType): ArticleBlock {
   return getBlockMeta(type).createDefault();
+}
+
+/** Icon for Settings chrome header — reflects heading level / list·button variant. */
+export function resolveBlockChromeIcon(block: ArticleBlock): BlockMeta["Icon"] {
+  switch (block.type) {
+    case "heading":
+      if (block.level === 3) return Heading3Icon;
+      if (block.level === 4) return Heading4Icon;
+      return Heading2Icon;
+    case "list":
+      if (block.variant === "ordered") return ListOrderedIcon;
+      if (block.variant === "dash") return ListDashIcon;
+      return ListBulletIcon;
+    case "button":
+      if (block.variant === "primary") return ButtonPrimaryIcon;
+      if (block.variant === "secondary") return ButtonSecondaryIcon;
+      return ButtonOutlineIcon;
+    default:
+      return getBlockMeta(block.type).Icon;
+  }
+}
+
+/** Label for Settings chrome header icon title. */
+export function resolveBlockChromeLabel(block: ArticleBlock): string {
+  switch (block.type) {
+    case "heading":
+      if (block.level === 3) return "زیرعنوان";
+      if (block.level === 4) return "ریزعنوان";
+      return "عنوان";
+    case "list":
+      if (block.variant === "ordered") return "لیست شماره‌دار";
+      if (block.variant === "dash") return "لیست خط‌تیره";
+      return "لیست نقطه‌ای";
+    case "button":
+      if (block.variant === "primary") return "دکمه پررنگ";
+      if (block.variant === "secondary") return "دکمه ثانویه";
+      return "دکمه حاشیه‌دار";
+    default:
+      return getBlockMeta(block.type).label;
+  }
 }
 
 export type InsertableEntry = {

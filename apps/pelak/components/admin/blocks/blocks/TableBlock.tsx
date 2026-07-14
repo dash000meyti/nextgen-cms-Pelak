@@ -8,9 +8,22 @@ import {
 } from "@/components/article/blockStyles";
 import { BlockPlainInput } from "../BlockPlainInput";
 import type { BlockEditorProps, BlockSettingsProps } from "../blockTypes";
+import {
+  TableAddColIcon,
+  TableAddRowIcon,
+  TableRemoveColIcon,
+  TableRemoveRowIcon,
+} from "../icons";
 
 function emptyRow(cols: number): string[] {
   return Array.from({ length: cols }, () => "");
+}
+
+function iconBtnClass(disabled?: boolean): string {
+  return [
+    "inline-flex items-center justify-center rounded border border-rule p-1 text-ink-muted transition-colors hover:bg-surface-2",
+    disabled ? "disabled:opacity-40" : "",
+  ].join(" ");
 }
 
 export function TableSettings({ block, onChange }: BlockSettingsProps) {
@@ -57,32 +70,40 @@ export function TableSettings({ block, onChange }: BlockSettingsProps) {
       <button
         type="button"
         onClick={addColumn}
-        className="rounded border border-rule px-1.5 py-0.5 text-[10px] font-medium text-ink-muted hover:bg-surface-2"
+        aria-label="افزودن ستون"
+        title="افزودن ستون"
+        className={iconBtnClass()}
       >
-        + ستون
+        <TableAddColIcon className="h-3.5 w-3.5" />
       </button>
       <button
         type="button"
         onClick={removeColumn}
         disabled={colCount <= 1}
-        className="rounded border border-rule px-1.5 py-0.5 text-[10px] font-medium text-ink-muted hover:bg-surface-2 disabled:opacity-40"
+        aria-label="حذف ستون"
+        title="حذف ستون"
+        className={iconBtnClass(colCount <= 1)}
       >
-        − ستون
+        <TableRemoveColIcon className="h-3.5 w-3.5" />
       </button>
       <button
         type="button"
         onClick={addRow}
-        className="rounded border border-rule px-1.5 py-0.5 text-[10px] font-medium text-ink-muted hover:bg-surface-2"
+        aria-label="افزودن ردیف"
+        title="افزودن ردیف"
+        className={iconBtnClass()}
       >
-        + ردیف
+        <TableAddRowIcon className="h-3.5 w-3.5" />
       </button>
       <button
         type="button"
         onClick={removeRow}
         disabled={rowCount <= 1}
-        className="rounded border border-rule px-1.5 py-0.5 text-[10px] font-medium text-ink-muted hover:bg-surface-2 disabled:opacity-40"
+        aria-label="حذف ردیف"
+        title="حذف ردیف"
+        className={iconBtnClass(rowCount <= 1)}
       >
-        − ردیف
+        <TableRemoveRowIcon className="h-3.5 w-3.5" />
       </button>
     </fieldset>
   );

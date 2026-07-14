@@ -8,12 +8,15 @@ import { PlusIcon } from "./icons";
 type InsertionZoneProps = {
   index: number;
   onInsert: (index: number, block: ArticleBlock) => void;
-  /** Whether a drag is active; zones expand to make dropping easier. */
+  /** Whether a drag is active; zones show drop target in the same + footprint. */
   dragActive?: boolean;
   onDropAt?: (index: number) => void;
   /** Hide hover + button (keep drag drop target). Used for trailing zone replaced by permanent CTA. */
   hideWhenIdle?: boolean;
 };
+
+const zoneButtonClass =
+  "flex w-full items-center justify-center gap-1 rounded border border-dashed py-1";
 
 export function InsertionZone({
   index,
@@ -31,40 +34,48 @@ export function InsertionZone({
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: HTML5 DnD drop target; the + button handles click insertion.
     <div
-      className={[
-        "group relative flex items-center transition-all",
-        dragActive ? "h-8" : "min-h-5",
-      ].join(" ")}
+      className="group relative flex items-center"
       onDragOver={(e) => {
         if (!onDropAt) return;
-        if (e.dataTransfer.types.includes("application/block-index")) {
+        const accept =
+          dragActive ||
+          e.dataTransfer.types.includes("application/block-index");
+        if (accept) {
           e.preventDefault();
           e.dataTransfer.dropEffect = "move";
         }
       }}
       onDrop={(e) => {
         if (!onDropAt) return;
-        if (e.dataTransfer.types.includes("application/block-index")) {
+        const accept =
+          dragActive ||
+          e.dataTransfer.types.includes("application/block-index");
+        if (accept) {
           e.preventDefault();
           onDropAt(index);
         }
       }}
     >
       {dragActive ? (
-        <div className="h-0.5 w-full rounded-full bg-accent animate-block-drop-blink" />
+        <div
+          aria-hidden
+          className={`${zoneButtonClass} border-accent bg-accent-soft text-accent animate-block-drop-blink`}
+        >
+          <PlusIcon className="h-3.5 w-3.5" />
+        </div>
       ) : (
         <button
           type="button"
           onClick={() => setMenuOpen((v) => !v)}
           aria-label={`افزودن بلوک در موقعیت ${index + 1}`}
-          className="flex w-full items-center justify-center gap-1 rounded border border-dashed border-rule bg-paper py-1 text-ink-muted opacity-0 transition-opacity hover:border-accent hover:text-accent group-hover:opacity-100"
+          className={`${zoneButtonClass} border-rule bg-paper text-ink-muted opacity-0 transition-opacity hover:border-accent hover:text-accent group-hover:opacity-100`}
         >
           <PlusIcon className="h-3.5 w-3.5" />
         </button>
       )}
 
       {menuOpen ? (
-        <div className="absolute start-0 end-0 top-full z-30 mt-1 flex justify-center">
+        <div className="absolute inset-s-0 inset-e-0 top-full z-30 mt-1 flex justify-center">
           <InsertionMenu
             onSelect={(block) => {
               setMenuOpen(false);

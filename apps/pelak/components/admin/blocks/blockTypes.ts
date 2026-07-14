@@ -21,6 +21,10 @@ export type BlockEditorComponent = (
 export type BlockSettingsProps = {
   block: ArticleBlock;
   onChange: (block: ArticleBlock) => void;
+  /** Cross-type conversion within a family (Settings chrome). */
+  onConvert?: (type: BlockType) => void;
+  /** Disable conversion (e.g. multi-select). */
+  convertDisabled?: boolean;
 };
 
 export type BlockSettingsComponent = (
@@ -38,10 +42,8 @@ export type BlockMeta = {
   Icon: BlockIcon;
   createDefault: () => ArticleBlock;
   Editor: BlockEditorComponent;
-  /** Inline settings rendered in the card header next to the label. */
+  /** Inline settings rendered in the Settings chrome (variants / in-family convert). */
   Settings?: BlockSettingsComponent;
-  /** Types this block can be transformed into via the toolbar. */
-  convertibleTo: BlockType[];
 };
 
 export type { BlockType };

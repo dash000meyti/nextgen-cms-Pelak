@@ -40,7 +40,7 @@ description: راهنمای Studio CMS و افزودن document type در پلت
 
 ## Block editor
 
-ادیتور بدنهٔ مقاله در `apps/pelak/components/admin/blocks/` — رجیستری بلوک، DnD native، palette استیکی ۵×۳، inserter `+` تمام‌عرض بین بلوک‌ها، چندانتخاب با چک‌باکس (⌘/Ctrl و Shift) جدا از drag، جابه‌جایی گروهی، کروم فشرده (transform فقط تک‌انتخاب). WYSIWYG سطح A. جزئیات: `docs/BLOCK-EDITOR.md`.
+ادیتور بدنهٔ مقاله در `apps/pelak/components/admin/blocks/` — رجیستری بلوک، DnD native، palette استیکی ۵×۳، inserter `+` تمام‌عرض بین بلوک‌ها، چندانتخاب با Select handle، جابه‌جایی تک/گروهی جدا، تبدیل درون‌خانواده در Settings (نه Toolbar). WYSIWYG سطح A. جزئیات: `docs/BLOCK-EDITOR.md`.
 
 ## فرم محتوا
 

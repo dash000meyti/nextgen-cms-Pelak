@@ -6,16 +6,25 @@ import {
   buttonVariantClass,
 } from "@/components/article/blockStyles";
 import type { BlockEditorProps, BlockSettingsProps } from "../blockTypes";
+import {
+  ButtonOutlineIcon,
+  ButtonPrimaryIcon,
+  ButtonSecondaryIcon,
+} from "../icons";
 
-const VARIANTS: Array<{ variant: ButtonVariant; label: string }> = [
-  { variant: "primary", label: "پررنگ" },
-  { variant: "outline", label: "حاشیه‌دار" },
-  { variant: "secondary", label: "ثانویه" },
+const VARIANTS: Array<{
+  variant: ButtonVariant;
+  label: string;
+  Icon: typeof ButtonPrimaryIcon;
+}> = [
+  { variant: "primary", label: "پررنگ", Icon: ButtonPrimaryIcon },
+  { variant: "outline", label: "حاشیه‌دار", Icon: ButtonOutlineIcon },
+  { variant: "secondary", label: "ثانویه", Icon: ButtonSecondaryIcon },
 ];
 
-function pillClass(active: boolean): string {
+function iconBtnClass(active: boolean): string {
   return [
-    "rounded border px-1.5 py-0.5 text-[10px] font-medium transition-colors",
+    "inline-flex items-center justify-center rounded border p-1 transition-colors",
     active
       ? "border-accent bg-accent-soft text-accent"
       : "border-rule text-ink-muted hover:bg-surface-2",
@@ -28,7 +37,7 @@ export function ButtonSettings({ block, onChange }: BlockSettingsProps) {
   return (
     <fieldset className="flex flex-col gap-1" aria-label="نوع دکمه">
       <legend className="sr-only">نوع دکمه</legend>
-      {VARIANTS.map(({ variant: v, label }) => {
+      {VARIANTS.map(({ variant: v, label, Icon }) => {
         const active = variant === v;
         return (
           <button
@@ -40,10 +49,12 @@ export function ButtonSettings({ block, onChange }: BlockSettingsProps) {
                 ...(v === "outline" ? { variant: undefined } : { variant: v }),
               })
             }
+            aria-label={label}
             aria-pressed={active}
-            className={pillClass(active)}
+            title={label}
+            className={iconBtnClass(active)}
           >
-            {label}
+            <Icon className="h-3.5 w-3.5" />
           </button>
         );
       })}

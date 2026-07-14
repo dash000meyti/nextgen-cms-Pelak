@@ -4,16 +4,25 @@ import type { HeadingLevel } from "@nextgen-cms/contract/types/article";
 import { HEADING_CLASS } from "@/components/article/blockStyles";
 import { BlockPlainTextarea } from "../BlockPlainTextarea";
 import type { BlockEditorProps, BlockSettingsProps } from "../blockTypes";
+import {
+  Heading2Icon,
+  Heading3Icon,
+  Heading4Icon,
+} from "../icons";
 
-const LEVELS: Array<{ level: HeadingLevel; label: string }> = [
-  { level: 2, label: "H2" },
-  { level: 3, label: "H3" },
-  { level: 4, label: "H4" },
+const LEVELS: Array<{
+  level: HeadingLevel;
+  label: string;
+  Icon: typeof Heading2Icon;
+}> = [
+  { level: 2, label: "H2", Icon: Heading2Icon },
+  { level: 3, label: "H3", Icon: Heading3Icon },
+  { level: 4, label: "H4", Icon: Heading4Icon },
 ];
 
-function pillClass(active: boolean): string {
+function iconBtnClass(active: boolean): string {
   return [
-    "rounded border px-1.5 py-0.5 text-[10px] font-medium transition-colors",
+    "inline-flex items-center justify-center rounded border p-1 transition-colors",
     active
       ? "border-accent bg-accent-soft text-accent"
       : "border-rule text-ink-muted hover:bg-surface-2",
@@ -25,17 +34,19 @@ export function HeadingSettings({ block, onChange }: BlockSettingsProps) {
   return (
     <fieldset className="flex flex-col gap-1" aria-label="سطح عنوان">
       <legend className="sr-only">سطح عنوان</legend>
-      {LEVELS.map(({ level, label }) => {
+      {LEVELS.map(({ level, label, Icon }) => {
         const active = block.level === level;
         return (
           <button
             key={level}
             type="button"
             onClick={() => onChange({ ...block, level })}
+            aria-label={label}
             aria-pressed={active}
-            className={pillClass(active)}
+            title={label}
+            className={iconBtnClass(active)}
           >
-            {label}
+            <Icon className="h-3.5 w-3.5" />
           </button>
         );
       })}

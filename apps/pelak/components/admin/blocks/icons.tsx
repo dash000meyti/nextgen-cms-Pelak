@@ -42,42 +42,35 @@ export function HeadingIcon({ className }: IconProps): JSX.Element {
 
 function HeadingLevelIconImpl({
   className,
-  text,
-}: IconProps & { text: string }): JSX.Element {
+  level,
+}: IconProps & { level: 2 | 3 | 4 }): JSX.Element {
   return (
     <svg viewBox="0 0 24 24" className={base(className)} aria-hidden="true">
-      <path
-        d="M5 5v14M14 5v14M5 12h9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
       <text
-        x="19"
-        y="18"
-        fontSize="9"
+        x="12"
+        y="16.5"
+        fontSize="11"
         fontWeight="700"
         fill="currentColor"
         textAnchor="middle"
+        fontFamily="ui-sans-serif, system-ui, sans-serif"
       >
-        {text}
+        {`H${level}`}
       </text>
     </svg>
   );
 }
 
 export function Heading2Icon({ className }: IconProps): JSX.Element {
-  return <HeadingLevelIconImpl className={className} text="۲" />;
+  return <HeadingLevelIconImpl className={className} level={2} />;
 }
 
 export function Heading3Icon({ className }: IconProps): JSX.Element {
-  return <HeadingLevelIconImpl className={className} text="۳" />;
+  return <HeadingLevelIconImpl className={className} level={3} />;
 }
 
 export function Heading4Icon({ className }: IconProps): JSX.Element {
-  return <HeadingLevelIconImpl className={className} text="۴" />;
+  return <HeadingLevelIconImpl className={className} level={4} />;
 }
 
 export function QuoteIcon({ className }: IconProps): JSX.Element {
@@ -140,34 +133,51 @@ export function ListBulletIcon({ className }: IconProps): JSX.Element {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.6"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={base(className)}
       aria-hidden="true"
     >
-      <path d="M9 6h11M9 12h11M9 18h11" />
-      <circle cx="4.5" cy="6" r="1.2" fill="currentColor" stroke="none" />
-      <circle cx="4.5" cy="12" r="1.2" fill="currentColor" stroke="none" />
-      <circle cx="4.5" cy="18" r="1.2" fill="currentColor" stroke="none" />
+      <path d="M11 8h10M11 16h10" />
+      <circle cx="5.5" cy="8" r="2.2" fill="currentColor" stroke="none" />
+      <circle cx="5.5" cy="16" r="2.2" fill="currentColor" stroke="none" />
     </svg>
   );
 }
 
 export function ListOrderedIcon({ className }: IconProps): JSX.Element {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={base(className)}
-      aria-hidden="true"
-    >
-      <path d="M9 6h11M9 12h11M9 18h11" />
-      <path d="M4 5h1.5v3M4 11h2l-2 2.5h2M4 17h2v2H4" />
+    <svg viewBox="0 0 24 24" className={base(className)} aria-hidden="true">
+      <path
+        d="M11 8h10M11 16h10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <text
+        x="5.5"
+        y="10.5"
+        fontSize="9"
+        fontWeight="700"
+        fill="currentColor"
+        textAnchor="middle"
+        fontFamily="ui-sans-serif, system-ui, sans-serif"
+      >
+        1
+      </text>
+      <text
+        x="5.5"
+        y="18.5"
+        fontSize="9"
+        fontWeight="700"
+        fill="currentColor"
+        textAnchor="middle"
+        fontFamily="ui-sans-serif, system-ui, sans-serif"
+      >
+        2
+      </text>
     </svg>
   );
 }
@@ -178,14 +188,14 @@ export function ListDashIcon({ className }: IconProps): JSX.Element {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.6"
+      strokeWidth="2.2"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={base(className)}
       aria-hidden="true"
     >
-      <path d="M9 6h11M9 12h11M9 18h11" />
-      <path d="M3 6h3M3 12h3M3 18h3" />
+      <path d="M11 8h10M11 16h10" strokeWidth="1.8" />
+      <path d="M3 8h5M3 16h5" />
     </svg>
   );
 }
@@ -204,6 +214,78 @@ export function TableIcon({ className }: IconProps): JSX.Element {
     >
       <rect x="3" y="4" width="18" height="16" rx="1.5" />
       <path d="M3 10h18M3 15h18M9 4v16M15 4v16" />
+    </svg>
+  );
+}
+
+export function TableAddColIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <rect x="3" y="5" width="12" height="14" rx="1.5" />
+      <path d="M9 5v14M3 12h12M18 8v8M14 12h8" />
+    </svg>
+  );
+}
+
+export function TableRemoveColIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <rect x="3" y="5" width="12" height="14" rx="1.5" />
+      <path d="M9 5v14M3 12h12M14 12h8" />
+    </svg>
+  );
+}
+
+export function TableAddRowIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="18" height="11" rx="1.5" />
+      <path d="M3 8.5h18M12 3v11M12 16v5M9.5 18.5h5" />
+    </svg>
+  );
+}
+
+export function TableRemoveRowIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="18" height="11" rx="1.5" />
+      <path d="M3 8.5h18M12 3v11M9.5 18.5h5" />
     </svg>
   );
 }
@@ -384,6 +466,25 @@ export function DragHandleIcon({ className }: IconProps): JSX.Element {
       <circle cx="15" cy="12" r="1.4" />
       <circle cx="9" cy="18" r="1.4" />
       <circle cx="15" cy="18" r="1.4" />
+    </svg>
+  );
+}
+
+/** Select / group-drag handle — stacked layers, distinct from single DragHandleIcon. */
+export function GroupSelectIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <path d="M8 7h11a1 1 0 0 1 1 1v7" />
+      <rect x="4" y="9" width="13" height="9" rx="1.5" />
     </svg>
   );
 }

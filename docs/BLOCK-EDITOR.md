@@ -24,16 +24,19 @@
 
 ```mermaid
 flowchart TB
-  Shell["BlockEditor.tsx<br/>grid: content + sticky palette"] --> DragList["BlockDragList.tsx<br/>DnD + insertion zones"]
+  Shell["BlockEditor.tsx<br/>grid: content + sticky palette"] --> DragList["BlockDragList.tsx<br/>orchestration"]
   Shell --> Palette["BlockInsertPalette.tsx<br/>5×3 icon column"]
+  DragList --> Sel["useBlockSelection"]
+  DragList --> DnD["useBlockDnD<br/>single + group entry"]
   DragList --> Wrapper["BlockWrapper.tsx<br/>hover chrome + selection"]
   Wrapper --> Row["flex row p-1"]
   Row --> Chrome["Settings col + BlockToolbar col"]
   Row --> Editor["block.Editor flex-1"]
   Registry["blockRegistry.tsx"] --> Editor
   Registry --> Settings["block.Settings"]
-  Registry --> Toolbar["BlockToolbar.tsx<br/>drag / up / transform / down"]
+  Registry --> Toolbar["BlockToolbar.tsx<br/>single drag / up / down"]
   Registry --> Palette
+  Wrapper --> SelectHandle["BlockSelectHandle<br/>select + group drag"]
   DragList --> Zone["InsertionZone.tsx<br/>full-width +"]
   Zone --> Menu["InsertionMenu → BlockInsertPalette"]
   Styles["blockStyles.ts"] --> Editor
@@ -52,8 +55,7 @@ type BlockMeta = {
   Icon: BlockIcon;          // inline SVG
   createDefault: () => ArticleBlock;
   Editor: BlockEditorComponent;
-  Settings?: BlockSettingsComponent;  // در ستون کروم Settings
-  convertibleTo: BlockType[];
+  Settings?: BlockSettingsComponent;  // variants / in-family convert در Settings
 };
 ```
 
@@ -87,21 +89,23 @@ type BlockMeta = {
 
 ```
 ┌─ BlockWrapper (p-1 flex row) ─────────────────────────────┐
-│ Settings col │ Toolbar col │ Content (flex-1 min-w-0)     │
-│ label·delete │ drag        │  outline نازک روی ورودی     │
-│ (+Settings   │ (+ ▲ ⇄ ▼    │                              │
-│  on hover    │  on handle  │  block.Editor                │
-│  overlay)    │  hover)     │                              │
-└──────────────┴─────────────┴──────────────────────────────┘
+│ Select col │ Settings col │ Toolbar col │ Content         │
+│ group drag │ icon·delete  │ single drag │  outline نازک  │
+│ (+ ▲ ▼     │ (+Settings   │ (+ ▲ ⇄ ▼    │  block.Editor  │
+│  گروهی)    │  overlay)    │  تک)        │                │
+└────────────┴──────────────┴─────────────┴────────────────┘
 ```
 
-- ترتیب در ردیف (RTL start→end): Settings → Toolbar → محتوا.
-- ترتیب Toolbar عمودی: **drag → بالا → transform → پایین**؛ footprint فقط drag است و اکشن‌ها با hover/`focus-within` روی Toolbar به‌صورت overlay باز می‌شوند بدون رشد layout.
-- ستون Settings: ابتدا فقط لیبل·حذف؛ `Settings` با hover/`focus-within` به‌صورت overlay بدون رشد layout.
+- ترتیب در ردیف (RTL start→end): **Select → Settings → Toolbar → محتوا**.
+- ستون Select (`BlockSelectHandle`): همان الگوی Toolbar (footprint + absolute chrome عمودی: **انتخاب/درگ گروهی → ▲ → ▼**)؛ جابه‌جایی گروهی با ▲/▼ و درگ فقط از همین ستون.
+- ترتیب Toolbar عمودی: **single drag → بالا → پایین**؛ ▲/▼ Toolbar فقط تک‌بلوک.
+- ستون Settings: آیکون نوع (بر اساس سطح/واریانت: `resolveBlockChromeIcon`) + حذف؛ `Settings` با hover/`focus-within` به‌صورت overlay — گزینه‌ها آیکونی؛ تبدیل درون‌خانواده در Settings: `H2`/`H3`/`H4`؛ پاراگراف/نقل‌قول/پرسش؛ واریانت‌های لیست؛ واریانت دکمه؛ ابعاد جدول.
 - بدون ring در idle؛ روی بلوک **انتخاب‌شده** `ring-1 ring-accent`. روی `BlockPlainTextarea` / `BlockPlainInput` در hover گروه یا `focus-visible`، outline نازک `accent` (۱px).
+- روی انتخاب: فقط ستون Select همیشه visible می‌ماند؛ Settings و Toolbar با hover بلوک یا focus داخل همان ستون ظاهر می‌شوند — نه با focus روی Select. ساختار Toolbar با select عوض نمی‌شود؛ Transform در چندانتخاب فقط disabled است.
 - لیبل نوع، حذف دو‌مرحله‌ای، و `Settings` در ستون Settings؛ فقط روی hover/`focus-within` chrome کل ستون visible.
-- `focus-within` برای قابل‌استفاده ماندن منوی transform و دکمه‌ها با کیبورد.
-- **انتخاب:** چک‌باکس به‌جای آیکون نوع در ستون Settings (جدا از drag handle). `selectedKeys` + `selectionAnchorKey` در `BlockDragList`. کلیک ساده = فقط همان / یا لغو اگر تنها انتخاب باشد؛ `Meta/Ctrl` = toggle؛ `Shift` = range؛ Escape = پاک کردن انتخاب (خارج از فیلد متنی). درگ بدون تیک فقط همان بلوک را جابه‌جا می‌کند و انتخاب را عوض نمی‌کند.
+- `focus-within` برای قابل‌استفاده ماندن دکمه‌های کروم با کیبورد.
+- **انتخاب:** `BlockSelectHandle` با `GroupSelectIcon` (لایه‌های روی‌هم، نه grip نقطه‌ای Toolbar و نه چک‌باکس) به‌عنوان ستون اول کروم. انتخاب‌شده → رنگ accent قرمز (`bg-accent-soft` / `text-accent`) + ring کارت و ring ستون Select. state در `useBlockSelection` (`selectedKeys` + `selectionAnchorKey`). کلیک ساده = فقط همان / یا لغو اگر تنها انتخاب باشد؛ `Meta/Ctrl` = toggle؛ `Shift` = range؛ Escape = پاک کردن انتخاب (خارج از فیلد متنی).
+- **درگ تکی vs گروهی (جدا):** grip در Toolbar همیشه فقط همان بلوک را جابه‌جا می‌کند و انتخاب را نمی‌خواند و عوض نمی‌کند. درگ گروهی فقط از ستون Select وقتی بیش از یک بلوک انتخاب شده و این بلوک جزو انتخاب است (`useBlockDnD.startSingleDrag` / `startGroupDrag`). منطق جابه‌جایی: `blockMove.ts` (`relocateKeys`).
 - **حذف دو مرحله‌ای** (تک‌بلوک از Settings): کلیک اول → مسلح؛ کلیک دوم → حذف. پس از ۳ ثانیه یا blur، disarm. حذف گروهی فعلاً پشتیبانی نمی‌شود.
 - `data-block-key` برای `scrollIntoView` پس از move/drop.
 - `data-field="body.{i}"` روی `BlockWrapper` برای اسکرول به خطای اعتبارسنجی (جدا از `data-block-key`)؛ toast: `FormMessage` + `useFormFeedback` — `docs/UI-BOUNDARY.md`.
@@ -115,10 +119,10 @@ type BlockMeta = {
 
 ### تعامل
 
-- **درگ‌اند‌دراپ native** — drag handle در Toolbar؛ drop روی insertion zoneها؛ با چندانتخاب، کل مجموعه به‌صورت run پیوسته جابه‌جا می‌شود.
-- **چندانتخاب / جابه‌جایی گروهی** — چک‌باکس برای انتخاب؛ ▲/▼ و drag روی مجموعه وقتی بلوکِ در حال جابه‌جایی تیک خورده و بیش از یکی انتخاب شده؛ transform در حالت چندتایی غیرفعال است.
-- **+ بین بلوک‌ها** — `InsertionZone` روی hover دکمهٔ `+` تمام‌عرض (border dashed)؛ منو = همان `BlockInsertPalette` آیکونی ۵×۳؛ هنگام درگ خط accent چشمک‌زن.
-- **تبدیل نوع** — `convertBlock`؛ منوی transform در Toolbar (فقط تک‌انتخاب). `table` تبدیل‌پذیر نیست.
+- **درگ تکی (Toolbar)** — native HTML5 از grip Toolbar؛ همیشه یک بلوک؛ drop روی insertion zoneها (`dragActive` منبع پذیرش drop است).
+- **چندانتخاب / درگ گروهی** — `BlockSelectHandle` برای انتخاب (ظاهر قرمز وقتی انتخاب‌شده)؛ درگ گروهی و ▲/▼ گروهی فقط از همان ستون؛ Toolbar فقط تک‌بلوک؛ تبدیل Settings در چندانتخاب غیرفعال است.
+- **+ بین بلوک‌ها** — `InsertionZone` روی hover دکمهٔ `+` تمام‌عرض (border dashed)؛ منو = همان `BlockInsertPalette` آیکونی ۵×۳؛ هنگام درگ همان footprint دکمهٔ `+` (بدون ارتفاع/مارجین اضافه) با border accent چشمک‌زن.
+- **تبدیل نوع** — در ستون Settings (نه Toolbar): سطوح عنوان به‌هم؛ پاراگراف/نقل‌قول/پرسش با `ProseSettings` + `convertBlock`؛ واریانت لیست/دکمه؛ جدول فقط ابعاد. media به هم تبدیل نمی‌شوند.
 - **حرکت با پیکان** — پس از move/drop، `scrollIntoView` روی اولین بلوک گروه؛ انتخاب حفظ می‌شود.
 - **لیست** — Enter افزودن مورد، Backspace روی مورد خالی حذف.
 

@@ -5,18 +5,21 @@ import { useRef } from "react";
 import { listVariantClass } from "@/components/article/blockStyles";
 import { BlockPlainInput } from "../BlockPlainInput";
 import type { BlockEditorProps, BlockSettingsProps } from "../blockTypes";
+import { ListBulletIcon, ListDashIcon, ListOrderedIcon } from "../icons";
 
-const VARIANT_LABEL: Record<ListVariant, string> = {
-  bullet: "نقطه‌ای",
-  ordered: "شماره‌دار",
-  dash: "خط تیره",
-};
+const VARIANT_META: Array<{
+  variant: ListVariant;
+  label: string;
+  Icon: typeof ListBulletIcon;
+}> = [
+  { variant: "bullet", label: "نقطه‌ای", Icon: ListBulletIcon },
+  { variant: "ordered", label: "شماره‌دار", Icon: ListOrderedIcon },
+  { variant: "dash", label: "خط تیره", Icon: ListDashIcon },
+];
 
-const VARIANTS: ListVariant[] = ["bullet", "ordered", "dash"];
-
-function pillClass(active: boolean): string {
+function iconBtnClass(active: boolean): string {
   return [
-    "rounded border px-1.5 py-0.5 text-[10px] font-medium transition-colors",
+    "inline-flex items-center justify-center rounded border p-1 transition-colors",
     active
       ? "border-accent bg-accent-soft text-accent"
       : "border-rule text-ink-muted hover:bg-surface-2",
@@ -28,17 +31,19 @@ export function ListSettings({ block, onChange }: BlockSettingsProps) {
   return (
     <fieldset className="flex flex-col gap-1" aria-label="نوع لیست">
       <legend className="sr-only">نوع لیست</legend>
-      {VARIANTS.map((variant) => {
+      {VARIANT_META.map(({ variant, label, Icon }) => {
         const active = block.variant === variant;
         return (
           <button
             key={variant}
             type="button"
             onClick={() => onChange({ ...block, variant })}
+            aria-label={label}
             aria-pressed={active}
-            className={pillClass(active)}
+            title={label}
+            className={iconBtnClass(active)}
           >
-            {VARIANT_LABEL[variant]}
+            <Icon className="h-3.5 w-3.5" />
           </button>
         );
       })}

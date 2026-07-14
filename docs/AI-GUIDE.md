@@ -20,7 +20,7 @@
 | schema DB | `packages/core/src/db/schema/` | `data-layer.mdc` |
 | type دامنه | `packages/contract/src/types/` | `monorepo.mdc` |
 | CMS field defs | `packages/contract/src/cms-schema/` | `hokmran-studio` · `docs/CMS-SCHEMA.md` |
-| ادیتور بدنهٔ مقاله (بلوک‌ها) | `apps/pelak/components/admin/blocks/` · `components/article/blockStyles.ts` | `hokmran-studio` · `docs/BLOCK-EDITOR.md` (چندانتخاب / جابه‌جایی گروهی) |
+| ادیتور بدنهٔ مقاله (بلوک‌ها) | `apps/pelak/components/admin/blocks/` · `components/article/blockStyles.ts` | `hokmran-studio` · `docs/BLOCK-EDITOR.md` (درگ تکی Toolbar / انتخاب+درگ گروهی Select handle) |
 | فیلد مرجع فرم‌ها (اعضا/موضوع/گروه) | `apps/pelak/components/admin/fields/ReferencePicker.tsx` | `hokmran-studio` · `docs/STUDIO.md` |
 | فرم محتوا (متادیتای فشرده) | `apps/pelak/components/admin/studio/ArticleForm.tsx` | `hokmran-studio` · `docs/STUDIO.md` |
 | مجوز RBAC | `packages/contract/src/permissions.ts` | `hokmran-rbac` · `docs/STUDIO.md` |

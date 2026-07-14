@@ -9,20 +9,26 @@ import { ListBlock, ListSettings } from "./blocks/ListBlock";
 import { ParagraphBlock } from "./blocks/ParagraphBlock";
 import { QuestionBlock } from "./blocks/QuestionBlock";
 import { QuoteBlock } from "./blocks/QuoteBlock";
+import { TableBlock, TableSettings } from "./blocks/TableBlock";
 import { VideoBlock } from "./blocks/VideoBlock";
 import type { BlockMeta } from "./blockTypes";
 import {
   ButtonIcon,
+  ButtonOutlineIcon,
+  ButtonPrimaryIcon,
+  ButtonSecondaryIcon,
   Heading2Icon,
   Heading3Icon,
   Heading4Icon,
   HeadingIcon,
   ImageIcon,
   ListBulletIcon,
+  ListDashIcon,
   ListOrderedIcon,
   ParagraphIcon,
   QuestionIcon,
   QuoteIcon,
+  TableIcon,
   VideoIcon,
 } from "./icons";
 
@@ -104,6 +110,20 @@ const registry: Record<BlockType, BlockMeta> = {
     Editor: VideoBlock,
     convertibleTo: [],
   },
+  table: {
+    type: "table",
+    label: "جدول",
+    group: "media",
+    Icon: TableIcon,
+    createDefault: () => ({
+      type: "table",
+      headers: ["", ""],
+      rows: [["", ""]],
+    }),
+    Editor: TableBlock,
+    Settings: TableSettings,
+    convertibleTo: [],
+  },
   button: {
     type: "button",
     label: "دکمه",
@@ -121,19 +141,6 @@ const registry: Record<BlockType, BlockMeta> = {
   },
 };
 
-/** Alternate icon for ordered lists in the insert menu. */
-export const orderedListMeta = {
-  type: "list" as const,
-  label: "لیست شماره‌دار",
-  group: "text" as const,
-  Icon: ListOrderedIcon,
-  createDefault: () => ({
-    type: "list" as const,
-    variant: "ordered",
-    items: [""],
-  }),
-};
-
 export function getBlockMeta(type: BlockType): BlockMeta {
   return registry[type];
 }
@@ -142,7 +149,7 @@ export function createBlock(type: BlockType): ArticleBlock {
   return getBlockMeta(type).createDefault();
 }
 
-type InsertableEntry = {
+export type InsertableEntry = {
   type: BlockType;
   label: string;
   group: BlockMeta["group"];
@@ -150,63 +157,136 @@ type InsertableEntry = {
   payload: ArticleBlock;
 };
 
+/**
+ * Explicit 5×3 insert palette order (rows of three):
+ * headings · text · lists · media · buttons
+ */
 export function listInsertableBlocks(): InsertableEntry[] {
-  const base: InsertableEntry[] = Object.values(registry).map((meta) => ({
-    type: meta.type,
-    label: meta.label,
-    group: meta.group,
-    Icon: meta.Icon,
-    payload: meta.createDefault(),
-  }));
-
-  // Replace the single "heading" entry with three level-specific buttons.
-  const headingIndex = base.findIndex((entry) => entry.type === "heading");
-  if (headingIndex >= 0) {
-    const headingLevels: InsertableEntry[] = [
-      {
-        type: "heading",
-        label: "عنوان",
-        group: "text",
-        Icon: Heading2Icon,
-        payload: { type: "heading", level: 2, content: "" },
-      },
-      {
-        type: "heading",
-        label: "زیرعنوان",
-        group: "text",
-        Icon: Heading3Icon,
-        payload: { type: "heading", level: 3, content: "" },
-      },
-      {
-        type: "heading",
-        label: "ریزعنوان",
-        group: "text",
-        Icon: Heading4Icon,
-        payload: { type: "heading", level: 4, content: "" },
-      },
-    ];
-    base.splice(headingIndex, 1, ...headingLevels);
-  }
-
-  // Split the single "list" entry into bullet + ordered for clarity in the menu.
-  const listIndex = base.findIndex((entry) => entry.type === "list");
-  if (listIndex >= 0) {
-    base[listIndex] = {
-      type: "list",
-      label: "لیست نقطه‌ای",
+  return [
+    {
+      type: "heading",
+      label: "عنوان",
       group: "text",
-      Icon: ListBulletIcon,
-      payload: { type: "list", variant: "bullet", items: [""] },
-    };
-    base.splice(listIndex + 1, 0, {
+      Icon: Heading2Icon,
+      payload: { type: "heading", level: 2, content: "" },
+    },
+    {
+      type: "heading",
+      label: "زیرعنوان",
+      group: "text",
+      Icon: Heading3Icon,
+      payload: { type: "heading", level: 3, content: "" },
+    },
+    {
+      type: "heading",
+      label: "ریزعنوان",
+      group: "text",
+      Icon: Heading4Icon,
+      payload: { type: "heading", level: 4, content: "" },
+    },
+    {
+      type: "paragraph",
+      label: "پاراگراف",
+      group: "text",
+      Icon: ParagraphIcon,
+      payload: { type: "paragraph", content: "" },
+    },
+    {
+      type: "quote",
+      label: "نقل‌قول",
+      group: "text",
+      Icon: QuoteIcon,
+      payload: { type: "quote", content: "", attribution: "" },
+    },
+    {
+      type: "question",
+      label: "پرسش",
+      group: "text",
+      Icon: QuestionIcon,
+      payload: { type: "question", content: "", answer: "" },
+    },
+    {
       type: "list",
       label: "لیست شماره‌دار",
       group: "text",
       Icon: ListOrderedIcon,
       payload: { type: "list", variant: "ordered", items: [""] },
-    });
-  }
-  return base;
+    },
+    {
+      type: "list",
+      label: "لیست نقطه‌ای",
+      group: "text",
+      Icon: ListBulletIcon,
+      payload: { type: "list", variant: "bullet", items: [""] },
+    },
+    {
+      type: "list",
+      label: "لیست خط‌تیره",
+      group: "text",
+      Icon: ListDashIcon,
+      payload: { type: "list", variant: "dash", items: [""] },
+    },
+    {
+      type: "image",
+      label: "تصویر",
+      group: "media",
+      Icon: ImageIcon,
+      payload: {
+        type: "image",
+        image: { src: "", alt: "", caption: "", credit: "" },
+      },
+    },
+    {
+      type: "video",
+      label: "آپارات",
+      group: "media",
+      Icon: VideoIcon,
+      payload: { type: "video", src: "", caption: "" },
+    },
+    {
+      type: "table",
+      label: "جدول",
+      group: "media",
+      Icon: TableIcon,
+      payload: { type: "table", headers: ["", ""], rows: [["", ""]] },
+    },
+    {
+      type: "button",
+      label: "دکمه پررنگ",
+      group: "interactive",
+      Icon: ButtonPrimaryIcon,
+      payload: {
+        type: "button",
+        label: "",
+        href: "",
+        variant: "primary",
+      },
+    },
+    {
+      type: "button",
+      label: "دکمه حاشیه‌دار",
+      group: "interactive",
+      Icon: ButtonOutlineIcon,
+      payload: {
+        type: "button",
+        label: "",
+        href: "",
+        variant: "outline",
+      },
+    },
+    {
+      type: "button",
+      label: "دکمه ثانویه",
+      group: "interactive",
+      Icon: ButtonSecondaryIcon,
+      payload: {
+        type: "button",
+        label: "",
+        href: "",
+        variant: "secondary",
+      },
+    },
+  ];
 }
 
 /**
@@ -265,6 +345,10 @@ export function convertBlock(
       return source.type === "video"
         ? source
         : { type: "video", src: "", caption: "" };
+    case "table":
+      return source.type === "table"
+        ? source
+        : { type: "table", headers: ["", ""], rows: [["", ""]] };
     case "button":
       return source.type === "button"
         ? source
@@ -287,6 +371,7 @@ function readPrimaryText(block: ArticleBlock): string {
       return block.label;
     case "image":
     case "video":
+    case "table":
       return "";
     default:
       return "";

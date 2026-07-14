@@ -10,7 +10,12 @@ import { TrashIcon } from "./icons";
 
 type BlockWrapperProps = {
   block: EditorBlock;
+  /** Form feedback anchor — e.g. `body.2`. */
+  fieldKey?: string;
   isDragging?: boolean;
+  isSelected?: boolean;
+  /** True when this block is part of a multi-block selection (disables transform). */
+  multiSelectActive?: boolean;
   canMoveUp: boolean;
   canMoveDown: boolean;
   onChange: (block: EditorBlock) => void;
@@ -20,6 +25,7 @@ type BlockWrapperProps = {
   onDelete: () => void;
   onDragStart: (e: React.DragEvent<HTMLButtonElement>) => void;
   onDragEnd: () => void;
+  onSelect: (e: React.MouseEvent) => void;
   uploadContext?: MediaUploadContext;
 };
 
@@ -28,7 +34,10 @@ const chromeVisible =
 
 export function BlockWrapper({
   block,
+  fieldKey,
   isDragging = false,
+  isSelected = false,
+  multiSelectActive = false,
   canMoveUp,
   canMoveDown,
   onChange,
@@ -38,6 +47,7 @@ export function BlockWrapper({
   onDelete,
   onDragStart,
   onDragEnd,
+  onSelect,
   uploadContext,
 }: BlockWrapperProps) {
   const meta = getBlockMeta(block.type);
@@ -80,40 +90,54 @@ export function BlockWrapper({
     setDeleteArmed(false);
   }
 
+  const chromeClass = [
+    "flex shrink-0 flex-row items-start gap-1.5",
+    isSelected ? "pointer-events-auto opacity-100" : chromeVisible,
+  ].join(" ");
+
   return (
     <div
       data-block-key={block._key}
+      data-field={fieldKey}
       className={[
         "group relative rounded-md",
         isDragging ? "opacity-40" : "",
+        isSelected ? "ring-1 ring-accent" : "",
       ].join(" ")}
     >
       <div className="flex min-w-0 items-start gap-2 p-1">
-        <div
-          className={[
-            "flex shrink-0 flex-row items-start gap-1.5",
-            chromeVisible,
-          ].join(" ")}
-        >
-          <div className="group/settings relative max-w-[7.5rem]">
+        <div className={chromeClass}>
+          <div className="group/settings relative max-w-30">
             {/* footprint — label row only; settings overlay below without layout growth */}
-            <div
-              className="invisible rounded-md p-1"
-              aria-hidden
-            >
+            <div className="invisible rounded-md p-1" aria-hidden>
               <div className="flex items-center gap-1 px-0.5 text-[10px] font-medium">
-                <meta.Icon className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{meta.label}</span>
+                <span className="h-3.5 w-3.5 shrink-0" />
+                <span className="h-3.5 w-3.5 shrink-0" />
                 <span className="ms-auto shrink-0 rounded p-0.5">
                   <TrashIcon className="h-3.5 w-3.5" />
                 </span>
               </div>
             </div>
 
-            <div className="absolute start-0 top-0 z-20 flex w-full max-w-[7.5rem] flex-col items-stretch gap-1 rounded-md bg-paper/95 p-1 shadow-sm ring-1 ring-rule">
+            <div className="absolute inset-s-0 top-0 z-20 flex w-full max-w-30 flex-col items-stretch gap-1 rounded-md bg-paper/95 p-1 shadow-sm ring-1 ring-rule">
               <div className="flex items-center gap-1 px-0.5 text-[10px] font-medium text-ink-muted">
-                <meta.Icon className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{meta.label}</span>
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={() => {
+                    /* selection handled in onClick for modifier keys */
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelect(e);
+                  }}
+                  aria-label={`انتخاب بلوک ${meta.label}`}
+                  title="انتخاب بلوک — ⌘/Ctrl برای چندتایی، Shift برای بازه"
+                  className="h-3.5 w-3.5 shrink-0 accent-accent"
+                />
+                <span title={meta.label} className="inline-flex shrink-0">
+                  <meta.Icon className="h-3.5 w-3.5 text-ink-muted" />
+                </span>
                 <button
                   type="button"
                   aria-label={deleteArmed ? "تأیید حذف" : "حذف بلوک"}
@@ -142,9 +166,7 @@ export function BlockWrapper({
                 >
                   <Settings
                     block={block}
-                    onChange={(next) =>
-                      onChange({ ...next, _key: block._key })
-                    }
+                    onChange={(next) => onChange({ ...next, _key: block._key })}
                   />
                 </div>
               ) : null}
@@ -155,6 +177,7 @@ export function BlockWrapper({
             convertibleTo={meta.convertibleTo}
             canMoveUp={canMoveUp}
             canMoveDown={canMoveDown}
+            transformDisabled={multiSelectActive}
             onConvert={onConvert}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}

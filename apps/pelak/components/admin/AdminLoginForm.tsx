@@ -1,7 +1,9 @@
 "use client";
 
 import { type LoginState, loginAdmin } from "@nextgen-cms/studio/admin/actions";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type AdminLoginFormProps = {
   next: string;
@@ -9,15 +11,22 @@ type AdminLoginFormProps = {
 };
 
 export function AdminLoginForm({ next, initialError }: AdminLoginFormProps) {
+  const feedback = useFormFeedback();
   const [state, formAction, pending] = useActionState<LoginState, FormData>(
     loginAdmin,
     { error: initialError },
   );
 
+  useEffect(() => {
+    if (state.error) {
+      feedback.reportError(state.error);
+    }
+  }, [state.error, feedback.reportError]);
+
   return (
     <form action={formAction} className="mt-6 space-y-4">
       <input type="hidden" name="next" value={next} />
-      <div>
+      <div data-field="username">
         <label htmlFor="username" className="block text-sm text-ink-muted">
           نام کاربری
         </label>
@@ -30,7 +39,7 @@ export function AdminLoginForm({ next, initialError }: AdminLoginFormProps) {
           className="mt-1 w-full rounded-md border border-rule bg-paper px-3 py-2 text-sm text-ink"
         />
       </div>
-      <div>
+      <div data-field="password">
         <label htmlFor="password" className="block text-sm text-ink-muted">
           رمز عبور
         </label>
@@ -43,11 +52,11 @@ export function AdminLoginForm({ next, initialError }: AdminLoginFormProps) {
           className="mt-1 w-full rounded-md border border-rule bg-paper px-3 py-2 text-sm text-ink"
         />
       </div>
-      {state.error ? (
-        <p className="text-sm text-accent" role="alert">
-          {state.error}
-        </p>
-      ) : null}
+      <FormMessage
+        error={feedback.error}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
       <button
         type="submit"
         disabled={pending}

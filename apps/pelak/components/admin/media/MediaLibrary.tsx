@@ -12,9 +12,10 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { FolderBreadcrumb } from "@/components/admin/media/FolderBreadcrumb";
 import { MediaGrid } from "@/components/admin/media/MediaGrid";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { MediaSettingsForm } from "@/components/admin/studio/MediaSettingsForm";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type MediaLibraryProps = {
   browseFolder: string;
@@ -48,23 +49,21 @@ export function MediaLibrary({
   );
   const [pending, startTransition] = useTransition();
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const deletableSet = new Set(deletableIds);
   const { confirm, dialog } = useConfirmDialog();
 
   function handleUpload(file: File) {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       const formData = new FormData();
       formData.set("file", file);
       const result = await uploadMedia(formData, { folder: uploadFolder });
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
-      setSuccess("فایل آپلود شد.");
+      feedback.reportSuccess("فایل آپلود شد.");
       router.refresh();
     });
   }
@@ -77,17 +76,16 @@ export function MediaLibrary({
     });
     if (!confirmed) return;
 
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     setDeletingId(asset.id);
     startTransition(async () => {
       const result = await deleteMedia(asset.id);
       setDeletingId(null);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
-      setSuccess("فایل حذف شد.");
+      feedback.reportSuccess("فایل حذف شد.");
       router.refresh();
     });
   }
@@ -149,7 +147,12 @@ export function MediaLibrary({
         </div>
       ) : null}
 
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
 
       {tab === "settings" && canManageSettings && mediaSettings ? (
         <MediaSettingsForm value={mediaSettings} />

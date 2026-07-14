@@ -25,10 +25,15 @@ import {
 } from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-permission";
-import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
+import {
+  type MutationResult,
+  mutationIssue,
+} from "@nextgen-cms/studio/cms/mutations/mutation-result";
 import { assertUniqueSlug } from "@nextgen-cms/studio/cms/queries/slug";
 import {
+  issue,
   normalizeSlugInput,
+  type ValidationIssue,
   validateImageMeta,
   validateRequired,
   validateSlug,
@@ -92,8 +97,8 @@ function resolveContentGroupStatus(
 async function validate(
   input: ContentGroupWriteInput,
   excludeId?: number,
-): Promise<string | undefined> {
-  const titleError = validateRequired(input.title, "عنوان");
+): Promise<ValidationIssue | undefined> {
+  const titleError = validateRequired(input.title, "عنوان", "title");
   if (titleError) return titleError;
   const slugError = validateSlug(input.slug);
   if (slugError) return slugError;
@@ -103,10 +108,13 @@ async function validate(
     excludeId,
   );
   if (uniqueError) return uniqueError;
-  const coverError = validateImageMeta(input.coverSrc, input.coverAlt, "جلد");
+  const coverError = validateImageMeta(input.coverSrc, input.coverAlt, "جلد", {
+    src: "cover",
+    alt: "coverAlt",
+  });
   if (coverError) return coverError;
   if (input.pdfSrc && !input.pdfSrc.toLowerCase().endsWith(".pdf")) {
-    return "فایل PDF نامعتبر است.";
+    return issue("pdf", "فایل PDF نامعتبر است.");
   }
   return undefined;
 }
@@ -165,7 +173,7 @@ export async function createContentGroup(
   input.status = statusResult;
 
   const error = await validate(input);
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   try {
     const id = await insertContentGroup(input, access(session.memberId));
@@ -214,7 +222,7 @@ export async function saveContentGroup(
   input.status = statusResult;
 
   const error = await validate(input, id);
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   try {
     const coverSrc = await resolveContentGroupCoverSrc(id, input.coverSrc);

@@ -1,5 +1,7 @@
 export {
+  issue,
   parseArticleBlocks,
+  type ValidationIssue,
   validateArticleBlocks,
   validateImageMeta,
   validateRequired,

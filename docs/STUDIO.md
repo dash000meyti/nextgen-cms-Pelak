@@ -89,6 +89,14 @@ packages/core/src/db/repositories/ — نوشتن DB
 - Public فقط `@nextgen-cms/site-data`
 - Studio هرگز `components/home/` یا `components/article/` import نکند
 
+## بازخورد فرم (خطا / موفقیت)
+
+- نتیجهٔ mutation: `MutationResult` = `{ ok: true }` | `{ ok: false; error: string; field?: string }`
+- اعتبارسنجی: `ValidationIssue = { message, field }` در `packages/studio/src/cms/validation/`
+- UI: `useFormFeedback` + `FormMessage` (`components/ui/`) — toast ثابت روی viewport (قرمز / سبز / خاکستری)، بستن با X یا محو پس از ۱۰ ثانیه؛ روی خطا اسکرول/هایلایت به `[data-field]`
+- فیلدهای ادمین (`TextField`, `ImageField`, …) و بلوک‌ها (`data-field="body.{i}"`) لنگر دارند
+- جزئیات UI: `docs/UI-BOUNDARY.md` · بلوک‌ها: `docs/BLOCK-EDITOR.md`
+
 ## سیاست slug (canonical)
 
 - منبع policy: `packages/studio/src/cms/validation/slug.ts`
@@ -155,7 +163,7 @@ packages/core/src/db/repositories/ — نوشتن DB
   - فاصلهٔ عمودی `space-y-4`؛ گرید عنوان|نامک، تاریخ+زمان‌مطالعه+پرچم‌ها، زیرعنوان|چکیده
   - تصویر شاخص با `ImageField` دوستونه (`twoColumn`)
   - اعضا / موضوعات / گروه محتوا با `ReferencePicker` (سلکت جست‌وجودار + چیپ انتخاب؛ لیست اسکرول دائمی ندارد)
-  - بدنه محتوا: `BlockEditor` — جدا از فشرده‌سازی متادیتا
+  - بدنه محتوا: `BlockEditor` — ستون استیکی palette آیکونی ۵×۳ کنار بدنه؛ چندانتخاب با چک‌باکس (⌘/Ctrl و Shift) + جابه‌جایی گروهی — `docs/BLOCK-EDITOR.md`
   - تاریخ انتشار قابل تنظیم دستی برای مقالات قدیمی (فهرست گروه محتوا بر اساس `publishedAt DESC`)
 - `ReferencePicker` در `apps/pelak/components/admin/fields/ReferencePicker.tsx` — props پایدار؛ مصرف در فرم محتوا، ویدیو، گروه محتوا
 - «ارسال به بایگانی» → `archived` و redirect به لیست بایگانی همان بخش (`?status=archived`)

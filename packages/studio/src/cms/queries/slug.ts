@@ -110,8 +110,10 @@ export async function assertUniqueSlug(
   collection: CollectionType,
   slug: string,
   excludeId?: number,
-): Promise<string | undefined> {
+): Promise<{ message: string; field: string } | undefined> {
   const exists = await slugExists(collection, slug, excludeId);
-  if (exists) return "این نامک قبلاً استفاده شده است.";
+  if (exists) {
+    return { message: "این نامک قبلاً استفاده شده است.", field: "slug" };
+  }
   return undefined;
 }

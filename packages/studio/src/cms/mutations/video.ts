@@ -22,7 +22,10 @@ import { parseJalaliInput } from "@nextgen-cms/core/platform/datetime";
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-permission";
-import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
+import {
+  type MutationResult,
+  mutationIssue,
+} from "@nextgen-cms/studio/cms/mutations/mutation-result";
 import { assertUniqueSlug } from "@nextgen-cms/studio/cms/queries/slug";
 import {
   normalizeSlugInput,
@@ -83,7 +86,7 @@ function parseFormData(data: VideoFormData): VideoWriteInput {
 }
 
 async function validate(input: VideoWriteInput, excludeId?: number) {
-  const titleError = validateRequired(input.title, "عنوان");
+  const titleError = validateRequired(input.title, "عنوان", "title");
   if (titleError) return titleError;
   const slugError = validateSlug(input.slug);
   if (slugError) return slugError;
@@ -93,17 +96,30 @@ async function validate(input: VideoWriteInput, excludeId?: number) {
     input.thumbnailSrc,
     input.thumbnailAlt,
     "تصویر بندانگشتی",
+    { src: "thumbnail", alt: "thumbnailAlt" },
   );
   if (thumbError) return thumbError;
   if (input.linkSource === "thumbnail") {
-    const linkError = validateRequired(input.externalLink, "لینک ویدیو");
+    const linkError = validateRequired(
+      input.externalLink,
+      "لینک ویدیو",
+      "externalLink",
+    );
     if (linkError) return linkError;
   }
   if (input.linkSource === "aparat") {
-    const aparatError = validateRequired(input.aparatUrl, "لینک آپارات");
+    const aparatError = validateRequired(
+      input.aparatUrl,
+      "لینک آپارات",
+      "aparatUrl",
+    );
     if (aparatError) return aparatError;
   }
-  const dateError = validateRequired(input.publishedAt, "تاریخ انتشار");
+  const dateError = validateRequired(
+    input.publishedAt,
+    "تاریخ انتشار",
+    "publishedAt",
+  );
   if (dateError) return dateError;
   return undefined;
 }
@@ -142,7 +158,7 @@ export async function createVideo(
 
   const input = await enrichWithAparat(parseFormData(data));
   const error = await validate(input);
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   try {
     const id = await insertVideo(input, access(session.memberId));
@@ -174,7 +190,7 @@ export async function saveVideo(
 
   const input = await enrichWithAparat(parseFormData(data));
   const error = await validate(input, id);
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   try {
     const thumbnailSrc = await resolveVideoThumbnailSrc(id, input.thumbnailSrc);

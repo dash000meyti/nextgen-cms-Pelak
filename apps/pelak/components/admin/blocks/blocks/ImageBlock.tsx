@@ -9,7 +9,6 @@ import { MediaPickerModal } from "@/components/admin/media/MediaPickerModal";
 import {
   FIGURE_CAPTION_CLASS,
   FIGURE_CLASS,
-  FIGURE_IMG_CLASS,
 } from "@/components/article/blockStyles";
 import type { BlockEditorProps } from "../blockTypes";
 
@@ -61,9 +60,7 @@ export function ImageBlock({
         <MediaPickerModal
           open={pickerOpen}
           uploadContext={uploadContext}
-          onSelect={(src) =>
-            onChange({ ...block, image: { ...image, src } })
-          }
+          onSelect={(src) => onChange({ ...block, image: { ...image, src } })}
           onClose={() => setPickerOpen(false)}
         />
       ) : null}
@@ -74,7 +71,7 @@ export function ImageBlock({
           <img
             src={image.src}
             alt={image.alt || "پیش‌نمایش تصویر"}
-            className={`${FIGURE_IMG_CLASS} absolute inset-0 h-full w-full object-contain`}
+            className="absolute inset-0 h-full w-full rounded object-cover"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-xs text-ink-faint">
@@ -82,7 +79,7 @@ export function ImageBlock({
           </div>
         )}
 
-        <div className="pointer-events-none absolute inset-0 flex flex-col justify-between gap-2 bg-linear-to-b from-paper/80 via-transparent to-paper/80 p-2">
+        <div className="pointer-events-none absolute inset-0 flex flex-col justify-between gap-2 p-2">
           <div className="pointer-events-auto flex flex-wrap items-center gap-1.5">
             <input
               id={`block-image-src-${blockId}`}

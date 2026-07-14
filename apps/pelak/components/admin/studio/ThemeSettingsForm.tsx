@@ -5,7 +5,8 @@ import { saveThemeTokens } from "@nextgen-cms/studio/cms/mutations/settings";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ThemePaletteEditor } from "@/components/admin/fields/ThemePaletteEditor";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type ThemeSettingsFormProps = {
   themeTokens: ThemeTokens;
@@ -14,27 +15,30 @@ type ThemeSettingsFormProps = {
 export function ThemeSettingsForm({ themeTokens }: ThemeSettingsFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [theme, setTheme] = useState(themeTokens);
 
   function save() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       try {
         await saveThemeTokens(theme);
-        setSuccess("ذخیره شد.");
+        feedback.reportSuccess("ذخیره شد.");
         router.refresh();
       } catch {
-        setError("خطا در ذخیرهٔ تنظیمات.");
+        feedback.reportError("خطا در ذخیرهٔ تنظیمات.");
       }
     });
   }
 
   return (
     <div className="space-y-6">
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
       <ThemePaletteEditor
         label="پالت روشن"
         value={theme.light}

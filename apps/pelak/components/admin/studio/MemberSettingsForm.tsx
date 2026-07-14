@@ -6,8 +6,9 @@ import type { RoleRow } from "@nextgen-cms/core/db/schema/roles";
 import { saveMemberSettings } from "@nextgen-cms/studio/cms/mutations/settings";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { SectionListSettingsFields } from "@/components/admin/studio/SectionListSettingsFields";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type MemberSettingsFormProps = {
   value: MemberSettings;
@@ -17,29 +18,32 @@ type MemberSettingsFormProps = {
 export function MemberSettingsForm({ value, roles }: MemberSettingsFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [settings, setSettings] = useState(value);
 
   function save() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     const normalized = normalizeMemberSettings(settings);
     startTransition(async () => {
       try {
         await saveMemberSettings(normalized);
         setSettings(normalized);
-        setSuccess("ذخیره شد.");
+        feedback.reportSuccess("ذخیره شد.");
         router.refresh();
       } catch {
-        setError("خطا در ذخیرهٔ تنظیمات.");
+        feedback.reportError("خطا در ذخیرهٔ تنظیمات.");
       }
     });
   }
 
   return (
     <div className="max-w-lg space-y-6">
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
       <label className="block space-y-1.5 text-sm">
         <span className="font-medium text-ink">نقش پیش‌فرض عضو جدید</span>
         <select

@@ -21,6 +21,8 @@ alwaysApply: false
 requirePermissionMutation("…") → validate → repository write → invalidate*() → return | redirect
 ```
 
+خطای اعتبارسنجی: `{ ok: false, error, field? }` — UI با `useFormFeedback` به `[data-field]` اسکرول می‌کند.
+
 ## RBAC
 
 - `settings.*` — تب‌های هاب `/admin/settings/*` (۶ تب، شامل `settings.database`)

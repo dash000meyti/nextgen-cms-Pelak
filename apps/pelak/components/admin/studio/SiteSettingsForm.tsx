@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type SiteSettingsFormProps = {
   siteConfig: SiteConfig;
@@ -15,13 +16,11 @@ type SiteSettingsFormProps = {
 export function SiteSettingsForm({ siteConfig }: SiteSettingsFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [site, setSite] = useState(siteConfig);
 
   function save() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       try {
         await saveSiteSettings({
@@ -34,17 +33,22 @@ export function SiteSettingsForm({ siteConfig }: SiteSettingsFormProps) {
           defaultDirection: site.defaultDirection,
           typography: site.typography,
         });
-        setSuccess("ذخیره شد.");
+        feedback.reportSuccess("ذخیره شد.");
         router.refresh();
       } catch {
-        setError("خطا در ذخیرهٔ تنظیمات.");
+        feedback.reportError("خطا در ذخیرهٔ تنظیمات.");
       }
     });
   }
 
   return (
     <div className="space-y-6">
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
       <div className="grid max-w-2xl gap-6">
         <TextField
           id="site-name"

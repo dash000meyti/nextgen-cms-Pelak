@@ -6,17 +6,20 @@ import {
   findContentGroupsForPicker,
   findMembersForArticlePicker,
   findTopicsForPicker,
+  listArticlesAdmin,
 } from "@nextgen-cms/studio/cms/queries";
 import { ArticleForm } from "@/components/admin/studio/ArticleForm";
 
 export default async function NewArticlePage() {
   const session = await requirePermission("content.create");
-  const [members, topics, contentGroups, contentSettings] = await Promise.all([
-    findMembersForArticlePicker(),
-    findTopicsForPicker(),
-    findContentGroupsForPicker(),
-    getContentSettings(),
-  ]);
+  const [members, topics, contentGroups, contentSettings, articles] =
+    await Promise.all([
+      findMembersForArticlePicker(),
+      findTopicsForPicker(),
+      findContentGroupsForPicker(),
+      getContentSettings(),
+      listArticlesAdmin("all"),
+    ]);
   const labels = sectionAdminLabels(contentSettings.pageTitle);
 
   const initial: ArticleFormData = {
@@ -40,6 +43,12 @@ export default async function NewArticlePage() {
     topicIds: [],
   };
 
+  const articleOptions = articles.map((article) => ({
+    id: article.id,
+    label: article.title,
+    slug: article.slug,
+  }));
+
   return (
     <div className="space-y-6">
       <h1 className="font-heading text-2xl text-ink">{labels.newItem}</h1>
@@ -49,6 +58,7 @@ export default async function NewArticlePage() {
         members={members}
         topics={topics}
         contentGroups={contentGroups}
+        articles={articleOptions}
       />
     </div>
   );

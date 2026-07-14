@@ -13,8 +13,9 @@ import { ImageField } from "@/components/admin/fields/ImageField";
 import { SlugField } from "@/components/admin/fields/SlugField";
 import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type PlaylistFormProps = {
   mode: "create" | "edit";
@@ -26,8 +27,7 @@ export function PlaylistForm({ mode, playlistId, initial }: PlaylistFormProps) {
   const router = useRouter();
   const session = useAdminMember();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [form, setForm] = useState(initial);
   const { confirm, dialog } = useConfirmDialog();
   const uploadContext = { memberId: session.memberId };
@@ -40,21 +40,22 @@ export function PlaylistForm({ mode, playlistId, initial }: PlaylistFormProps) {
   }
 
   function handleSave() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       if (mode === "create") {
         const result = await createPlaylistAndRedirect(form);
-        if (result && !result.ok) setError(result.error);
+        if (result && !result.ok) {
+          feedback.reportError(result.error, result.field);
+        }
         return;
       }
       if (!playlistId) return;
       const result = await savePlaylist(playlistId, form);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
-      setSuccess("ذخیره شد.");
+      feedback.reportSuccess("ذخیره شد.");
       router.refresh();
     });
   }
@@ -69,10 +70,11 @@ export function PlaylistForm({ mode, playlistId, initial }: PlaylistFormProps) {
       variant: "destructive",
     });
     if (!confirmed) return;
+    feedback.clear();
     startTransition(async () => {
       const result = await deletePlaylist(playlistId);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
       router.push("/admin/videos/settings/playlists");
@@ -82,7 +84,12 @@ export function PlaylistForm({ mode, playlistId, initial }: PlaylistFormProps) {
 
   return (
     <div className="space-y-6">
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
       <TextField
         id="name"
         label="نام"
@@ -113,6 +120,8 @@ export function PlaylistForm({ mode, playlistId, initial }: PlaylistFormProps) {
         onSrcChange={(coverSrc) => update("coverSrc", coverSrc)}
         onAltChange={(coverAlt) => update("coverAlt", coverAlt)}
         uploadContext={uploadContext}
+        fieldKey="cover"
+        altFieldKey="coverAlt"
         required
       />
       <div className="flex items-center gap-3">

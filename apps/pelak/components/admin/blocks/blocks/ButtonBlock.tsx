@@ -8,8 +8,9 @@ import {
 import type { BlockEditorProps, BlockSettingsProps } from "../blockTypes";
 
 const VARIANTS: Array<{ variant: ButtonVariant; label: string }> = [
-  { variant: "outline", label: "حاشیه‌دار" },
   { variant: "primary", label: "پررنگ" },
+  { variant: "outline", label: "حاشیه‌دار" },
+  { variant: "secondary", label: "ثانویه" },
 ];
 
 function pillClass(active: boolean): string {
@@ -36,7 +37,7 @@ export function ButtonSettings({ block, onChange }: BlockSettingsProps) {
             onClick={() =>
               onChange({
                 ...block,
-                variant: v === "outline" ? undefined : "primary",
+                ...(v === "outline" ? { variant: undefined } : { variant: v }),
               })
             }
             aria-pressed={active}

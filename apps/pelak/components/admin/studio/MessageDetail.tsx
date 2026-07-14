@@ -10,12 +10,13 @@ import {
 } from "@nextgen-cms/studio/cms/mutations/message";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useState, useTransition } from "react";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
 import {
   MESSAGE_STATUS_OPTIONS,
   MessageStatusBadge,
 } from "@/components/admin/studio/MessageStatusBadge";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 const FIELD_LABELS: Record<string, string> = {
   name: "نام",
@@ -89,8 +90,7 @@ export function MessageDetail({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [status, setStatus] = useState<MessageStatus>(message.status);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const { confirm, dialog } = useConfirmDialog();
 
   const entries = Object.entries(message.payload).filter(
@@ -98,16 +98,15 @@ export function MessageDetail({
   );
 
   function handleStatusChange(next: MessageStatus) {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       const result = await saveMessageStatus(message.id, next);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
       setStatus(next);
-      setSuccess("وضعیت به‌روز شد.");
+      feedback.reportSuccess("وضعیت به‌روز شد.");
       router.refresh();
     });
   }
@@ -119,10 +118,11 @@ export function MessageDetail({
       confirmLabel: "حذف",
     });
     if (!confirmed) return;
+    feedback.clear();
     startTransition(async () => {
       const result = await removeMessage(message.id);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
       router.push("/admin/messages");
@@ -145,7 +145,12 @@ export function MessageDetail({
         <MessageStatusBadge status={status} />
       </div>
 
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
 
       {canEdit ? (
         <div className="space-y-2 text-sm">

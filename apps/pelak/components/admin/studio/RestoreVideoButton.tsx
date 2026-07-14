@@ -2,9 +2,11 @@
 
 import { restoreVideoFromArchiveAndRedirect } from "@nextgen-cms/studio/cms/mutations/video";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { TableActionButton } from "@/components/admin/studio/TableActionButton";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type RestoreVideoButtonProps = {
@@ -13,7 +15,7 @@ type RestoreVideoButtonProps = {
 
 export function RestoreVideoButton({ videoId }: RestoreVideoButtonProps) {
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const { confirm, dialog } = useConfirmDialog();
 
   async function handleRestore() {
@@ -24,14 +26,16 @@ export function RestoreVideoButton({ videoId }: RestoreVideoButtonProps) {
       variant: "default",
     });
     if (!confirmed) return;
-    setError(null);
+    feedback.clear();
     startTransition(() => {
       void (async () => {
         const result = await restoreVideoFromArchiveAndRedirect(videoId);
-        if (result && !result.ok) setError(result.error);
+        if (result && !result.ok) {
+          feedback.reportError(result.error, result.field);
+        }
       })().catch((caught: unknown) => {
         if (isRedirectError(caught)) throw caught;
-        setError(formatServerActionError(caught));
+        feedback.reportError(formatServerActionError(caught));
       });
     });
   }
@@ -45,7 +49,11 @@ export function RestoreVideoButton({ videoId }: RestoreVideoButtonProps) {
         onClick={handleRestore}
         disabled={pending}
       />
-      {error ? <span className="text-xs text-accent">{error}</span> : null}
+      <FormMessage
+        error={feedback.error}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
     </span>
   );
 }

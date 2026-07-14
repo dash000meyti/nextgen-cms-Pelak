@@ -13,6 +13,8 @@ type PdfFieldProps = {
   onSrcChange: (value: string) => void;
   uploadContext?: MediaUploadContext;
   maxBytes?: number;
+  /** Anchor for form feedback scroll (`data-field`). Defaults to `id`. */
+  fieldKey?: string;
 };
 
 export function PdfField({
@@ -22,6 +24,7 @@ export function PdfField({
   onSrcChange,
   uploadContext,
   maxBytes,
+  fieldKey,
 }: PdfFieldProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -55,7 +58,10 @@ export function PdfField({
   }
 
   return (
-    <div className="space-y-4 rounded border border-rule bg-surface-2 p-4">
+    <div
+      className="space-y-4 rounded border border-rule bg-surface-2 p-4"
+      data-field={fieldKey ?? id}
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-medium text-ink">{label}</h3>
         <div className="flex gap-2">

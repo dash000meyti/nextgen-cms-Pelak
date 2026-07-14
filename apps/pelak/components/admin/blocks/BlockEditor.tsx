@@ -3,9 +3,10 @@
 import type { ArticleBlock } from "@nextgen-cms/contract/types/article";
 import { normalizeArticleBlock } from "@nextgen-cms/contract/types/article";
 import type { MediaUploadContext } from "@nextgen-cms/contract/types/media";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { BlockDragList } from "./BlockDragList";
-import { listInsertableBlocks } from "./blockRegistry";
+import { InsertionMenu } from "./BlockInsertMenu";
+import { BlockInsertPalette } from "./BlockInsertPalette";
 import type { EditorBlock } from "./blockTypes";
 import { PlusIcon } from "./icons";
 
@@ -40,53 +41,63 @@ export function BlockEditor({
   const [blocks, setBlocks] = useState<EditorBlock[]>(() =>
     toEditorBlocks(value),
   );
+  const [addMenuOpen, setAddMenuOpen] = useState(false);
 
   function commit(next: EditorBlock[]) {
     setBlocks(next);
     onChange(toArticleBlocks(next));
   }
 
-  const insertable = useMemo(() => listInsertableBlocks(), []);
-
   function append(block: ArticleBlock) {
     commit([...blocks, { ...block, _key: crypto.randomUUID() }]);
   }
 
   return (
-    <div className="space-y-3">
-      <div className="sticky top-14 z-10 flex flex-wrap items-center justify-between gap-2 border-b border-rule bg-paper py-2">
-        <h3 className="text-sm font-medium text-ink">بدنهٔ محتوا</h3>
-        <div className="flex flex-wrap gap-1.5">
-          {insertable.map((entry) => (
-            <button
-              key={`${entry.type}-${entry.label}`}
-              type="button"
-              onClick={() => append(entry.payload)}
-              className="flex items-center gap-1.5 rounded border border-rule px-2.5 py-1 text-xs text-ink hover:bg-surface-2"
-              title={entry.label}
-            >
-              <entry.Icon className="h-3.5 w-3.5 text-ink-muted" />
-              <span>{entry.label}</span>
-              <PlusIcon className="h-3 w-3" />
-            </button>
-          ))}
+    <div className="grid gap-4 lg:grid-cols-[1fr_auto]" data-field="body">
+      <div className="min-w-0 space-y-3">
+        {blocks.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-rule px-4 py-10 text-center">
+            <p className="text-sm text-ink-muted">بلوکی اضافه نشده است.</p>
+            <p className="mt-1 text-xs text-ink-faint">
+              با دکمه‌های کناری یا «افزودن» اضافه کنید.
+            </p>
+          </div>
+        ) : (
+          <BlockDragList
+            blocks={blocks}
+            onChange={commit}
+            uploadContext={uploadContext}
+          />
+        )}
+
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setAddMenuOpen((open) => !open)}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-rule bg-surface-2 px-4 py-3 text-sm text-ink-muted hover:border-accent hover:text-accent"
+          >
+            <PlusIcon className="h-4 w-4" />
+            افزودن
+          </button>
+          {addMenuOpen ? (
+            <div className="absolute start-0 end-0 top-full z-30 mt-1 flex justify-center">
+              <InsertionMenu
+                onSelect={(block) => {
+                  setAddMenuOpen(false);
+                  append(block);
+                }}
+                onClose={() => setAddMenuOpen(false)}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
 
-      {blocks.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-rule px-4 py-10 text-center">
-          <p className="text-sm text-ink-muted">بلوکی اضافه نشده است.</p>
-          <p className="mt-1 text-xs text-ink-faint">
-            با دکمه‌های بالا یا علامت + بین بلوک‌ها اضافه کنید.
-          </p>
+      <div className="lg:sticky lg:top-[40dvh] lg:self-start">
+        <div className="flex flex-row flex-wrap gap-1.5 lg:flex-col">
+          <BlockInsertPalette onSelect={append} layout="column" />
         </div>
-      ) : (
-        <BlockDragList
-          blocks={blocks}
-          onChange={commit}
-          uploadContext={uploadContext}
-        />
-      )}
+      </div>
     </div>
   );
 }

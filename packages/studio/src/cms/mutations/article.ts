@@ -7,6 +7,7 @@ import {
   invalidateContentGroups,
 } from "@nextgen-cms/config/cache";
 import type { ArticleBlock } from "@nextgen-cms/contract/types/article";
+import { estimateReadingMinutes } from "@nextgen-cms/contract/types/article";
 import { PermissionDeniedError } from "@nextgen-cms/core/db/access/permission-denied-error";
 import {
   type ArticleWriteInput,
@@ -37,11 +38,16 @@ import {
 } from "@nextgen-cms/studio/admin/article-access";
 import { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-permission";
-import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
+import {
+  type MutationResult,
+  mutationIssue,
+} from "@nextgen-cms/studio/cms/mutations/mutation-result";
 import { assertUniqueSlug } from "@nextgen-cms/studio/cms/queries/slug";
 import {
+  issue,
   normalizeSlugInput,
   parseArticleBlocks,
+  type ValidationIssue,
   validateArticleBlocks,
   validateImageMeta,
   validateRequired,
@@ -94,6 +100,8 @@ function parseFormData(data: ArticleFormData): ArticleWriteInput {
     }
   }
 
+  const body = parseArticleBlocks(data.body);
+
   return {
     slug: normalizeSlugInput(data.slug),
     title: data.title.trim(),
@@ -101,7 +109,7 @@ function parseFormData(data: ArticleFormData): ArticleWriteInput {
     excerpt: data.excerpt.trim(),
     status: data.status,
     publishedAt,
-    readingMinutes: data.readingMinutes || 5,
+    readingMinutes: estimateReadingMinutes(body),
     heroSrc: data.heroSrc.trim(),
     heroAlt: data.heroAlt.trim(),
     heroCaption: data.heroCaption.trim() || null,
@@ -109,7 +117,7 @@ function parseFormData(data: ArticleFormData): ArticleWriteInput {
     contentGroupIds: data.contentGroupIds,
     isFeatured: data.isFeatured,
     isEditorsPick: data.isEditorsPick,
-    body: parseArticleBlocks(data.body),
+    body,
     relatedSlugs: data.relatedSlugs.filter(Boolean),
     memberIds: data.memberIds,
     topicIds: data.topicIds,
@@ -135,8 +143,8 @@ function normalizeMemberIds(
 async function validateArticleInput(
   input: ArticleWriteInput,
   excludeId?: number,
-): Promise<string | undefined> {
-  const titleError = validateRequired(input.title, "عنوان");
+): Promise<ValidationIssue | undefined> {
+  const titleError = validateRequired(input.title, "عنوان", "title");
   if (titleError) return titleError;
 
   const slugError = validateSlug(input.slug);
@@ -149,13 +157,16 @@ async function validateArticleInput(
     input.heroSrc,
     input.heroAlt,
     "تصویر شاخص",
+    { src: "hero", alt: "heroAlt" },
   );
   if (heroError) return heroError;
 
   const bodyError = validateArticleBlocks(input.body);
   if (bodyError) return bodyError;
 
-  if (input.memberIds.length === 0) return "حداقل یک عضو انتخاب کنید.";
+  if (input.memberIds.length === 0) {
+    return issue("memberIds", "حداقل یک عضو انتخاب کنید.");
+  }
 
   return undefined;
 }
@@ -227,7 +238,7 @@ export async function createArticle(
   input.status = statusResult;
 
   const error = await validateArticleInput(input);
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   try {
     const id = await insertArticle(input, access(session.memberId), {
@@ -276,7 +287,7 @@ export async function saveArticle(
   input.status = statusResult;
 
   const error = await validateArticleInput(input, id);
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   try {
     const promoted = await promoteArticleMedia(id, input.heroSrc, input.body);

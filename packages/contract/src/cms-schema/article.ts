@@ -29,7 +29,7 @@ export const articleSchema = {
     { key: "heroAlt", label: "متن جایگزین تصویر", kind: "text" },
     { key: "heroCaption", label: "زیرنویس تصویر", kind: "text" },
     { key: "heroCredit", label: "اعتبار تصویر", kind: "text" },
-    { key: "readingMinutes", label: "زمان مطالعه (دقیقه)", kind: "number" },
+    { key: "readingMinutes", label: "زمان مطالعه (محاسبه‌شده)", kind: "number" },
     {
       key: "contentGroupIds",
       label: "گروه محتوا",

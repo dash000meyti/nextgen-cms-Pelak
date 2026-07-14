@@ -8,7 +8,8 @@ import { useState, useTransition } from "react";
 import { ImageField } from "@/components/admin/fields/ImageField";
 import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type PersonalSettingsFormProps = {
   member: Member;
@@ -17,8 +18,7 @@ type PersonalSettingsFormProps = {
 export function PersonalSettingsForm({ member }: PersonalSettingsFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [name, setName] = useState(member.name);
   const [username, setUsername] = useState(member.username);
   const [email, setEmail] = useState(member.email ?? "");
@@ -27,8 +27,7 @@ export function PersonalSettingsForm({ member }: PersonalSettingsFormProps) {
   const [avatarSrc, setAvatarSrc] = useState(member.avatar.src);
 
   function handleSave() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       const result = await savePersonalSettings({
         name,
@@ -40,18 +39,23 @@ export function PersonalSettingsForm({ member }: PersonalSettingsFormProps) {
         avatarAlt: name,
       });
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
       setPassword("");
-      setSuccess("ذخیره شد.");
+      feedback.reportSuccess("ذخیره شد.");
       router.refresh();
     });
   }
 
   return (
     <div className="space-y-8">
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
 
       <div className="grid max-w-2xl gap-6">
         <TextField

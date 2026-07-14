@@ -25,16 +25,21 @@ function trimString(value: unknown): string {
 function validatePayload(
   form: MessageForm,
   payload: MessagePayload,
-): string | null {
+): { error: string; field?: string } | null {
   const required = REQUIRED_FIELDS[form] ?? [];
   for (const key of required) {
     const value = trimString(payload[key]);
-    if (!value) return "لطفاً تمام فیلدهای ضروری را پر کنید.";
+    if (!value) {
+      return {
+        error: "لطفاً تمام فیلدهای ضروری را پر کنید.",
+        field: key,
+      };
+    }
   }
 
   for (const [key, value] of Object.entries(payload)) {
     if (typeof value !== "string" && value !== undefined) {
-      return "ورودی نامعتبر است.";
+      return { error: "ورودی نامعتبر است." };
     }
     const trimmed = trimString(value);
     const limit =
@@ -42,7 +47,10 @@ function validatePayload(
         ? MAX_MESSAGE_LENGTH
         : MAX_FIELD_LENGTH;
     if (trimmed.length > limit) {
-      return "یکی از فیلدها بیش از حد طولانی است.";
+      return {
+        error: "یکی از فیلدها بیش از حد طولانی است.",
+        field: key,
+      };
     }
   }
 
@@ -72,7 +80,7 @@ export async function submitMessage(
   }
 
   const error = validatePayload(form, payload);
-  if (error) return { ok: false, error };
+  if (error) return { ok: false, error: error.error, field: error.field };
 
   try {
     await insertMessage({ form, payload });

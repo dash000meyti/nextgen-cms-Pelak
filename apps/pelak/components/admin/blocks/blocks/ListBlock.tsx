@@ -2,14 +2,17 @@
 
 import type { ListVariant } from "@nextgen-cms/contract/types/article";
 import { useRef } from "react";
-import { LIST_CLASS } from "@/components/article/blockStyles";
+import { listVariantClass } from "@/components/article/blockStyles";
 import { BlockPlainInput } from "../BlockPlainInput";
 import type { BlockEditorProps, BlockSettingsProps } from "../blockTypes";
 
 const VARIANT_LABEL: Record<ListVariant, string> = {
   bullet: "نقطه‌ای",
   ordered: "شماره‌دار",
+  dash: "خط تیره",
 };
+
+const VARIANTS: ListVariant[] = ["bullet", "ordered", "dash"];
 
 function pillClass(active: boolean): string {
   return [
@@ -25,7 +28,7 @@ export function ListSettings({ block, onChange }: BlockSettingsProps) {
   return (
     <fieldset className="flex flex-col gap-1" aria-label="نوع لیست">
       <legend className="sr-only">نوع لیست</legend>
-      {(["bullet", "ordered"] as const).map((variant) => {
+      {VARIANTS.map((variant) => {
         const active = block.variant === variant;
         return (
           <button
@@ -50,7 +53,6 @@ export function ListBlock({ block: rawBlock, onChange }: BlockEditorProps) {
 
   const items = block.items.length > 0 ? block.items : [""];
   const ListTag = block.variant === "ordered" ? "ol" : "ul";
-  const listMarker = block.variant === "ordered" ? "list-decimal" : "list-disc";
 
   function updateItem(index: number, value: string) {
     const next = [...items];
@@ -90,7 +92,7 @@ export function ListBlock({ block: rawBlock, onChange }: BlockEditorProps) {
 
   return (
     <div>
-      <ListTag className={`${LIST_CLASS} ${listMarker} !my-0`}>
+      <ListTag className={`${listVariantClass(block.variant)} !my-0`}>
         {items.map((item, index) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: list item order is authoritative; content may duplicate
           <li key={index} className="group/item">

@@ -22,9 +22,10 @@ import { ReferencePicker } from "@/components/admin/fields/ReferencePicker";
 import { SlugField } from "@/components/admin/fields/SlugField";
 import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { PublishBar } from "@/components/admin/studio/PublishBar";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type VideoFormProps = {
@@ -47,8 +48,7 @@ export function VideoForm({
   const canDelete = session.permissions.includes("modules.video.delete");
   const [pending, startTransition] = useTransition();
   const [fetchingAparat, startFetchTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [form, setForm] = useState(initial);
   const uploadContext = videoId ? { videoId } : { memberId: session.memberId };
 
@@ -63,37 +63,38 @@ export function VideoForm({
     startTransition(() => {
       void task().catch((err: unknown) => {
         if (isRedirectError(err)) throw err;
-        setError(formatServerActionError(err));
+        feedback.reportError(formatServerActionError(err));
       });
     });
   }
 
   function handleSave() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     runMutation(async () => {
       if (mode === "create") {
         const result = await createVideoAndRedirect(form);
-        if (result && !result.ok) setError(result.error);
+        if (result && !result.ok) {
+          feedback.reportError(result.error, result.field);
+        }
         return;
       }
       if (!videoId) return;
       const result = await saveVideo(videoId, form);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
-      setSuccess("ذخیره شد.");
+      feedback.reportSuccess("ذخیره شد.");
       router.refresh();
     });
   }
 
   function handleResolveAparat() {
-    setError(null);
+    feedback.clear();
     startFetchTransition(async () => {
       const result = await resolveAparatFromUrl(form.aparatUrl);
       if (!result.ok || !("data" in result)) {
-        setError(
+        feedback.reportError(
           "error" in result ? result.error : "خطا در دریافت اطلاعات آپارات.",
         );
         return;
@@ -105,7 +106,7 @@ export function VideoForm({
         thumbnailSrc: result.data.thumbnailSrc || prev.thumbnailSrc,
         externalLink: result.data.externalLink || prev.externalLink,
       }));
-      setSuccess("اطلاعات آپارات دریافت شد.");
+      feedback.reportSuccess("اطلاعات آپارات دریافت شد.");
     });
   }
 
@@ -117,15 +118,15 @@ export function VideoForm({
       confirmLabel: "انتشار",
     });
     if (!confirmed) return;
-    setError(null);
+    feedback.clear();
     runMutation(async () => {
       const result = await publishVideo(videoId);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
       update("status", "published");
-      setSuccess("منتشر شد.");
+      feedback.reportSuccess("منتشر شد.");
       router.refresh();
     });
   }
@@ -138,15 +139,15 @@ export function VideoForm({
       confirmLabel: "لغو انتشار",
     });
     if (!confirmed) return;
-    setError(null);
+    feedback.clear();
     runMutation(async () => {
       const result = await unpublishVideo(videoId);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
       update("status", "draft");
-      setSuccess("انتشار لغو شد.");
+      feedback.reportSuccess("انتشار لغو شد.");
       router.refresh();
     });
   }
@@ -159,19 +160,23 @@ export function VideoForm({
       confirmLabel: "بایگانی",
     });
     if (!confirmed) return;
-    setError(null);
+    feedback.clear();
     runMutation(async () => {
       const result = await archiveVideoAndRedirect(videoId);
-      if (result && !result.ok) setError(result.error);
+      if (result && !result.ok) {
+        feedback.reportError(result.error, result.field);
+      }
     });
   }
 
   async function handleRestore() {
     if (!videoId) return;
-    setError(null);
+    feedback.clear();
     runMutation(async () => {
       const result = await restoreVideoFromArchiveAndRedirect(videoId);
-      if (result && !result.ok) setError(result.error);
+      if (result && !result.ok) {
+        feedback.reportError(result.error, result.field);
+      }
     });
   }
 
@@ -184,10 +189,12 @@ export function VideoForm({
       variant: "destructive",
     });
     if (!confirmed) return;
-    setError(null);
+    feedback.clear();
     runMutation(async () => {
       const result = await removeVideoAndRedirect(videoId);
-      if (result && !result.ok) setError(result.error);
+      if (result && !result.ok) {
+        feedback.reportError(result.error, result.field);
+      }
     });
   }
 
@@ -204,7 +211,12 @@ export function VideoForm({
           publishing={pending || fetchingAparat}
         />
       ) : null}
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
       <div className="grid gap-6 lg:grid-cols-2">
         <TextField
           id="title"
@@ -291,6 +303,8 @@ export function VideoForm({
             onSrcChange={(thumbnailSrc) => update("thumbnailSrc", thumbnailSrc)}
             onAltChange={(thumbnailAlt) => update("thumbnailAlt", thumbnailAlt)}
             uploadContext={uploadContext}
+            fieldKey="thumbnail"
+            altFieldKey="thumbnailAlt"
             required
           />
         </div>
@@ -304,6 +318,8 @@ export function VideoForm({
             onSrcChange={(thumbnailSrc) => update("thumbnailSrc", thumbnailSrc)}
             onAltChange={(thumbnailAlt) => update("thumbnailAlt", thumbnailAlt)}
             uploadContext={uploadContext}
+            fieldKey="thumbnail"
+            altFieldKey="thumbnailAlt"
             required
           />
           <TextField

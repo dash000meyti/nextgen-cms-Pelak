@@ -10,7 +10,8 @@
 | کامپوننت UI | `apps/pelak/components/` | `hokmran-component` · `docs/UI-BOUNDARY.md` |
 | لینک مدیریت در هدر (کاربر واردشده) | `apps/pelak/app/layout.tsx`, `components/layout/{SiteHeader,AdminLink}.tsx`, `getMemberSession()` | `hokmran-component` · `docs/UI-BOUNDARY.md` · `docs/STUDIO.md` (Auth) |
 | داده public | `packages/site-data/src/get-content.ts` | `data-layer.mdc` |
-| فرم عمومی (نوشتن پیام) | `packages/site-data/src/messages-actions.ts` (`submitMessage`) | `docs/CMS-SCHEMA.md` |
+| فرم عمومی (نوشتن پیام) | `packages/site-data/src/messages-actions.ts` (`submitMessage`) | `docs/CMS-SCHEMA.md` · `docs/UI-BOUNDARY.md` (FormMessage) |
+| بازخورد خطا/موفقیت فرم | `components/ui/{FormMessage,useFormFeedback}.ts(x)` · `MutationResult.field` | `docs/UI-BOUNDARY.md` · `docs/STUDIO.md` |
 | صندوق پیام‌ها (ادمین) | `/admin/messages`, `packages/studio/src/cms/{queries,mutations}/messages.ts` | `docs/STUDIO.md` |
 | mutation admin | `packages/studio/src/cms/mutations/` | `admin-studio.mdc` · `hokmran-studio` |
 | تنظیمات هاب | `/admin/settings/*` (۷ تب) | `settings-tabs.ts` |
@@ -19,7 +20,7 @@
 | schema DB | `packages/core/src/db/schema/` | `data-layer.mdc` |
 | type دامنه | `packages/contract/src/types/` | `monorepo.mdc` |
 | CMS field defs | `packages/contract/src/cms-schema/` | `hokmran-studio` · `docs/CMS-SCHEMA.md` |
-| ادیتور بدنهٔ مقاله (بلوک‌ها) | `apps/pelak/components/admin/blocks/` · `components/article/blockStyles.ts` | `hokmran-studio` · `docs/BLOCK-EDITOR.md` |
+| ادیتور بدنهٔ مقاله (بلوک‌ها) | `apps/pelak/components/admin/blocks/` · `components/article/blockStyles.ts` | `hokmran-studio` · `docs/BLOCK-EDITOR.md` (چندانتخاب / جابه‌جایی گروهی) |
 | فیلد مرجع فرم‌ها (اعضا/موضوع/گروه) | `apps/pelak/components/admin/fields/ReferencePicker.tsx` | `hokmran-studio` · `docs/STUDIO.md` |
 | فرم محتوا (متادیتای فشرده) | `apps/pelak/components/admin/studio/ArticleForm.tsx` | `hokmran-studio` · `docs/STUDIO.md` |
 | مجوز RBAC | `packages/contract/src/permissions.ts` | `hokmran-rbac` · `docs/STUDIO.md` |

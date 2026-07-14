@@ -11,6 +11,8 @@ type InsertionZoneProps = {
   /** Whether a drag is active; zones expand to make dropping easier. */
   dragActive?: boolean;
   onDropAt?: (index: number) => void;
+  /** Hide hover + button (keep drag drop target). Used for trailing zone replaced by permanent CTA. */
+  hideWhenIdle?: boolean;
 };
 
 export function InsertionZone({
@@ -18,15 +20,20 @@ export function InsertionZone({
   onInsert,
   dragActive = false,
   onDropAt,
+  hideWhenIdle = false,
 }: InsertionZoneProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  if (hideWhenIdle && !dragActive) {
+    return null;
+  }
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: HTML5 DnD drop target; the + button handles click insertion.
     <div
       className={[
         "group relative flex items-center transition-all",
-        dragActive ? "h-8" : "h-5",
+        dragActive ? "h-8" : "min-h-5",
       ].join(" ")}
       onDragOver={(e) => {
         if (!onDropAt) return;
@@ -46,22 +53,18 @@ export function InsertionZone({
       {dragActive ? (
         <div className="h-0.5 w-full rounded-full bg-accent animate-block-drop-blink" />
       ) : (
-        <div className="flex w-full items-center opacity-0 transition-opacity group-hover:opacity-100">
-          <div className="h-px flex-1 bg-rule" />
-          <button
-            type="button"
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label={`افزودن بلوک در موقعیت ${index + 1}`}
-            className="mx-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-rule bg-paper text-ink-muted hover:border-accent hover:text-accent"
-          >
-            <PlusIcon className="h-3 w-3" />
-          </button>
-          <div className="h-px flex-1 bg-rule" />
-        </div>
+        <button
+          type="button"
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label={`افزودن بلوک در موقعیت ${index + 1}`}
+          className="flex w-full items-center justify-center gap-1 rounded border border-dashed border-rule bg-paper py-1 text-ink-muted opacity-0 transition-opacity hover:border-accent hover:text-accent group-hover:opacity-100"
+        >
+          <PlusIcon className="h-3.5 w-3.5" />
+        </button>
       )}
 
       {menuOpen ? (
-        <div className="absolute start-0 top-full z-30">
+        <div className="absolute start-0 end-0 top-full z-30 mt-1 flex justify-center">
           <InsertionMenu
             onSelect={(block) => {
               setMenuOpen(false);

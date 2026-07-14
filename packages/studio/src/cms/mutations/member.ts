@@ -28,10 +28,15 @@ import {
 } from "@nextgen-cms/studio/admin/member-access";
 import { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-permission";
-import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
+import {
+  type MutationResult,
+  mutationIssue,
+} from "@nextgen-cms/studio/cms/mutations/mutation-result";
 import { assertUniqueSlug } from "@nextgen-cms/studio/cms/queries/slug";
 import {
+  issue,
   normalizeSlugInput,
+  type ValidationIssue,
   validateRequired,
   validateSlug,
 } from "@nextgen-cms/studio/cms/validation";
@@ -108,14 +113,18 @@ function parseFormData(
 async function validateMemberInput(
   input: Omit<MemberAdminWriteInput, "passwordHash"> & { password?: string },
   options: { mode: "create" | "edit"; excludeId?: number },
-): Promise<string | undefined> {
-  const nameError = validateRequired(input.name, "نام");
+): Promise<ValidationIssue | undefined> {
+  const nameError = validateRequired(input.name, "نام", "name");
   if (nameError) return nameError;
 
-  const usernameError = validateRequired(input.username, "نام کاربری");
+  const usernameError = validateRequired(
+    input.username,
+    "نام کاربری",
+    "username",
+  );
   if (usernameError) return usernameError;
   if (await memberUsernameExists(input.username, options.excludeId)) {
-    return "این نام کاربری قبلاً ثبت شده است.";
+    return issue("username", "این نام کاربری قبلاً ثبت شده است.");
   }
 
   const slugError = validateSlug(input.slug);
@@ -130,16 +139,16 @@ async function validateMemberInput(
 
   if (input.email) {
     if (await memberEmailExists(input.email, options.excludeId)) {
-      return "این ایمیل قبلاً ثبت شده است.";
+      return issue("email", "این ایمیل قبلاً ثبت شده است.");
     }
   }
 
   if (input.password && input.password.length < MIN_PASSWORD_LENGTH) {
-    return "رمز عبور باید حداقل ۸ کاراکتر باشد.";
+    return issue("password", "رمز عبور باید حداقل ۸ کاراکتر باشد.");
   }
 
   const role = await findRoleById(input.roleId);
-  if (!role) return "نقش انتخاب‌شده معتبر نیست.";
+  if (!role) return issue("roleId", "نقش انتخاب‌شده معتبر نیست.");
 
   return undefined;
 }
@@ -253,8 +262,8 @@ export async function savePersonalSettings(
   const avatarSrc = input.avatarSrc.trim();
   const avatarAlt = name;
 
-  const nameError = validateRequired(name, "نام");
-  if (nameError) return { ok: false, error: nameError };
+  const nameError = validateRequired(name, "نام", "name");
+  if (nameError) return mutationIssue(nameError);
 
   const member = await findMemberById(session.memberId);
   if (!member) {
@@ -263,14 +272,22 @@ export async function savePersonalSettings(
 
   if (username && username !== member.username) {
     if (await memberUsernameExists(username, session.memberId)) {
-      return { ok: false, error: "این نام کاربری قبلاً ثبت شده است." };
+      return {
+        ok: false,
+        error: "این نام کاربری قبلاً ثبت شده است.",
+        field: "username",
+      };
     }
     await updateMemberUsername(session.memberId, username);
   }
 
   if (email && email !== member.email) {
     if (await memberEmailExists(email, session.memberId)) {
-      return { ok: false, error: "این ایمیل قبلاً ثبت شده است." };
+      return {
+        ok: false,
+        error: "این ایمیل قبلاً ثبت شده است.",
+        field: "email",
+      };
     }
     await updateMemberEmail(session.memberId, email);
   }
@@ -310,7 +327,7 @@ export async function createMember(
 
   const parsed = parseFormData(data);
   const error = await validateMemberInput(parsed, { mode: "create" });
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   const role = await findRoleById(parsed.roleId);
   if (!role) return { ok: false, error: "نقش انتخاب‌شده معتبر نیست." };
@@ -356,7 +373,7 @@ export async function saveMember(
     mode: "edit",
     excludeId: id,
   });
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   const role = await findRoleById(parsed.roleId);
   if (!role) return { ok: false, error: "نقش انتخاب‌شده معتبر نیست." };

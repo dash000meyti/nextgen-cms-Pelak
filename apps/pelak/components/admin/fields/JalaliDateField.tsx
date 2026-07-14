@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  formatJalali,
   parseJalaliInput,
   todayIsoIran,
 } from "@nextgen-cms/core/platform/datetime";
@@ -32,6 +31,8 @@ type JalaliDateFieldProps = {
   value: string;
   onChange: (isoDate: string) => void;
   required?: boolean;
+  /** Anchor for form feedback scroll (`data-field`). Defaults to `id`. */
+  fieldKey?: string;
 };
 
 function isoToJalaliParts(iso: string) {
@@ -54,6 +55,7 @@ export function JalaliDateField({
   value,
   onChange,
   required,
+  fieldKey,
 }: JalaliDateFieldProps) {
   const initial = useMemo(() => isoToJalaliParts(value), [value]);
   const [year, setYear] = useState(initial.year);
@@ -76,10 +78,8 @@ export function JalaliDateField({
     }
   }
 
-  const display = value ? formatJalali(value) : "—";
-
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1.5" data-field={fieldKey ?? id}>
       <label
         htmlFor={`${id}-year`}
         className="block text-sm font-medium text-ink"
@@ -123,7 +123,6 @@ export function JalaliDateField({
           ))}
         </select>
       </div>
-      <p className="text-xs text-ink-faint fa-num">{display}</p>
     </div>
   );
 }

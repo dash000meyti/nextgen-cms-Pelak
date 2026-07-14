@@ -21,8 +21,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 const PERMISSION_LABELS = permissionActionLabels;
 
@@ -61,8 +62,7 @@ export function RolesSettingsPanel({
 }: RolesSettingsPanelProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [activeId, setActiveId] = useState<number | "new" | null>(
     selectedId ?? roles[0]?.id ?? null,
   );
@@ -98,16 +98,15 @@ export function RolesSettingsPanel({
   }
 
   function handleSave() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       if (activeId === "new") {
         const result = await createRole(form);
         if (!result.ok) {
-          setError(result.error);
+          feedback.reportError(result.error, result.field);
           return;
         }
-        setSuccess("نقش ایجاد شد.");
+        feedback.reportSuccess("نقش ایجاد شد.");
         router.refresh();
         if (result.id) setActiveId(result.id);
         return;
@@ -115,10 +114,10 @@ export function RolesSettingsPanel({
       if (typeof activeId !== "number") return;
       const result = await saveRole(activeId, form);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
-      setSuccess("ذخیره شد.");
+      feedback.reportSuccess("ذخیره شد.");
       router.refresh();
     });
   }
@@ -131,11 +130,11 @@ export function RolesSettingsPanel({
       confirmLabel: "حذف",
     });
     if (!confirmed) return;
-    setError(null);
+    feedback.clear();
     startTransition(async () => {
       const result = await removeRole(activeId);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
       setActiveId(roles[0]?.id ?? null);
@@ -174,7 +173,12 @@ export function RolesSettingsPanel({
       </div>
 
       <div className="space-y-6">
-        <FormMessage error={error} success={success} />
+        <FormMessage
+          error={feedback.error}
+          success={feedback.success}
+          info={feedback.info}
+          onDismiss={feedback.clear}
+        />
         {activeId === null ? (
           <p className="text-sm text-ink-muted">نقشی انتخاب نشده است.</p>
         ) : (

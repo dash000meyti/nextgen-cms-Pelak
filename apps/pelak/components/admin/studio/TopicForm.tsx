@@ -11,8 +11,9 @@ import { useState, useTransition } from "react";
 import { SlugField } from "@/components/admin/fields/SlugField";
 import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type TopicFormProps = {
   mode: "create" | "edit";
@@ -23,8 +24,7 @@ type TopicFormProps = {
 export function TopicForm({ mode, topicId, initial }: TopicFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [form, setForm] = useState(initial);
   const { confirm, dialog } = useConfirmDialog();
 
@@ -36,21 +36,22 @@ export function TopicForm({ mode, topicId, initial }: TopicFormProps) {
   }
 
   function handleSave() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       if (mode === "create") {
         const result = await createTopicAndRedirect(form);
-        if (result && !result.ok) setError(result.error);
+        if (result && !result.ok) {
+          feedback.reportError(result.error, result.field);
+        }
         return;
       }
       if (!topicId) return;
       const result = await saveTopic(topicId, form);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
-      setSuccess("ذخیره شد.");
+      feedback.reportSuccess("ذخیره شد.");
       router.refresh();
     });
   }
@@ -63,10 +64,11 @@ export function TopicForm({ mode, topicId, initial }: TopicFormProps) {
       confirmLabel: "حذف",
     });
     if (!confirmed) return;
+    feedback.clear();
     startTransition(async () => {
       const result = await deleteTopic(topicId);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
       router.push("/admin/content/settings/topics");
@@ -77,7 +79,12 @@ export function TopicForm({ mode, topicId, initial }: TopicFormProps) {
   return (
     <div className="space-y-8">
       {dialog}
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
       <div className="grid gap-6 lg:grid-cols-2">
         <TextField
           id="name"

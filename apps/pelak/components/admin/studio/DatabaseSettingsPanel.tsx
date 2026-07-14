@@ -1,30 +1,28 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 export function DatabaseSettingsPanel() {
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [file, setFile] = useState<File | null>(null);
 
   const [snapshotFile, setSnapshotFile] = useState<File | null>(null);
   const [snapshotPending, startSnapshotTransition] = useTransition();
-  const [snapshotError, setSnapshotError] = useState<string | null>(null);
-  const [snapshotSuccess, setSnapshotSuccess] = useState<string | null>(null);
+  const snapshotFeedback = useFormFeedback();
 
   const busy = pending || snapshotPending;
 
   function handleExport() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       const response = await fetch("/api/admin/database/export", {
         method: "GET",
       });
       if (!response.ok) {
-        setError("دانلود فایل پشتیبان ناموفق بود.");
+        feedback.reportError("دانلود فایل پشتیبان ناموفق بود.");
         return;
       }
       const blob = await response.blob();
@@ -36,17 +34,16 @@ export function DatabaseSettingsPanel() {
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
-      setSuccess("فایل پشتیبان دانلود شد.");
+      feedback.reportSuccess("فایل پشتیبان دانلود شد.");
     });
   }
 
   function handleImport() {
     if (!file) {
-      setError("ابتدا فایل sqlite را انتخاب کنید.");
+      feedback.reportError("ابتدا فایل sqlite را انتخاب کنید.");
       return;
     }
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       const formData = new FormData();
       formData.append("database", file);
@@ -56,23 +53,24 @@ export function DatabaseSettingsPanel() {
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setError(payload?.error ?? "آپلود/بازیابی دیتابیس ناموفق بود.");
+        feedback.reportError(
+          payload?.error ?? "آپلود/بازیابی دیتابیس ناموفق بود.",
+        );
         return;
       }
-      setSuccess("دیتابیس با موفقیت بازیابی شد.");
+      feedback.reportSuccess("دیتابیس با موفقیت بازیابی شد.");
       setFile(null);
     });
   }
 
   function handleExportSnapshot() {
-    setSnapshotError(null);
-    setSnapshotSuccess(null);
+    snapshotFeedback.clear();
     startSnapshotTransition(async () => {
       const response = await fetch("/api/admin/database/export-snapshot", {
         method: "GET",
       });
       if (!response.ok) {
-        setSnapshotError("دانلود پشتیبان کامل ناموفق بود.");
+        snapshotFeedback.reportError("دانلود پشتیبان کامل ناموفق بود.");
         return;
       }
       const blob = await response.blob();
@@ -84,17 +82,20 @@ export function DatabaseSettingsPanel() {
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
-      setSnapshotSuccess("پشتیبان کامل (دیتابیس + رسانه‌ها) دانلود شد.");
+      snapshotFeedback.reportSuccess(
+        "پشتیبان کامل (دیتابیس + رسانه‌ها) دانلود شد.",
+      );
     });
   }
 
   function handleImportSnapshot() {
     if (!snapshotFile) {
-      setSnapshotError("ابتدا فایل tar.gz پشتیبان کامل را انتخاب کنید.");
+      snapshotFeedback.reportError(
+        "ابتدا فایل tar.gz پشتیبان کامل را انتخاب کنید.",
+      );
       return;
     }
-    setSnapshotError(null);
-    setSnapshotSuccess(null);
+    snapshotFeedback.clear();
     startSnapshotTransition(async () => {
       const response = await fetch("/api/admin/database/import-snapshot", {
         method: "POST",
@@ -103,7 +104,7 @@ export function DatabaseSettingsPanel() {
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setSnapshotError(
+        snapshotFeedback.reportError(
           payload?.error ?? "آپلود/بازیابی پشتیبان کامل ناموفق بود.",
         );
         return;
@@ -112,7 +113,7 @@ export function DatabaseSettingsPanel() {
       const backupNote = payload?.backupUploadsPath
         ? `رسانه‌های قبلی در ${payload.backupUploadsPath} ذخیره شدند. `
         : "";
-      setSnapshotSuccess(
+      snapshotFeedback.reportSuccess(
         `${backupNote}پشتیبان کامل بازیابی شد (تعداد رسانه: ${uploadsFiles}). برای اعمال کامل، Container را ری‌استارت کنید.`,
       );
       setSnapshotFile(null);
@@ -142,7 +143,12 @@ export function DatabaseSettingsPanel() {
           وضعیت فعلی گرفته می‌شود.
         </p>
 
-        <FormMessage error={snapshotError} success={snapshotSuccess} />
+        <FormMessage
+          error={snapshotFeedback.error}
+          success={snapshotFeedback.success}
+          info={snapshotFeedback.info}
+          onDismiss={snapshotFeedback.clear}
+        />
 
         <div className="space-y-3">
           <button
@@ -191,7 +197,12 @@ export function DatabaseSettingsPanel() {
           یکپارچگی، از پشتیبان کامل استفاده کنید.
         </p>
 
-        <FormMessage error={error} success={success} />
+        <FormMessage
+          error={feedback.error}
+          success={feedback.success}
+          info={feedback.info}
+          onDismiss={feedback.clear}
+        />
 
         <div className="space-y-3">
           <button

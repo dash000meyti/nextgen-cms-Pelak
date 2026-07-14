@@ -5,7 +5,8 @@ import { saveMediaSettings } from "@nextgen-cms/studio/cms/mutations/settings";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { TextField } from "@/components/admin/fields/TextField";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 const MIME_OPTIONS = [
   { value: "image/jpeg", label: "JPEG" },
@@ -22,8 +23,7 @@ type MediaSettingsFormProps = {
 export function MediaSettingsForm({ value }: MediaSettingsFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [settings, setSettings] = useState(value);
 
   function toggleMime(mime: string) {
@@ -34,22 +34,26 @@ export function MediaSettingsForm({ value }: MediaSettingsFormProps) {
   }
 
   function save() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       try {
         await saveMediaSettings(settings);
-        setSuccess("ذخیره شد.");
+        feedback.reportSuccess("ذخیره شد.");
         router.refresh();
       } catch {
-        setError("خطا در ذخیرهٔ تنظیمات.");
+        feedback.reportError("خطا در ذخیرهٔ تنظیمات.");
       }
     });
   }
 
   return (
     <div className="max-w-lg space-y-6">
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
       <TextField
         id="max-image-bytes"
         label="حداکثر حجم تصویر (بایت)"

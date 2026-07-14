@@ -20,9 +20,10 @@ import { PdfField } from "@/components/admin/fields/PdfField";
 import { ReferencePicker } from "@/components/admin/fields/ReferencePicker";
 import { SlugField } from "@/components/admin/fields/SlugField";
 import { TextField } from "@/components/admin/fields/TextField";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { PublishBar } from "@/components/admin/studio/PublishBar";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type ContentGroupFormProps = {
@@ -51,8 +52,7 @@ export function ContentGroupForm({
   const { confirm, dialog } = useConfirmDialog();
   const canPublish = session.permissions.includes("modules.contentGroup.edit");
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [form, setForm] = useState(initial);
 
   const uploadContext = contentGroupId
@@ -70,27 +70,28 @@ export function ContentGroupForm({
     startTransition(() => {
       void task().catch((err: unknown) => {
         if (isRedirectError(err)) throw err;
-        setError(formatServerActionError(err));
+        feedback.reportError(formatServerActionError(err));
       });
     });
   }
 
   function handleSave() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     runMutation(async () => {
       if (mode === "create") {
         const result = await createContentGroupAndRedirect(form);
-        if (result && !result.ok) setError(result.error);
+        if (result && !result.ok) {
+          feedback.reportError(result.error, result.field);
+        }
         return;
       }
       if (!contentGroupId) return;
       const result = await saveContentGroup(contentGroupId, form);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
-      setSuccess("ذخیره شد.");
+      feedback.reportSuccess("ذخیره شد.");
       router.refresh();
     });
   }
@@ -103,10 +104,12 @@ export function ContentGroupForm({
       confirmLabel: "بایگانی",
     });
     if (!confirmed) return;
-    setError(null);
+    feedback.clear();
     runMutation(async () => {
       const result = await archiveContentGroupAndRedirect(contentGroupId);
-      if (result && !result.ok) setError(result.error);
+      if (result && !result.ok) {
+        feedback.reportError(result.error, result.field);
+      }
     });
   }
 
@@ -118,10 +121,12 @@ export function ContentGroupForm({
       confirmLabel: "حذف",
     });
     if (!confirmed) return;
-    setError(null);
+    feedback.clear();
     runMutation(async () => {
       const result = await removeContentGroupAndRedirect(contentGroupId);
-      if (result && !result.ok) setError(result.error);
+      if (result && !result.ok) {
+        feedback.reportError(result.error, result.field);
+      }
     });
   }
 
@@ -133,15 +138,15 @@ export function ContentGroupForm({
       confirmLabel: "انتشار",
     });
     if (!confirmed) return;
-    setError(null);
+    feedback.clear();
     runMutation(async () => {
       const result = await publishContentGroup(contentGroupId);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
       update("status", "published");
-      setSuccess("منتشر شد.");
+      feedback.reportSuccess("منتشر شد.");
       router.refresh();
     });
   }
@@ -154,15 +159,15 @@ export function ContentGroupForm({
       confirmLabel: "لغو انتشار",
     });
     if (!confirmed) return;
-    setError(null);
+    feedback.clear();
     runMutation(async () => {
       const result = await unpublishContentGroup(contentGroupId);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
       update("status", "draft");
-      setSuccess("انتشار لغو شد.");
+      feedback.reportSuccess("انتشار لغو شد.");
       router.refresh();
     });
   }
@@ -185,7 +190,12 @@ export function ContentGroupForm({
         />
       ) : null}
 
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <TextField
@@ -223,6 +233,8 @@ export function ContentGroupForm({
         uploadContext={uploadContext}
         maxBytes={maxImageBytes}
         previewAspectClass="aspect-2/3 w-full max-w-[160px]"
+        fieldKey="cover"
+        altFieldKey="coverAlt"
         required
       />
 
@@ -233,6 +245,7 @@ export function ContentGroupForm({
         onSrcChange={(pdfSrc) => update("pdfSrc", pdfSrc)}
         uploadContext={uploadContext}
         maxBytes={maxPdfBytes}
+        fieldKey="pdf"
       />
 
       <ReferencePicker

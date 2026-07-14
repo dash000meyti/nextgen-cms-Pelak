@@ -19,6 +19,8 @@ export function VideoModuleSettingsForm({
     pending,
     error,
     success,
+    info,
+    clear,
     submit,
   } = useSingletonSettingsForm({
     initialValue: value,
@@ -36,6 +38,8 @@ export function VideoModuleSettingsForm({
         pending={pending}
         error={error}
         success={success}
+        info={info}
+        onDismiss={clear}
         onSave={submit}
       />
     </div>

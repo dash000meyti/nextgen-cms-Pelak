@@ -6,7 +6,9 @@ import type {
 } from "@nextgen-cms/contract/types/messages";
 import { findMessagesSettings } from "@nextgen-cms/core/db/repositories/site-config";
 
-export type SubmitMessageResult = { ok: true } | { ok: false; error: string };
+export type SubmitMessageResult =
+  | { ok: true }
+  | { ok: false; error: string; field?: string };
 
 export type SubmitMessageInput = {
   form: MessageForm;

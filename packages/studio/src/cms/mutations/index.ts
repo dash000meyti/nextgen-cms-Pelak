@@ -39,16 +39,18 @@ export {
   saveMessageStatus,
 } from "@nextgen-cms/studio/cms/mutations/message";
 export {
+  type MutationResult,
+  mutationFailure,
+  mutationIssue,
+} from "@nextgen-cms/studio/cms/mutations/mutation-result";
+export {
   createPlaylist,
   createPlaylistAndRedirect,
   deletePlaylist,
   type PlaylistFormData,
   savePlaylist,
 } from "@nextgen-cms/studio/cms/mutations/playlist";
-export {
-  type MutationResult,
-  requireAdmin,
-} from "@nextgen-cms/studio/cms/mutations/require-admin";
+export { requireAdmin } from "@nextgen-cms/studio/cms/mutations/require-admin";
 export {
   createRole,
   createRoleAndRedirect,

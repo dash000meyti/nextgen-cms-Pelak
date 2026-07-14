@@ -15,8 +15,9 @@ import { ImageField } from "@/components/admin/fields/ImageField";
 import { SlugField } from "@/components/admin/fields/SlugField";
 import { TextareaField } from "@/components/admin/fields/TextareaField";
 import { TextField } from "@/components/admin/fields/TextField";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type RoleOption = {
   id: number;
@@ -42,8 +43,7 @@ export function MemberForm({
   const router = useRouter();
   const session = useAdminMember();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [form, setForm] = useState(initial);
   const { confirm, dialog } = useConfirmDialog();
   const uploadContext =
@@ -59,21 +59,22 @@ export function MemberForm({
   }
 
   function handleSave() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       if (mode === "create") {
         const result = await createMemberAndRedirect(form);
-        if (result && !result.ok) setError(result.error);
+        if (result && !result.ok) {
+          feedback.reportError(result.error, result.field);
+        }
         return;
       }
       if (!memberId) return;
       const result = await saveMember(memberId, form);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
-      setSuccess("ذخیره شد.");
+      feedback.reportSuccess("ذخیره شد.");
       router.refresh();
     });
   }
@@ -86,12 +87,11 @@ export function MemberForm({
       confirmLabel: "حذف",
     });
     if (!confirmed) return;
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       const result = await removeMember(memberId);
       if (!result.ok) {
-        setError(result.error);
+        feedback.reportError(result.error, result.field);
         return;
       }
       router.push("/admin/members");
@@ -102,7 +102,12 @@ export function MemberForm({
   return (
     <div className="space-y-8">
       {dialog}
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <TextField
@@ -156,7 +161,7 @@ export function MemberForm({
           value={form.displayRole}
           onChange={(displayRole) => update("displayRole", displayRole)}
         />
-        <div className="space-y-2">
+        <div className="space-y-2" data-field="roleId">
           <label
             htmlFor="roleId"
             className="block text-sm font-medium text-ink"
@@ -208,6 +213,7 @@ export function MemberForm({
         hideAlt
         emptyPreviewSrc={DEFAULT_MEMBER_AVATAR_SRC}
         uploadContext={uploadContext}
+        fieldKey="avatar"
       />
 
       <div className="grid gap-6 lg:grid-cols-3">

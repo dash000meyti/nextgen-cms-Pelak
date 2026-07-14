@@ -14,6 +14,7 @@ type BlockToolbarProps = {
   convertibleTo: BlockType[];
   canMoveUp: boolean;
   canMoveDown: boolean;
+  transformDisabled?: boolean;
   onConvert: (type: BlockType) => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
@@ -31,6 +32,7 @@ export function BlockToolbar({
   convertibleTo,
   canMoveUp,
   canMoveDown,
+  transformDisabled = false,
   onConvert,
   onMoveUp,
   onMoveDown,
@@ -38,6 +40,10 @@ export function BlockToolbar({
 }: BlockToolbarProps) {
   const [transformOpen, setTransformOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (transformDisabled) setTransformOpen(false);
+  }, [transformDisabled]);
 
   useEffect(() => {
     if (!transformOpen) return;
@@ -58,6 +64,7 @@ export function BlockToolbar({
   }, [transformOpen]);
 
   const actionsExpanded = transformOpen;
+  const showTransform = convertibleTo.length > 0 && !transformDisabled;
 
   return (
     <div ref={rootRef} className="group/toolbar relative">
@@ -68,7 +75,7 @@ export function BlockToolbar({
         </div>
       </div>
 
-      <div className="absolute start-0 top-0 z-20 flex flex-col items-center gap-0 overflow-visible rounded-md bg-paper/95 p-0.5 shadow-sm ring-1 ring-rule">
+      <div className="absolute inset-s-0 top-0 z-20 flex flex-col items-center gap-0 overflow-visible rounded-md bg-paper/95 p-0.5 shadow-sm ring-1 ring-rule">
         <button
           type="button"
           aria-label="جابه‌جایی"
@@ -101,7 +108,7 @@ export function BlockToolbar({
             <ArrowUpIcon className="h-4 w-4" />
           </button>
 
-          {convertibleTo.length > 0 ? (
+          {showTransform ? (
             <div className="relative">
               <button
                 type="button"

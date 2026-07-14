@@ -8,6 +8,7 @@ import {
   findMembersForArticlePicker,
   findTopicsForPicker,
   getArticleForAdmin,
+  listArticlesAdmin,
 } from "@nextgen-cms/studio/cms/queries";
 import { notFound } from "next/navigation";
 import { ArticleForm } from "@/components/admin/studio/ArticleForm";
@@ -22,13 +23,14 @@ export default async function EditArticlePage({ params }: PageProps) {
   if (Number.isNaN(articleId)) notFound();
 
   const session = await requireMember();
-  const [article, members, topics, contentGroups, contentSettings] =
+  const [article, members, topics, contentGroups, contentSettings, articles] =
     await Promise.all([
       getArticleForAdmin(articleId),
       findMembersForArticlePicker(),
       findTopicsForPicker(),
       findContentGroupsForPicker(),
       getContentSettings(),
+      listArticlesAdmin("all"),
     ]);
 
   if (!article) notFound();
@@ -55,6 +57,14 @@ export default async function EditArticlePage({ params }: PageProps) {
     topicIds: article.topicIds,
   };
 
+  const articleOptions = articles
+    .filter((item) => item.id !== articleId)
+    .map((item) => ({
+      id: item.id,
+      label: item.title,
+      slug: item.slug,
+    }));
+
   return (
     <div className="space-y-6">
       <h1 className="font-heading text-2xl text-ink">{labels.editItem}</h1>
@@ -65,6 +75,7 @@ export default async function EditArticlePage({ params }: PageProps) {
         members={members}
         topics={topics}
         contentGroups={contentGroups}
+        articles={articleOptions}
         canDelete={canDeleteArticle(session, {
           createdByMemberId: article.createdByMemberId,
         })}

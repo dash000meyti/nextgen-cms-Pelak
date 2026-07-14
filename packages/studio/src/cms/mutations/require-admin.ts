@@ -10,6 +10,4 @@ export async function requireAdmin() {
   };
 }
 
-export type MutationResult =
-  | { ok: true; id?: number }
-  | { ok: false; error: string };
+export type { MutationResult } from "@nextgen-cms/studio/cms/mutations/mutation-result";

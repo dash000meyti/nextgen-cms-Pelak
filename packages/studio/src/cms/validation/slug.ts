@@ -1,3 +1,8 @@
+import {
+  issue,
+  type ValidationIssue,
+} from "@nextgen-cms/studio/cms/validation/common";
+
 const RESERVED_SLUGS = new Set([
   "admin",
   "api",
@@ -27,14 +32,24 @@ export function normalizeSlugInput(value: string): string {
     .replace(/^-|-$/g, "");
 }
 
-export function validateSlug(value: string): string | undefined {
+export function validateSlug(
+  value: string,
+  field = "slug",
+): ValidationIssue | undefined {
   const normalized = normalizeSlugInput(value);
-  if (!normalized) return "نامک الزامی است.";
-  if (normalized.length > 120) return "نامک نباید بیش از ۱۲۰ کاراکتر باشد.";
-  if (!SLUG_PATTERN.test(normalized)) {
-    return "نامک فقط حروف فارسی یا لاتین، اعداد و خط تیره مجاز است.";
+  if (!normalized) return issue(field, "نامک الزامی است.");
+  if (normalized.length > 120) {
+    return issue(field, "نامک نباید بیش از ۱۲۰ کاراکتر باشد.");
   }
-  if (RESERVED_SLUGS.has(normalized)) return "این نامک رزرو شده است.";
+  if (!SLUG_PATTERN.test(normalized)) {
+    return issue(
+      field,
+      "نامک فقط حروف فارسی یا لاتین، اعداد و خط تیره مجاز است.",
+    );
+  }
+  if (RESERVED_SLUGS.has(normalized)) {
+    return issue(field, "این نامک رزرو شده است.");
+  }
   return undefined;
 }
 

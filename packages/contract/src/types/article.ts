@@ -9,9 +9,9 @@ export type ImageMeta = {
 
 export type HeadingLevel = 2 | 3 | 4;
 
-export type ListVariant = "bullet" | "ordered";
+export type ListVariant = "bullet" | "ordered" | "dash";
 
-export type ButtonVariant = "primary" | "outline";
+export type ButtonVariant = "primary" | "outline" | "secondary";
 
 export type ArticleBlock =
   | { type: "paragraph"; content: string }
@@ -21,7 +21,8 @@ export type ArticleBlock =
   | { type: "video"; src: string; caption?: string }
   | { type: "list"; variant: ListVariant; items: string[] }
   | { type: "question"; content: string; answer?: string }
-  | { type: "button"; label: string; href: string; variant?: ButtonVariant };
+  | { type: "button"; label: string; href: string; variant?: ButtonVariant }
+  | { type: "table"; headers: string[]; rows: string[][] };
 
 export type BlockType = ArticleBlock["type"];
 
@@ -85,7 +86,12 @@ export function normalizeArticleBlock(block: unknown): ArticleBlock {
     const items = Array.isArray(raw.items)
       ? raw.items.filter((item) => typeof item === "string")
       : [];
-    const variant = raw.variant === "ordered" ? "ordered" : "bullet";
+    const variant =
+      raw.variant === "ordered"
+        ? "ordered"
+        : raw.variant === "dash"
+          ? "dash"
+          : "bullet";
     return { type: "list", variant, items };
   }
   if (type === "question") {
@@ -98,13 +104,21 @@ export function normalizeArticleBlock(block: unknown): ArticleBlock {
     };
   }
   if (type === "button") {
-    const variant = raw.variant === "outline" ? "outline" : "primary";
+    const variant =
+      raw.variant === "primary"
+        ? "primary"
+        : raw.variant === "secondary"
+          ? "secondary"
+          : "outline";
     return {
       type: "button",
       label: typeof raw.label === "string" ? raw.label : "",
       href: typeof raw.href === "string" ? raw.href : "",
-      ...(variant === "outline" ? { variant } : {}),
+      ...(variant !== "outline" ? { variant } : {}),
     };
+  }
+  if (type === "table") {
+    return normalizeTableBlock(raw);
   }
   return {
     type: "paragraph",
@@ -112,9 +126,94 @@ export function normalizeArticleBlock(block: unknown): ArticleBlock {
   };
 }
 
+function normalizeTableBlock(
+  raw: Record<string, unknown>,
+): Extract<ArticleBlock, { type: "table" }> {
+  const rawHeaders = Array.isArray(raw.headers)
+    ? raw.headers.filter((h): h is string => typeof h === "string")
+    : [];
+  const colCount = Math.max(rawHeaders.length, 1);
+  const headers =
+    rawHeaders.length >= colCount
+      ? rawHeaders.slice(0, colCount)
+      : [...rawHeaders, ...Array(colCount - rawHeaders.length).fill("")];
+
+  const rawRows = Array.isArray(raw.rows) ? raw.rows : [[]];
+  const rows =
+    rawRows.length > 0
+      ? rawRows.map((row) => {
+          const cells = Array.isArray(row)
+            ? row.filter((c): c is string => typeof c === "string")
+            : [];
+          if (cells.length === colCount) return cells;
+          if (cells.length > colCount) return cells.slice(0, colCount);
+          return [...cells, ...Array(colCount - cells.length).fill("")];
+        })
+      : [Array(colCount).fill("")];
+
+  return { type: "table", headers, rows };
+}
+
 export function normalizeArticleBlocks(blocks: unknown): ArticleBlock[] {
   if (!Array.isArray(blocks)) return [];
   return blocks.map(normalizeArticleBlock);
+}
+
+/** Join readable body text for metrics (reading time, search, etc.). */
+export function articleBodyPlainText(blocks: ArticleBlock[]): string {
+  const parts: string[] = [];
+  for (const block of blocks) {
+    switch (block.type) {
+      case "paragraph":
+      case "heading":
+        if (block.content) parts.push(block.content);
+        break;
+      case "quote":
+        if (block.content) parts.push(block.content);
+        if (block.attribution) parts.push(block.attribution);
+        break;
+      case "list":
+        for (const item of block.items) {
+          if (item) parts.push(item);
+        }
+        break;
+      case "question":
+        if (block.content) parts.push(block.content);
+        if (block.answer) parts.push(block.answer);
+        break;
+      case "image":
+        if (block.image.alt) parts.push(block.image.alt);
+        if (block.image.caption) parts.push(block.image.caption);
+        if (block.image.credit) parts.push(block.image.credit);
+        break;
+      case "video":
+        if (block.caption) parts.push(block.caption);
+        break;
+      case "button":
+        break;
+      case "table":
+        for (const header of block.headers) {
+          if (header) parts.push(header);
+        }
+        for (const row of block.rows) {
+          for (const cell of row) {
+            if (cell) parts.push(cell);
+          }
+        }
+        break;
+    }
+  }
+  return parts.join(" ").replace(/\s+/g, " ").trim();
+}
+
+const WORDS_PER_MINUTE = 200;
+
+/** Estimate reading minutes from body blocks (Persian-friendly WPM). Min 1. */
+export function estimateReadingMinutes(blocks: ArticleBlock[]): number {
+  const text = articleBodyPlainText(blocks);
+  if (!text) return 1;
+  const words = text.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE));
 }
 
 export type Author = {

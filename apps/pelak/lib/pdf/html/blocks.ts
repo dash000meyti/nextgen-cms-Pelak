@@ -35,11 +35,25 @@ export function renderBlocksHtml(blocks: ResolvedBlock[]): string {
 
       if (block.type === "list") {
         const tag = block.variant === "ordered" ? "ol" : "ul";
+        const classAttr = block.variant === "dash" ? ' class="list-dash"' : "";
         const items = block.items
           .filter((item) => item.trim())
           .map((item) => `<li>${escapeHtml(item)}</li>`)
           .join("");
-        return `<${tag}>${items}</${tag}>`;
+        return `<${tag}${classAttr}>${items}</${tag}>`;
+      }
+
+      if (block.type === "table") {
+        const head = block.headers
+          .map((h) => `<th>${escapeHtml(h)}</th>`)
+          .join("");
+        const body = block.rows
+          .map(
+            (row) =>
+              `<tr>${row.map((c) => `<td>${escapeHtml(c)}</td>`).join("")}</tr>`,
+          )
+          .join("");
+        return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
       }
 
       if (block.type === "question") {

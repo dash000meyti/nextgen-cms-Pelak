@@ -4,11 +4,21 @@ import type {
   ImageMeta,
 } from "@nextgen-cms/contract/types/article";
 
+export type ValidationIssue = {
+  message: string;
+  field: string;
+};
+
+export function issue(field: string, message: string): ValidationIssue {
+  return { message, field };
+}
+
 export function validateRequired(
   value: string | undefined | null,
   label: string,
-): string | undefined {
-  if (!value?.trim()) return `${label} الزامی است.`;
+  field: string,
+): ValidationIssue | undefined {
+  if (!value?.trim()) return issue(field, `${label} الزامی است.`);
   return undefined;
 }
 
@@ -16,10 +26,13 @@ export function validateImageMeta(
   src: string,
   alt: string,
   label = "تصویر",
-): string | undefined {
-  const srcError = validateRequired(src, label);
+  fields: { src: string; alt: string } = { src: "image", alt: "imageAlt" },
+): ValidationIssue | undefined {
+  const srcError = validateRequired(src, label, fields.src);
   if (srcError) return srcError;
-  if (!alt.trim()) return `متن جایگزین ${label} الزامی است.`;
+  if (!alt.trim()) {
+    return issue(fields.alt, `متن جایگزین ${label} الزامی است.`);
+  }
   return undefined;
 }
 
@@ -33,9 +46,19 @@ function isHeadingLevel(value: unknown): value is HeadingLevel {
   return value === 2 || value === 3 || value === 4;
 }
 
-export function validateArticleBlocks(blocks: unknown): string | undefined {
-  if (!Array.isArray(blocks)) return "بدنهٔ محتوا نامعتبر است.";
-  if (blocks.length === 0) return "حداقل یک بلوک متن لازم است.";
+function blockIssue(index: number, message: string): ValidationIssue {
+  return issue(`body.${index}`, message);
+}
+
+export function validateArticleBlocks(
+  blocks: unknown,
+): ValidationIssue | undefined {
+  if (!Array.isArray(blocks)) {
+    return issue("body", "بدنهٔ محتوا نامعتبر است.");
+  }
+  if (blocks.length === 0) {
+    return issue("body", "حداقل یک بلوک متن لازم است.");
+  }
 
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i] as Record<string, unknown>;
@@ -44,57 +67,102 @@ export function validateArticleBlocks(blocks: unknown): string | undefined {
 
     if (type === "paragraph") {
       if (typeof block.content !== "string" || !block.content.trim()) {
-        return `${at}: محتوا الزامی است.`;
+        return blockIssue(i, `${at}: محتوا الزامی است.`);
       }
     } else if (type === "heading") {
       if (!isHeadingLevel(block.level)) {
-        return `${at}: سطح عنوان نامعتبر است (۲، ۳ یا ۴).`;
+        return blockIssue(i, `${at}: سطح عنوان نامعتبر است (۲، ۳ یا ۴).`);
       }
       if (typeof block.content !== "string" || !block.content.trim()) {
-        return `${at}: متن عنوان الزامی است.`;
+        return blockIssue(i, `${at}: متن عنوان الزامی است.`);
       }
     } else if (type === "quote") {
       if (typeof block.content !== "string" || !block.content.trim()) {
-        return `${at}: نقل‌قول الزامی است.`;
+        return blockIssue(i, `${at}: نقل‌قول الزامی است.`);
       }
     } else if (type === "image") {
       if (!isImageMeta(block.image)) {
-        return `${at}: تصویر نامعتبر است.`;
+        return blockIssue(i, `${at}: تصویر نامعتبر است.`);
       }
       const err = validateImageMeta(
         block.image.src,
         block.image.alt,
         "تصویر بلوک",
+        { src: `body.${i}`, alt: `body.${i}` },
       );
-      if (err) return `${at}: ${err}`;
+      if (err) return blockIssue(i, `${at}: ${err.message}`);
     } else if (type === "video") {
       if (typeof block.src !== "string" || !block.src.trim()) {
-        return `${at}: لینک ویدیو الزامی است.`;
+        return blockIssue(i, `${at}: لینک ویدیو الزامی است.`);
       }
     } else if (type === "list") {
-      if (block.variant !== "bullet" && block.variant !== "ordered") {
-        return `${at}: نوع لیست نامعتبر است.`;
+      if (
+        block.variant !== "bullet" &&
+        block.variant !== "ordered" &&
+        block.variant !== "dash"
+      ) {
+        return blockIssue(i, `${at}: نوع لیست نامعتبر است.`);
       }
       if (
         !Array.isArray(block.items) ||
         block.items.length === 0 ||
         !block.items.some((item) => typeof item === "string" && item.trim())
       ) {
-        return `${at}: حداقل یک مورد لیست الزامی است.`;
+        return blockIssue(i, `${at}: حداقل یک مورد لیست الزامی است.`);
       }
     } else if (type === "question") {
       if (typeof block.content !== "string" || !block.content.trim()) {
-        return `${at}: متن پرسش الزامی است.`;
+        return blockIssue(i, `${at}: متن پرسش الزامی است.`);
       }
     } else if (type === "button") {
       if (typeof block.label !== "string" || !block.label.trim()) {
-        return `${at}: برچسب دکمه الزامی است.`;
+        return blockIssue(i, `${at}: برچسب دکمه الزامی است.`);
       }
       if (typeof block.href !== "string" || !block.href.trim()) {
-        return `${at}: لینک دکمه الزامی است.`;
+        return blockIssue(i, `${at}: لینک دکمه الزامی است.`);
+      }
+      if (
+        block.variant !== undefined &&
+        block.variant !== "primary" &&
+        block.variant !== "outline" &&
+        block.variant !== "secondary"
+      ) {
+        return blockIssue(i, `${at}: نوع دکمه نامعتبر است.`);
+      }
+    } else if (type === "table") {
+      if (
+        !Array.isArray(block.headers) ||
+        block.headers.length === 0 ||
+        !block.headers.every((h) => typeof h === "string")
+      ) {
+        return blockIssue(i, `${at}: هدرهای جدول نامعتبر است.`);
+      }
+      if (!Array.isArray(block.rows) || block.rows.length === 0) {
+        return blockIssue(i, `${at}: حداقل یک ردیف جدول لازم است.`);
+      }
+      const colCount = block.headers.length;
+      for (let r = 0; r < block.rows.length; r++) {
+        const row = block.rows[r];
+        if (
+          !Array.isArray(row) ||
+          row.length !== colCount ||
+          !row.every((c) => typeof c === "string")
+        ) {
+          return blockIssue(i, `${at}: ردیف ${r + 1} جدول نامعتبر است.`);
+        }
+      }
+      const hasContent =
+        block.headers.some((h) => typeof h === "string" && h.trim()) ||
+        block.rows.some(
+          (row) =>
+            Array.isArray(row) &&
+            row.some((c) => typeof c === "string" && c.trim()),
+        );
+      if (!hasContent) {
+        return blockIssue(i, `${at}: حداقل یک سلول جدول باید پر باشد.`);
       }
     } else {
-      return `${at}: نوع نامعتبر است.`;
+      return blockIssue(i, `${at}: نوع نامعتبر است.`);
     }
   }
 
@@ -152,7 +220,14 @@ export function parseArticleBlocks(blocks: ArticleBlock[]): ArticleBlock[] {
         type: "button" as const,
         label: label.trim(),
         href: href.trim(),
-        ...(variant === "outline" ? { variant } : {}),
+        ...(variant && variant !== "outline" ? { variant } : {}),
+      };
+    }
+    if (block.type === "table") {
+      return {
+        type: "table" as const,
+        headers: block.headers.map((h) => h.trim()),
+        rows: block.rows.map((row) => row.map((c) => c.trim())),
       };
     }
     return block;

@@ -5,8 +5,9 @@ import type { ContentSettings } from "@nextgen-cms/contract/types/modules";
 import { saveContentSettings } from "@nextgen-cms/studio/cms/mutations/settings";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
 import { SectionListSettingsFields } from "@/components/admin/studio/SectionListSettingsFields";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type ContentSettingsFormProps = {
   value: ContentSettings;
@@ -15,33 +16,36 @@ type ContentSettingsFormProps = {
 export function ContentSettingsForm({ value }: ContentSettingsFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [settings, setSettings] = useState(value);
 
   function save() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     const normalized = normalizeContentSettings(settings);
     startTransition(async () => {
       try {
         const result = await saveContentSettings(normalized);
         if (result && "ok" in result && !result.ok) {
-          setError("دسترسی مجاز نیست.");
+          feedback.reportError("دسترسی مجاز نیست.");
           return;
         }
         setSettings(normalized);
-        setSuccess("ذخیره شد.");
+        feedback.reportSuccess("ذخیره شد.");
         router.refresh();
       } catch {
-        setError("خطا در ذخیرهٔ تنظیمات.");
+        feedback.reportError("خطا در ذخیرهٔ تنظیمات.");
       }
     });
   }
 
   return (
     <div className="max-w-lg space-y-6">
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
       <SectionListSettingsFields
         idPrefix="content"
         value={settings}

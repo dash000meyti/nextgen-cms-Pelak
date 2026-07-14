@@ -13,7 +13,10 @@ import {
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-permission";
-import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
+import {
+  type MutationResult,
+  mutationIssue,
+} from "@nextgen-cms/studio/cms/mutations/mutation-result";
 import { assertUniqueSlug } from "@nextgen-cms/studio/cms/queries/slug";
 import {
   normalizeSlugInput,
@@ -50,7 +53,7 @@ function parseFormData(data: TopicFormData): TopicWriteInput {
 }
 
 async function validate(input: TopicWriteInput, excludeId?: number) {
-  const nameError = validateRequired(input.name, "نام");
+  const nameError = validateRequired(input.name, "نام", "name");
   if (nameError) return nameError;
   const slugError = validateSlug(input.slug);
   if (slugError) return slugError;
@@ -66,7 +69,7 @@ export async function createTopic(
 
   const input = parseFormData(data);
   const error = await validate(input);
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   try {
     const id = await insertTopic(input, access(session.memberId));
@@ -91,7 +94,7 @@ export async function saveTopic(
 
   const input = parseFormData(data);
   const error = await validate(input, id);
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   try {
     await updateTopic(id, input, access(session.memberId));

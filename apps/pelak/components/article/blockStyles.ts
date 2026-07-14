@@ -23,6 +23,10 @@ export const QUOTE_ATTRIBUTION_CLASS =
 export const LIST_CLASS =
   "my-4 space-y-2 ps-6 text-base leading-relaxed text-ink";
 
+/** Unordered list with − markers (dash variant). */
+export const LIST_DASH_CLASS =
+  "my-4 space-y-2 ps-6 text-base leading-relaxed text-ink list-none [&>li]:relative [&>li]:ps-4 [&>li]:before:absolute [&>li]:before:start-0 [&>li]:before:content-['−'] [&>li]:before:text-ink-muted";
+
 export const FIGURE_CLASS = "my-8 w-full overflow-hidden";
 
 export const FIGURE_IMG_CLASS = "h-auto w-full rounded object-contain";
@@ -46,6 +50,9 @@ export const BUTTON_PRIMARY_CLASS =
 export const BUTTON_OUTLINE_CLASS =
   "border border-accent text-accent hover:bg-accent-soft";
 
+export const BUTTON_SECONDARY_CLASS =
+  "border border-rule bg-surface-2 text-ink hover:bg-surface";
+
 export const QUESTION_SHELL_CLASS =
   "my-4 w-full overflow-hidden rounded-lg border border-rule";
 
@@ -58,13 +65,36 @@ export const QUESTION_ICON_CLASS =
 export const QUESTION_ANSWER_CLASS =
   "m-0 border-t border-rule bg-surface-2 px-5 py-3 text-base leading-relaxed text-ink";
 
+export const TABLE_WRAP_CLASS = "my-6 w-full overflow-x-auto";
+
+export const TABLE_CLASS =
+  "w-full border-collapse text-start text-sm leading-relaxed text-ink";
+
+export const TABLE_TH_CLASS =
+  "border border-rule bg-surface-2 px-3 py-2 font-medium";
+
+export const TABLE_TD_CLASS = "border border-rule px-3 py-2";
+
 /** Default paragraph class in the editor (site may switch to justify via config). */
 export const EDITOR_PARAGRAPH_CLASS = "article-paragraph-start";
 
-export function buttonVariantClass(variant?: "primary" | "outline"): string {
-  const isOutline = variant !== "primary";
-  return [
-    BUTTON_BASE_CLASS,
-    isOutline ? BUTTON_OUTLINE_CLASS : BUTTON_PRIMARY_CLASS,
-  ].join(" ");
+export function listVariantClass(
+  variant: "bullet" | "ordered" | "dash",
+): string {
+  if (variant === "dash") return LIST_DASH_CLASS;
+  const marker = variant === "ordered" ? "list-decimal" : "list-disc";
+  return `${LIST_CLASS} ${marker}`;
+}
+
+export function buttonVariantClass(
+  variant?: "primary" | "outline" | "secondary",
+): string {
+  // Missing variant defaults to outline (legacy createDefault / storage).
+  const style =
+    variant === "primary"
+      ? BUTTON_PRIMARY_CLASS
+      : variant === "secondary"
+        ? BUTTON_SECONDARY_CLASS
+        : BUTTON_OUTLINE_CLASS;
+  return [BUTTON_BASE_CLASS, style].join(" ");
 }

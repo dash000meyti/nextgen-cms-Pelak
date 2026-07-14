@@ -13,14 +13,15 @@ export type ResolvedBlock =
       credit?: string;
     }
   | { type: "video"; src: string; caption?: string }
-  | { type: "list"; variant: "bullet" | "ordered"; items: string[] }
+  | { type: "list"; variant: "bullet" | "ordered" | "dash"; items: string[] }
   | { type: "question"; content: string; answer?: string }
   | {
       type: "button";
       label: string;
       href: string;
-      variant?: "primary" | "outline";
-    };
+      variant?: "primary" | "outline" | "secondary";
+    }
+  | { type: "table"; headers: string[]; rows: string[][] };
 
 export async function resolveArticleBlocks(
   blocks: ArticleBlock[],
@@ -67,6 +68,13 @@ export async function resolveArticleBlocks(
           label: block.label,
           href: block.href,
           ...(block.variant ? { variant: block.variant } : {}),
+        };
+      }
+      if (block.type === "table") {
+        return {
+          type: "table",
+          headers: block.headers,
+          rows: block.rows,
         };
       }
       return block;

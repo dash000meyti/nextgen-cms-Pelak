@@ -18,9 +18,14 @@ import {
 } from "@nextgen-cms/core/db/repositories/roles";
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-permission";
-import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
 import {
+  type MutationResult,
+  mutationIssue,
+} from "@nextgen-cms/studio/cms/mutations/mutation-result";
+import {
+  issue,
   normalizeSlugInput,
+  type ValidationIssue,
   validateRequired,
   validateSlug,
 } from "@nextgen-cms/studio/cms/validation";
@@ -80,25 +85,25 @@ function enforceSystemRolePermissions(
 async function validateRoleForm(
   data: RoleFormData,
   options: { mode: "create" | "edit"; excludeId?: number },
-): Promise<string | undefined> {
+): Promise<ValidationIssue | undefined> {
   const normalizedSlug = normalizeSlugInput(data.slug);
 
-  const nameError = validateRequired(data.name, "نام");
+  const nameError = validateRequired(data.name, "نام", "name");
   if (nameError) return nameError;
 
   const slugError = validateSlug(normalizedSlug);
   if (slugError) return slugError;
 
   if (await roleSlugExists(normalizedSlug, options.excludeId)) {
-    return "این شناسه قبلاً استفاده شده است.";
+    return issue("slug", "این شناسه قبلاً استفاده شده است.");
   }
 
   for (const perm of data.permissions) {
     if (isDeprecatedPermission(perm)) {
-      return `مجوز منسوخ قابل اختصاص نیست: ${perm}`;
+      return issue("permissions", `مجوز منسوخ قابل اختصاص نیست: ${perm}`);
     }
     if (!permissionValues.includes(perm)) {
-      return `مجوز نامعتبر: ${perm}`;
+      return issue("permissions", `مجوز نامعتبر: ${perm}`);
     }
   }
 
@@ -110,7 +115,7 @@ export async function createRole(data: RoleFormData): Promise<MutationResult> {
   if ("ok" in sessionOrDenied && !sessionOrDenied.ok) return sessionOrDenied;
 
   const error = await validateRoleForm(data, { mode: "create" });
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   try {
     const normalizedSlug = normalizeSlugInput(data.slug);
@@ -155,7 +160,7 @@ export async function saveRole(
   }
 
   const error = await validateRoleForm(data, { mode: "edit", excludeId: id });
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
 
   try {
     const existingPerms = await getPermissionsForRole(id);

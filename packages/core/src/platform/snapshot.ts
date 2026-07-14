@@ -282,9 +282,7 @@ export function resolveSnapshotRoot(dir: string): string {
   const hint = contents.length
     ? ` محتوای آرشیو: ${contents.join("، ")}`
     : " (آرشیو خالی یا استخراج‌نشده است)";
-  throw new Error(
-    `آرشیو شامل manifest.json نیست؛ snapshot معتبر نیست.${hint}`,
-  );
+  throw new Error(`آرشیو شامل manifest.json نیست؛ snapshot معتبر نیست.${hint}`);
 }
 
 export function readManifestFromDir(dir: string): SnapshotManifest {

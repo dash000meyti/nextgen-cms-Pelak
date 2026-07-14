@@ -19,6 +19,8 @@ export function ContentGroupModuleSettingsForm({
     pending,
     error,
     success,
+    info,
+    clear,
     submit,
   } = useSingletonSettingsForm({
     initialValue: value,
@@ -36,6 +38,8 @@ export function ContentGroupModuleSettingsForm({
         pending={pending}
         error={error}
         success={success}
+        info={info}
+        onDismiss={clear}
         onSave={submit}
       />
     </div>

@@ -6,7 +6,7 @@
 
 ```
 apps/pelak/components/
-  ui/         primitives — Button, Tag, JalaliDate, …
+  ui/         primitives — Button, Tag, JalaliDate, FormMessage, useFormFeedback, …
   admin/      استودیو — studio/, fields/, media/, blocks/
   home/       بخش‌های صفحهٔ اصلی
   article/    کارت/لیست/هدر مقاله
@@ -31,6 +31,16 @@ apps/pelak/components/
 - Server Component پیش‌فرض؛ `"use client"` فقط برای state/event
 - بدون UI library خارجی — Tailwind v4 + SVG inline
 - `packages/studio` package منطق admin است — **نه** app حذف‌شدهٔ `apps/studio`
+
+## بازخورد فرم (مشترک site + admin)
+
+| قطعه | مسیر | نقش |
+|------|------|-----|
+| `FormMessage` | `components/ui/FormMessage.tsx` | toast ثابت (مرکز افقی، حدود ۳۰٪ از بالای viewport): قرمز خطا · سبز موفقیت · خاکستری خنثی؛ بستن با X یا بعد از ۱۰ ثانیه |
+| `useFormFeedback` | `components/ui/useFormFeedback.ts` | `reportError` / `reportSuccess` / `reportInfo` / `clear` + اسکرول به فیلد خطا |
+| لنگر فیلد | `data-field="…"` روی wrapper فیلد/بلوک | هدف `scrollIntoView` و هایلایت موقت (`[data-invalid]`) |
+
+قرارداد سرور: `MutationResult` (و `SubmitMessageResult`) می‌تواند `field?: string` بدهد؛ کلاینت با همان کلید اسکرول می‌کند. نمونهٔ بلوک: `body.2`. import قدیم `components/admin/studio/FormMessage` فقط re-export است.
 
 ## Public shell (`layout/`)
 

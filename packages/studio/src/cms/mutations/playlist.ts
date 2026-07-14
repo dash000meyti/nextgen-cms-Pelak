@@ -18,7 +18,10 @@ import { promoteMediaToFolder } from "@nextgen-cms/core/media/promote-media";
 import { permissionDeniedResult } from "@nextgen-cms/studio/admin/article-access";
 import type { requireMember } from "@nextgen-cms/studio/admin/require-member";
 import { requirePermissionMutation } from "@nextgen-cms/studio/admin/require-permission";
-import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
+import {
+  type MutationResult,
+  mutationIssue,
+} from "@nextgen-cms/studio/cms/mutations/mutation-result";
 import { assertUniqueSlug } from "@nextgen-cms/studio/cms/queries/slug";
 import {
   normalizeSlugInput,
@@ -58,13 +61,16 @@ function parseFormData(data: PlaylistFormData): PlaylistWriteInput {
 }
 
 async function validate(input: PlaylistWriteInput, excludeId?: number) {
-  const nameError = validateRequired(input.name, "نام");
+  const nameError = validateRequired(input.name, "نام", "name");
   if (nameError) return nameError;
   const slugError = validateSlug(input.slug);
   if (slugError) return slugError;
   const uniqueError = await assertUniqueSlug("playlist", input.slug, excludeId);
   if (uniqueError) return uniqueError;
-  return validateImageMeta(input.coverSrc, input.coverAlt, "کاور لیست پخش");
+  return validateImageMeta(input.coverSrc, input.coverAlt, "کاور لیست پخش", {
+    src: "cover",
+    alt: "coverAlt",
+  });
 }
 
 async function resolvePlaylistCoverSrc(
@@ -83,7 +89,7 @@ export async function createPlaylist(
   const session = sessionOrDenied as Awaited<ReturnType<typeof requireMember>>;
   const input = parseFormData(data);
   const error = await validate(input);
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
   try {
     const id = await insertPlaylist(input, access(session.memberId));
     const coverSrc = await resolvePlaylistCoverSrc(id, input.coverSrc);
@@ -114,7 +120,7 @@ export async function savePlaylist(
   if (!existing) return { ok: false, error: "لیست پخش یافت نشد." };
   const input = parseFormData(data);
   const error = await validate(input, id);
-  if (error) return { ok: false, error };
+  if (error) return mutationIssue(error);
   try {
     const coverSrc = await resolvePlaylistCoverSrc(id, input.coverSrc);
     await updatePlaylist(id, { ...input, coverSrc }, access(session.memberId));

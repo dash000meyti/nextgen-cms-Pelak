@@ -7,7 +7,8 @@ import type {
 import { saveMessagesSettings } from "@nextgen-cms/studio/cms/mutations/settings";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { FormMessage } from "@/components/admin/studio/FormMessage";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type MessagesSettingsFormProps = {
   value: MessagesSettings;
@@ -20,8 +21,7 @@ function createMethod(index: number): ContactMethod {
 export function MessagesSettingsForm({ value }: MessagesSettingsFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [methods, setMethods] = useState<ContactMethod[]>(
     value.contactMethods.length > 0 ? value.contactMethods : [createMethod(0)],
   );
@@ -41,8 +41,7 @@ export function MessagesSettingsForm({ value }: MessagesSettingsFormProps) {
   }
 
   function save() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     const cleaned = methods
       .map((method) => ({
         id: method.id || `method-${Math.random().toString(36).slice(2)}`,
@@ -54,14 +53,14 @@ export function MessagesSettingsForm({ value }: MessagesSettingsFormProps) {
       try {
         const result = await saveMessagesSettings({ contactMethods: cleaned });
         if (result && "ok" in result && !result.ok) {
-          setError("دسترسی مجاز نیست.");
+          feedback.reportError("دسترسی مجاز نیست.");
           return;
         }
         setMethods(cleaned.length > 0 ? cleaned : [createMethod(0)]);
-        setSuccess("ذخیره شد.");
+        feedback.reportSuccess("ذخیره شد.");
         router.refresh();
       } catch {
-        setError("خطا در ذخیرهٔ تنظیمات.");
+        feedback.reportError("خطا در ذخیرهٔ تنظیمات.");
       }
     });
   }
@@ -71,7 +70,12 @@ export function MessagesSettingsForm({ value }: MessagesSettingsFormProps) {
 
   return (
     <div className="max-w-xl space-y-6">
-      <FormMessage error={error} success={success} />
+      <FormMessage
+        error={feedback.error}
+        success={feedback.success}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
 
       <div className="space-y-4">
         {methods.map((method, index) => (

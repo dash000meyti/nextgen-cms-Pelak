@@ -2,9 +2,11 @@
 
 import { removeContentGroupAndRedirect } from "@nextgen-cms/studio/cms/mutations/content-group";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { TableActionButton } from "@/components/admin/studio/TableActionButton";
 import { useConfirmDialog } from "@/components/admin/studio/useConfirmDialog";
+import { FormMessage } from "@/components/ui/FormMessage";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 import { formatServerActionError } from "@/lib/format-server-action-error";
 
 type DeleteArchivedContentGroupButtonProps = {
@@ -15,7 +17,7 @@ export function DeleteArchivedContentGroupButton({
   contentGroupId,
 }: DeleteArchivedContentGroupButtonProps) {
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const { confirm, dialog } = useConfirmDialog();
 
   async function handleDelete() {
@@ -25,14 +27,16 @@ export function DeleteArchivedContentGroupButton({
       confirmLabel: "حذف",
     });
     if (!confirmed) return;
-    setError(null);
+    feedback.clear();
     startTransition(() => {
       void (async () => {
         const result = await removeContentGroupAndRedirect(contentGroupId);
-        if (result && !result.ok) setError(result.error);
+        if (result && !result.ok) {
+          feedback.reportError(result.error, result.field);
+        }
       })().catch((caught: unknown) => {
         if (isRedirectError(caught)) throw caught;
-        setError(formatServerActionError(caught));
+        feedback.reportError(formatServerActionError(caught));
       });
     });
   }
@@ -46,7 +50,11 @@ export function DeleteArchivedContentGroupButton({
         onClick={handleDelete}
         disabled={pending}
       />
-      {error ? <span className="text-xs text-accent">{error}</span> : null}
+      <FormMessage
+        error={feedback.error}
+        info={feedback.info}
+        onDismiss={feedback.clear}
+      />
     </span>
   );
 }

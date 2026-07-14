@@ -11,12 +11,16 @@ import {
   FIGURE_IMG_CLASS,
   HEADING_CLASS,
   HEADING_TAG,
-  LIST_CLASS,
+  listVariantClass,
   QUESTION_ANSWER_CLASS,
   QUESTION_HEADER_CLASS,
   QUESTION_ICON_CLASS,
   QUESTION_SHELL_CLASS,
   QUOTE_CLASS,
+  TABLE_CLASS,
+  TABLE_TD_CLASS,
+  TABLE_TH_CLASS,
+  TABLE_WRAP_CLASS,
   VIDEO_FIGURE_CLASS,
   VIDEO_FRAME_CLASS,
 } from "./blockStyles";
@@ -148,10 +152,8 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
 
         if (block.type === "list") {
           const ListTag = block.variant === "ordered" ? "ol" : "ul";
-          const listClass =
-            block.variant === "ordered" ? "list-decimal" : "list-disc";
           return (
-            <ListTag key={key} className={`${LIST_CLASS} ${listClass}`}>
+            <ListTag key={key} className={listVariantClass(block.variant)}>
               {block.items
                 .filter((item) => item.trim())
                 .map((item, itemIndex) => (
@@ -159,6 +161,47 @@ export async function ArticleBody({ blocks, dir }: ArticleBodyProps) {
                   <li key={`${key}-${itemIndex}`}>{item}</li>
                 ))}
             </ListTag>
+          );
+        }
+
+        if (block.type === "table") {
+          return (
+            <div key={key} className={TABLE_WRAP_CLASS}>
+              <table className={TABLE_CLASS}>
+                <thead>
+                  <tr>
+                    {block.headers.map((header, col) => (
+                      <th
+                        // biome-ignore lint/suspicious/noArrayIndexKey: read-only public render; order is authoritative
+                        key={`${key}-h-${col}`}
+                        className={TABLE_TH_CLASS}
+                        scope="col"
+                      >
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {block.rows.map((row, rowIndex) => (
+                    <tr
+                      // biome-ignore lint/suspicious/noArrayIndexKey: read-only public render; order is authoritative
+                      key={`${key}-r-${rowIndex}`}
+                    >
+                      {row.map((cell, col) => (
+                        <td
+                          // biome-ignore lint/suspicious/noArrayIndexKey: read-only public render; order is authoritative
+                          key={`${key}-c-${rowIndex}-${col}`}
+                          className={TABLE_TD_CLASS}
+                        >
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           );
         }
 

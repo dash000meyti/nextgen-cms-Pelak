@@ -3,6 +3,7 @@
 import type { MutationResult } from "@nextgen-cms/studio/cms/mutations/require-admin";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { useFormFeedback } from "@/components/ui/useFormFeedback";
 
 type UseSingletonSettingsFormOptions<T> = {
   initialValue: T;
@@ -15,24 +16,22 @@ export function useSingletonSettingsForm<T>({
 }: UseSingletonSettingsFormOptions<T>) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const feedback = useFormFeedback();
   const [value, setValue] = useState(initialValue);
 
   function submit() {
-    setError(null);
-    setSuccess(null);
+    feedback.clear();
     startTransition(async () => {
       try {
         const result = await save(value);
         if (result && "ok" in result && !result.ok) {
-          setError("دسترسی مجاز نیست.");
+          feedback.reportError(result.error, result.field);
           return;
         }
-        setSuccess("ذخیره شد.");
+        feedback.reportSuccess("ذخیره شد.");
         router.refresh();
       } catch {
-        setError("خطا در ذخیرهٔ تنظیمات.");
+        feedback.reportError("خطا در ذخیرهٔ تنظیمات.");
       }
     });
   }
@@ -41,8 +40,10 @@ export function useSingletonSettingsForm<T>({
     value,
     setValue,
     pending,
-    error,
-    success,
+    error: feedback.error,
+    success: feedback.success,
+    info: feedback.info,
+    clear: feedback.clear,
     submit,
   };
 }

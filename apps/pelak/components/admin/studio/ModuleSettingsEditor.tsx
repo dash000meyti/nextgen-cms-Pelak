@@ -20,6 +20,8 @@ export function ModuleSettingsEditor({ value }: ModuleSettingsEditorProps) {
     pending,
     error,
     success,
+    info,
+    clear,
     submit,
   } = useSingletonSettingsForm({
     initialValue: value,
@@ -56,6 +58,8 @@ export function ModuleSettingsEditor({ value }: ModuleSettingsEditorProps) {
         pending={pending}
         error={error}
         success={success}
+        info={info}
+        onDismiss={clear}
         onSave={submit}
       />
     </div>

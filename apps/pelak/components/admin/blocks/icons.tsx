@@ -172,6 +172,99 @@ export function ListOrderedIcon({ className }: IconProps): JSX.Element {
   );
 }
 
+export function ListDashIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <path d="M9 6h11M9 12h11M9 18h11" />
+      <path d="M3 6h3M3 12h3M3 18h3" />
+    </svg>
+  );
+}
+
+export function TableIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <rect x="3" y="4" width="18" height="16" rx="1.5" />
+      <path d="M3 10h18M3 15h18M9 4v16M15 4v16" />
+    </svg>
+  );
+}
+
+export function ButtonPrimaryIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg viewBox="0 0 24 24" className={base(className)} aria-hidden="true">
+      <rect
+        x="3"
+        y="8"
+        width="18"
+        height="8"
+        rx="4"
+        fill="currentColor"
+        opacity="0.9"
+      />
+    </svg>
+  );
+}
+
+export function ButtonOutlineIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <rect x="3" y="8" width="18" height="8" rx="4" />
+    </svg>
+  );
+}
+
+export function ButtonSecondaryIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg viewBox="0 0 24 24" className={base(className)} aria-hidden="true">
+      <rect
+        x="3"
+        y="8"
+        width="18"
+        height="8"
+        rx="4"
+        fill="currentColor"
+        opacity="0.35"
+      />
+      <rect
+        x="3"
+        y="8"
+        width="18"
+        height="8"
+        rx="4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+      />
+    </svg>
+  );
+}
+
 export function QuestionIcon({ className }: IconProps): JSX.Element {
   return (
     <svg
@@ -308,6 +401,62 @@ export function TransformIcon({ className }: IconProps): JSX.Element {
       aria-hidden="true"
     >
       <path d="M4 8h12l-3-3M20 16H8l3 3" />
+    </svg>
+  );
+}
+
+export function SaveIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <path d="M5 3h11l3 3v15H5V3z" />
+      <path d="M8 3v6h8V3" />
+      <path d="M8 17h8" />
+    </svg>
+  );
+}
+
+export function ArchiveIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <path d="M4 5h16v4H4V5z" />
+      <path d="M6 9v10h12V9" />
+      <path d="M10 13h4" />
+    </svg>
+  );
+}
+
+export function ViewIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }

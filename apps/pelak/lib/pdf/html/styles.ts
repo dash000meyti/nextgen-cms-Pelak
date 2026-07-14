@@ -122,6 +122,36 @@ export const pdfBaseStyles = `
     color: var(--ink-muted);
   }
 
+  .body ul.list-dash {
+    list-style: none;
+    padding-right: 1.2em;
+  }
+
+  .body ul.list-dash li::before {
+    content: "−";
+    margin-left: 0.5em;
+    color: var(--ink-muted);
+  }
+
+  .body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 10pt;
+  }
+
+  .body th,
+  .body td {
+    border: 1px solid var(--rule);
+    padding: 6px 8px;
+    text-align: right;
+  }
+
+  .body th {
+    background: var(--surface-2, #f5f3f0);
+    font-weight: 600;
+  }
+
   .body figure {
     margin: 16px 0;
   }

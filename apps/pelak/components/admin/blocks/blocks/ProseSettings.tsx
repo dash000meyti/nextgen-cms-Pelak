@@ -54,7 +54,11 @@ export function ProseSettings({
             }}
             aria-label={label}
             aria-pressed={active}
-            title={label}
+            title={
+              convertDisabled && !active
+                ? "در چندانتخاب امکان تبدیل نوع نیست"
+                : label
+            }
             className={iconBtnClass(active, convertDisabled)}
           >
             <Icon className="h-3.5 w-3.5" />

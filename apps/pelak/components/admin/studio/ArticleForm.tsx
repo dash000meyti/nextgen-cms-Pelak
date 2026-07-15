@@ -20,8 +20,9 @@ import type { PickerOption } from "@nextgen-cms/studio/cms/queries";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { BlockEditor } from "@/components/admin/blocks/BlockEditor";
+import { BlockInsertPalette } from "@/components/admin/blocks/BlockInsertPalette";
 import {
   ArchiveIcon,
   SaveIcon,
@@ -69,6 +70,7 @@ export function ArticleForm({
   const [pending, startTransition] = useTransition();
   const feedback = useFormFeedback();
   const [form, setForm] = useState(initial);
+  const appendBlockRef = useRef<(block: ArticleBlock) => void>(() => {});
 
   const uploadContext = articleId
     ? { contentId: articleId }
@@ -374,12 +376,16 @@ export function ArticleForm({
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+      <div className="grid gap-y-3.5 gap-x-3.5 lg:grid-cols-[1fr_auto]">
         <div className="min-w-0 space-y-4">
           <BlockEditor
             value={form.body}
             onChange={(body: ArticleBlock[]) => update("body", body)}
             uploadContext={uploadContext}
+            showPalette={false}
+            onAppendReady={(append) => {
+              appendBlockRef.current = append;
+            }}
           />
 
           <ReferencePicker
@@ -393,54 +399,66 @@ export function ArticleForm({
         </div>
 
         <div className="lg:sticky lg:top-[40dvh] lg:self-start">
-          <div className="flex flex-row gap-2 lg:flex-col">
-            {viewHref ? (
-              <Link
-                href={viewHref}
-                target="_blank"
-                rel="noreferrer"
-                title="مشاهده"
-                aria-label="مشاهده"
-                className="flex h-10 w-10 items-center justify-center rounded border border-rule text-ink hover:bg-surface"
+          <div className="flex flex-row items-center gap-3">
+            <BlockInsertPalette
+              layout="column"
+              onSelect={(block) => appendBlockRef.current(block)}
+            />
+
+            <div
+              aria-hidden
+              className="shrink-0 self-stretch bg-rule w-px"
+            />
+
+            <div className="flex flex-col gap-2">
+              {viewHref ? (
+                <Link
+                  href={viewHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="مشاهده"
+                  aria-label="مشاهده"
+                  className="flex h-10 w-10 items-center justify-center rounded border border-rule text-ink hover:bg-surface"
+                >
+                  <ViewIcon className="h-5 w-5" />
+                </Link>
+              ) : null}
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={pending}
+                title={saveLabel}
+                aria-label={saveLabel}
+                className="flex h-10 w-10 items-center justify-center rounded bg-accent text-paper hover:bg-accent-hover disabled:opacity-50"
               >
-                <ViewIcon className="h-5 w-5" />
-              </Link>
-            ) : null}
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={pending}
-              title={saveLabel}
-              aria-label={saveLabel}
-              className="flex h-10 w-10 items-center justify-center rounded bg-accent text-paper hover:bg-accent-hover disabled:opacity-50"
-            >
-              <SaveIcon className="h-5 w-5" />
-            </button>
-            {mode === "edit" && canDelete ? (
-              form.status === "archived" ? (
-                <button
-                  type="button"
-                  onClick={handlePermanentDelete}
-                  disabled={pending}
-                  title="حذف دائمی"
-                  aria-label="حذف دائمی"
-                  className="flex h-10 w-10 items-center justify-center rounded border border-rule text-ink hover:bg-surface disabled:opacity-50"
-                >
-                  <TrashIcon className="h-5 w-5" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleArchive}
-                  disabled={pending}
-                  title="ارسال به بایگانی"
-                  aria-label="ارسال به بایگانی"
-                  className="flex h-10 w-10 items-center justify-center rounded border border-rule text-ink hover:bg-surface disabled:opacity-50"
-                >
-                  <ArchiveIcon className="h-5 w-5" />
-                </button>
-              )
-            ) : null}
+                <SaveIcon className="h-5 w-5" />
+              </button>
+              {mode === "edit" && canDelete ? (
+                form.status === "archived" ? (
+                  <button
+                    type="button"
+                    onClick={handlePermanentDelete}
+                    disabled={pending}
+                    title="حذف دائمی"
+                    aria-label="حذف دائمی"
+                    className="flex h-10 w-10 items-center justify-center rounded border border-rule text-ink hover:bg-surface disabled:opacity-50"
+                  >
+                    <TrashIcon className="h-5 w-5" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleArchive}
+                    disabled={pending}
+                    title="ارسال به بایگانی"
+                    aria-label="ارسال به بایگانی"
+                    className="flex h-10 w-10 items-center justify-center rounded border border-rule text-ink hover:bg-surface disabled:opacity-50"
+                  >
+                    <ArchiveIcon className="h-5 w-5" />
+                  </button>
+                )
+              ) : null}
+            </div>
           </div>
         </div>
       </div>

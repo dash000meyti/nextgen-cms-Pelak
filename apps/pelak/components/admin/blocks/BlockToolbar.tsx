@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  DragHandleIcon,
-} from "./icons";
+import { ArrowDownIcon, ArrowUpIcon, DragHandleIcon } from "./icons";
 
 type BlockToolbarProps = {
   canMoveUp: boolean;
@@ -41,7 +37,7 @@ export function BlockToolbar({
         <button
           type="button"
           aria-label="جابه‌جایی این بلوک"
-          title="برای جابه‌جایی این بلوک بکشید"
+          title="برای جابه‌جایی این بلوک بکشید — فقط همین بلوک جابه‌جا می‌شود"
           className={`cursor-grab active:cursor-grabbing ${btnClass}`}
           {...dragHandleProps}
         >
@@ -59,6 +55,7 @@ export function BlockToolbar({
           <button
             type="button"
             aria-label="بالا"
+            title="جابه‌جایی این بلوک به بالا"
             onClick={onMoveUp}
             disabled={canMoveUp === false}
             className={btnClass}
@@ -69,6 +66,7 @@ export function BlockToolbar({
           <button
             type="button"
             aria-label="پایین"
+            title="جابه‌جایی این بلوک به پایین"
             onClick={onMoveDown}
             disabled={canMoveDown === false}
             className={btnClass}

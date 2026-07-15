@@ -84,13 +84,9 @@ export function validateArticleBlocks(
       if (!isImageMeta(block.image)) {
         return blockIssue(i, `${at}: تصویر نامعتبر است.`);
       }
-      const err = validateImageMeta(
-        block.image.src,
-        block.image.alt,
-        "تصویر بلوک",
-        { src: `body.${i}`, alt: `body.${i}` },
-      );
-      if (err) return blockIssue(i, `${at}: ${err.message}`);
+      if (!block.image.alt.trim()) {
+        return blockIssue(i, `${at}: متن جایگزین تصویر بلوک الزامی است.`);
+      }
     } else if (type === "video") {
       if (typeof block.src !== "string" || !block.src.trim()) {
         return blockIssue(i, `${at}: لینک ویدیو الزامی است.`);

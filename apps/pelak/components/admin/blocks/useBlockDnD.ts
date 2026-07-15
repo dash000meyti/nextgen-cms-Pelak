@@ -42,18 +42,12 @@ export function useBlockDnD({
     setDraggingKeys([]);
   }
 
-  function startSingleDrag(
-    key: string,
-    e: React.DragEvent<HTMLButtonElement>,
-  ) {
+  function startSingleDrag(key: string, e: React.DragEvent<HTMLButtonElement>) {
     setDraggingKeys([key]);
     setDragMime(e, key);
   }
 
-  function startGroupDrag(
-    key: string,
-    e: React.DragEvent<HTMLButtonElement>,
-  ) {
+  function startGroupDrag(key: string, e: React.DragEvent<HTMLButtonElement>) {
     if (!(selectedSet.has(key) && orderedSelected.length > 1)) {
       e.preventDefault();
       return;

@@ -384,6 +384,82 @@ export function ButtonIcon({ className }: IconProps): JSX.Element {
   );
 }
 
+export function FileImportIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+      <path d="M14 2v6h6" />
+      <path d="M12 18v-6" />
+      <path d="M9 15l3-3 3 3" />
+    </svg>
+  );
+}
+
+/** Import tab — HTML / Word paste. */
+export function HtmlWordImportIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <path d="M8 6 4 12l4 6" />
+      <path d="M16 6l4 6-4 6" />
+      <path d="M14 5l-4 14" />
+    </svg>
+  );
+}
+
+/** Import tab — Markdown paste. */
+export function MarkdownImportIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg viewBox="0 0 24 24" className={base(className)} aria-hidden="true">
+      <text
+        x="12"
+        y="16.5"
+        fontSize="13"
+        fontWeight="700"
+        fill="currentColor"
+        textAnchor="middle"
+        fontFamily="ui-sans-serif, system-ui, sans-serif"
+      >
+        #
+      </text>
+    </svg>
+  );
+}
+
+export function ChevronDownIcon({ className }: IconProps): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={base(className)}
+      aria-hidden="true"
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
 export function PlusIcon({ className }: IconProps): JSX.Element {
   return (
     <svg
@@ -470,21 +546,21 @@ export function DragHandleIcon({ className }: IconProps): JSX.Element {
   );
 }
 
-/** Select / group-drag handle — stacked layers, distinct from single DragHandleIcon. */
+/** Select / group handle — Mac ⌘ (multi-select: ⌘/Ctrl+click). */
 export function GroupSelectIcon({ className }: IconProps): JSX.Element {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={base(className)}
-      aria-hidden="true"
-    >
-      <path d="M8 7h11a1 1 0 0 1 1 1v7" />
-      <rect x="4" y="9" width="13" height="9" rx="1.5" />
+    <svg viewBox="0 0 24 24" className={base(className)} aria-hidden="true">
+      <text
+        x="12"
+        y="12.5"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fill="currentColor"
+        fontSize="17"
+        fontFamily="system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
+      >
+        ⌘
+      </text>
     </svg>
   );
 }

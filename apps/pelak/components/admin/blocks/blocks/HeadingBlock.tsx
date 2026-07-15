@@ -4,20 +4,17 @@ import type { HeadingLevel } from "@nextgen-cms/contract/types/article";
 import { HEADING_CLASS } from "@/components/article/blockStyles";
 import { BlockPlainTextarea } from "../BlockPlainTextarea";
 import type { BlockEditorProps, BlockSettingsProps } from "../blockTypes";
-import {
-  Heading2Icon,
-  Heading3Icon,
-  Heading4Icon,
-} from "../icons";
+import { Heading2Icon, Heading3Icon, Heading4Icon } from "../icons";
 
 const LEVELS: Array<{
   level: HeadingLevel;
   label: string;
+  title: string;
   Icon: typeof Heading2Icon;
 }> = [
-  { level: 2, label: "H2", Icon: Heading2Icon },
-  { level: 3, label: "H3", Icon: Heading3Icon },
-  { level: 4, label: "H4", Icon: Heading4Icon },
+  { level: 2, label: "H2", title: "عنوان (سطح ۲)", Icon: Heading2Icon },
+  { level: 3, label: "H3", title: "زیرعنوان (سطح ۳)", Icon: Heading3Icon },
+  { level: 4, label: "H4", title: "ریزعنوان (سطح ۴)", Icon: Heading4Icon },
 ];
 
 function iconBtnClass(active: boolean): string {
@@ -34,7 +31,7 @@ export function HeadingSettings({ block, onChange }: BlockSettingsProps) {
   return (
     <fieldset className="flex flex-col gap-1" aria-label="سطح عنوان">
       <legend className="sr-only">سطح عنوان</legend>
-      {LEVELS.map(({ level, label, Icon }) => {
+      {LEVELS.map(({ level, label, title, Icon }) => {
         const active = block.level === level;
         return (
           <button
@@ -43,7 +40,7 @@ export function HeadingSettings({ block, onChange }: BlockSettingsProps) {
             onClick={() => onChange({ ...block, level })}
             aria-label={label}
             aria-pressed={active}
-            title={label}
+            title={title}
             className={iconBtnClass(active)}
           >
             <Icon className="h-3.5 w-3.5" />

@@ -192,136 +192,169 @@ export type InsertableEntry = {
   payload: ArticleBlock;
 };
 
+export type InsertablePaletteRow = {
+  main: InsertableEntry;
+  secondary: [InsertableEntry, InsertableEntry];
+};
+
 /**
- * Explicit 5×3 insert palette order (rows of three):
- * headings · text · lists · media · buttons
+ * Five palette rows: one primary insert + two related variants.
+ * Primary is the most common choice per family (large button in UI).
  */
-export function listInsertableBlocks(): InsertableEntry[] {
+export function listInsertablePaletteRows(): InsertablePaletteRow[] {
   return [
     {
-      type: "heading",
-      label: "عنوان",
-      group: "text",
-      Icon: Heading2Icon,
-      payload: { type: "heading", level: 2, content: "" },
+      main: {
+        type: "heading",
+        label: "عنوان",
+        group: "text",
+        Icon: Heading2Icon,
+        payload: { type: "heading", level: 2, content: "" },
+      },
+      secondary: [
+        {
+          type: "heading",
+          label: "زیرعنوان",
+          group: "text",
+          Icon: Heading3Icon,
+          payload: { type: "heading", level: 3, content: "" },
+        },
+        {
+          type: "heading",
+          label: "ریزعنوان",
+          group: "text",
+          Icon: Heading4Icon,
+          payload: { type: "heading", level: 4, content: "" },
+        },
+      ],
     },
     {
-      type: "heading",
-      label: "زیرعنوان",
-      group: "text",
-      Icon: Heading3Icon,
-      payload: { type: "heading", level: 3, content: "" },
+      main: {
+        type: "paragraph",
+        label: "پاراگراف",
+        group: "text",
+        Icon: ParagraphIcon,
+        payload: { type: "paragraph", content: "" },
+      },
+      secondary: [
+        {
+          type: "quote",
+          label: "نقل‌قول",
+          group: "text",
+          Icon: QuoteIcon,
+          payload: { type: "quote", content: "", attribution: "" },
+        },
+        {
+          type: "question",
+          label: "پرسش",
+          group: "text",
+          Icon: QuestionIcon,
+          payload: { type: "question", content: "", answer: "" },
+        },
+      ],
     },
     {
-      type: "heading",
-      label: "ریزعنوان",
-      group: "text",
-      Icon: Heading4Icon,
-      payload: { type: "heading", level: 4, content: "" },
+      main: {
+        type: "list",
+        label: "لیست نقطه‌ای",
+        group: "text",
+        Icon: ListBulletIcon,
+        payload: { type: "list", variant: "bullet", items: [""] },
+      },
+      secondary: [
+        {
+          type: "list",
+          label: "لیست شماره‌دار",
+          group: "text",
+          Icon: ListOrderedIcon,
+          payload: { type: "list", variant: "ordered", items: [""] },
+        },
+        {
+          type: "list",
+          label: "لیست خط‌تیره",
+          group: "text",
+          Icon: ListDashIcon,
+          payload: { type: "list", variant: "dash", items: [""] },
+        },
+      ],
     },
     {
-      type: "paragraph",
-      label: "پاراگراف",
-      group: "text",
-      Icon: ParagraphIcon,
-      payload: { type: "paragraph", content: "" },
-    },
-    {
-      type: "quote",
-      label: "نقل‌قول",
-      group: "text",
-      Icon: QuoteIcon,
-      payload: { type: "quote", content: "", attribution: "" },
-    },
-    {
-      type: "question",
-      label: "پرسش",
-      group: "text",
-      Icon: QuestionIcon,
-      payload: { type: "question", content: "", answer: "" },
-    },
-    {
-      type: "list",
-      label: "لیست شماره‌دار",
-      group: "text",
-      Icon: ListOrderedIcon,
-      payload: { type: "list", variant: "ordered", items: [""] },
-    },
-    {
-      type: "list",
-      label: "لیست نقطه‌ای",
-      group: "text",
-      Icon: ListBulletIcon,
-      payload: { type: "list", variant: "bullet", items: [""] },
-    },
-    {
-      type: "list",
-      label: "لیست خط‌تیره",
-      group: "text",
-      Icon: ListDashIcon,
-      payload: { type: "list", variant: "dash", items: [""] },
-    },
-    {
-      type: "image",
-      label: "تصویر",
-      group: "media",
-      Icon: ImageIcon,
-      payload: {
+      main: {
         type: "image",
-        image: { src: "", alt: "", caption: "", credit: "" },
+        label: "تصویر",
+        group: "media",
+        Icon: ImageIcon,
+        payload: {
+          type: "image",
+          image: { src: "", alt: "", caption: "", credit: "" },
+        },
       },
+      secondary: [
+        {
+          type: "video",
+          label: "آپارات",
+          group: "media",
+          Icon: VideoIcon,
+          payload: { type: "video", src: "", caption: "" },
+        },
+        {
+          type: "table",
+          label: "جدول",
+          group: "media",
+          Icon: TableIcon,
+          payload: { type: "table", headers: ["", ""], rows: [["", ""]] },
+        },
+      ],
     },
     {
-      type: "video",
-      label: "آپارات",
-      group: "media",
-      Icon: VideoIcon,
-      payload: { type: "video", src: "", caption: "" },
-    },
-    {
-      type: "table",
-      label: "جدول",
-      group: "media",
-      Icon: TableIcon,
-      payload: { type: "table", headers: ["", ""], rows: [["", ""]] },
-    },
-    {
-      type: "button",
-      label: "دکمه پررنگ",
-      group: "interactive",
-      Icon: ButtonPrimaryIcon,
-      payload: {
+      main: {
         type: "button",
-        label: "",
-        href: "",
-        variant: "primary",
+        label: "دکمه حاشیه‌دار",
+        group: "interactive",
+        Icon: ButtonOutlineIcon,
+        payload: {
+          type: "button",
+          label: "",
+          href: "",
+          variant: "outline",
+        },
       },
-    },
-    {
-      type: "button",
-      label: "دکمه حاشیه‌دار",
-      group: "interactive",
-      Icon: ButtonOutlineIcon,
-      payload: {
-        type: "button",
-        label: "",
-        href: "",
-        variant: "outline",
-      },
-    },
-    {
-      type: "button",
-      label: "دکمه ثانویه",
-      group: "interactive",
-      Icon: ButtonSecondaryIcon,
-      payload: {
-        type: "button",
-        label: "",
-        href: "",
-        variant: "secondary",
-      },
+      secondary: [
+        {
+          type: "button",
+          label: "دکمه پررنگ",
+          group: "interactive",
+          Icon: ButtonPrimaryIcon,
+          payload: {
+            type: "button",
+            label: "",
+            href: "",
+            variant: "primary",
+          },
+        },
+        {
+          type: "button",
+          label: "دکمه ثانویه",
+          group: "interactive",
+          Icon: ButtonSecondaryIcon,
+          payload: {
+            type: "button",
+            label: "",
+            href: "",
+            variant: "secondary",
+          },
+        },
+      ],
     },
   ];
+}
+
+/** Flat list (main then secondary×2 per row) — same order as palette rows. */
+export function listInsertableBlocks(): InsertableEntry[] {
+  return listInsertablePaletteRows().flatMap((row) => [
+    row.main,
+    ...row.secondary,
+  ]);
 }
 
 /**

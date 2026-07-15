@@ -5,7 +5,11 @@ import type { MediaUploadContext } from "@nextgen-cms/contract/types/media";
 import { useEffect, useRef, useState } from "react";
 import { BlockSelectHandle } from "./BlockSelectHandle";
 import { BlockToolbar } from "./BlockToolbar";
-import { getBlockMeta, resolveBlockChromeIcon, resolveBlockChromeLabel } from "./blockRegistry";
+import {
+  getBlockMeta,
+  resolveBlockChromeIcon,
+  resolveBlockChromeLabel,
+} from "./blockRegistry";
 import type { EditorBlock } from "./blockTypes";
 import { TrashIcon } from "./icons";
 
@@ -113,9 +117,7 @@ export function BlockWrapper({
 
   const selectChromeClass = [
     "shrink-0",
-    isSelected
-      ? "pointer-events-auto opacity-100"
-      : selectChromeVisible,
+    isSelected ? "pointer-events-auto opacity-100" : selectChromeVisible,
   ].join(" ");
 
   return (
@@ -166,7 +168,11 @@ export function BlockWrapper({
                   <button
                     type="button"
                     aria-label={deleteArmed ? "تأیید حذف" : "حذف بلوک"}
-                    title={deleteArmed ? "بار دیگر برای حذف" : "حذف"}
+                    title={
+                      deleteArmed
+                        ? "تأیید حذف — کلیک دوباره برای حذف نهایی"
+                        : "حذف بلوک — برای تأیید دوباره کلیک کنید"
+                    }
                     onClick={handleDeleteClick}
                     onBlur={disarmDelete}
                     aria-pressed={deleteArmed}

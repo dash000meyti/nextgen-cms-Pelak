@@ -163,7 +163,7 @@ packages/core/src/db/repositories/ — نوشتن DB
   - فاصلهٔ عمودی `space-y-4`؛ گرید عنوان|نامک، تاریخ+زمان‌مطالعه+پرچم‌ها، زیرعنوان|چکیده
   - تصویر شاخص با `ImageField` دوستونه (`twoColumn`)
   - اعضا / موضوعات / گروه محتوا با `ReferencePicker` (سلکت جست‌وجودار + چیپ انتخاب؛ لیست اسکرول دائمی ندارد)
-  - بدنه محتوا: `BlockEditor` — ستون استیکی palette آیکونی ۵×۳ کنار بدنه؛ چندانتخاب با Select handle قرمز (⌘/Ctrl و Shift) + درگ تکی از Toolbar و درگ گروهی از Select handle — `docs/BLOCK-EDITOR.md`
+  - بدنه محتوا: `BlockEditor` — ستون استیکی palette (۵ ردیف: اصلی بزرگ + ۲ واریانت کوچک) کنار بدنه؛ چندانتخاب با Select handle قرمز (⌘/Ctrl و Shift) + درگ تکی از Toolbar و درگ گروهی از Select handle — `docs/BLOCK-EDITOR.md`
   - تاریخ انتشار قابل تنظیم دستی برای مقالات قدیمی (فهرست گروه محتوا بر اساس `publishedAt DESC`)
 - `ReferencePicker` در `apps/pelak/components/admin/fields/ReferencePicker.tsx` — props پایدار؛ مصرف در فرم محتوا، ویدیو، گروه محتوا
 - «ارسال به بایگانی» → `archived` و redirect به لیست بایگانی همان بخش (`?status=archived`)

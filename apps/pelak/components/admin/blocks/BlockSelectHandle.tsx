@@ -22,6 +22,23 @@ const idleClass =
 const selectedClass =
   "rounded p-1 bg-accent-soft text-accent hover:bg-accent-soft";
 
+const SELECT_TOOLTIP = [
+  "انتخاب بلوک",
+  "کلیک: فقط این بلوک — کلیک دوباره روی همان: لغو انتخاب",
+  "⌘/Ctrl+کلیک: افزودن یا حذف از انتخاب",
+  "Shift+کلیک: انتخاب بازه از لنگر تا این بلوک",
+  "Escape: پاک کردن همهٔ انتخاب‌ها",
+].join("\n");
+
+const GROUP_DRAG_TOOLTIP = [
+  "انتخاب / جابه‌جایی گروهی",
+  "بکشید: جابه‌جایی همهٔ بلوک‌های انتخاب‌شده",
+  "⌘/Ctrl+کلیک: چندتایی",
+  "Shift+کلیک: بازه",
+  "Escape: لغو انتخاب",
+  "▲/▼: جابه‌جایی گروه به بالا/پایین",
+].join("\n");
+
 /**
  * Chrome column for selection + group drag / group nudge —
  * same overlay pattern as BlockToolbar; arrows live inside this column.
@@ -40,9 +57,7 @@ export function BlockSelectHandle({
 }: BlockSelectHandleProps) {
   const draggedRef = useRef(false);
 
-  const title = groupDragEnabled
-    ? "برای جابه‌جایی گروهی بکشید — ⌘/Ctrl برای چندتایی، Shift برای بازه"
-    : "انتخاب بلوک — ⌘/Ctrl برای چندتایی، Shift برای بازه";
+  const title = groupDragEnabled ? GROUP_DRAG_TOOLTIP : SELECT_TOOLTIP;
 
   const selectBtnClass = [
     isSelected ? selectedClass : idleClass,
